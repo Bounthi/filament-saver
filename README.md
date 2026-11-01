@@ -28,6 +28,12 @@ Requires OrcaSlicer 2.5 or later (Python plugins). Tested on macOS with OrcaSlic
 python3 -m unittest discover -s tests
 ```
 
+## Releasing
+
+1. Bump the version in `plugin/filament_saver/filament_saver.py` (header and `VERSION`) and add the changes to `CHANGELOG.md`.
+2. Commit, push, and publish a GitHub release tagged `vX.Y.Z` with the changelog as notes and `filament_saver.py` attached.
+3. The [Publish to OrcaCloud](.github/workflows/publish-orcacloud.yml) workflow then checks that the tag matches the plugin version, runs the tests and uploads the plugin to Orca Cloud as `filament_saver_any.py`, with the release notes as the changelog.
+
 ## License
 
 [MIT](LICENSE) © 2026 bounthi
