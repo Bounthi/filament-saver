@@ -4,7 +4,7 @@
 
 A plugin for [OrcaSlicer](https://github.com/OrcaSlicer/OrcaSlicer) 2.5 that adds a **Filament Saver** tab. Tell it what you are printing, and it suggests process settings that use less filament, shows why, and applies only the ones you accept.
 
-- **Purpose and three sliders.** Pick what the part is for (decoration, functional, prototype, mechanical, container, miniature, large part) and set Strength, Finish and Reliability from 0 to 5. Walls, infill, shells, solid fill, brim, skirt, raft and supports follow them.
+- **Purpose and three sliders.** Pick what the part is for (decoration, functional, prototype, mechanical, container, miniature, large part) and set Strength, Finish and Reliability from 0 to 5. Walls, infill, shells, solid fill, skirt and the support interface follow them; brim and raft only go down when you say the part holds on the bed by itself, and supports are never reduced.
 - **Material aware.** Rules adapt to the filament (PLA, Silk PLA, PETG, ABS/ASA, TPU, Nylon, PC), detected from the profile or picked by hand.
 - **Only certain changes.** Every suggestion has a known effect, and Orca still decides where it applies. The plugin never guesses what the part needs (such as whether it needs supports) and never changes the part itself. Things only you know, like hidden faces or printing as a vase, are optional questions.
 - **Apply, skip or undo.** One by one or all at once, with **Restore originals** for everything the plugin changed.

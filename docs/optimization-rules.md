@@ -104,37 +104,25 @@ Rationale:
 
 ## 5. Reliability slider (R)
 
-| R | `brim_type` | `skirt_loops` | `support_threshold_angle` | `support_base_pattern_spacing` (normal) | `support_remove_small_overhang` |
-|---|---|---|---|---|---|
-| 0 | `no_brim` | 0 | 20° | 3.5 mm | on |
-| 1 | `no_brim` | 1 | 25° | 3.0 mm | on |
-| 2 | `auto_brim` | 1 | 30° | 2.5 mm | on |
-| 3 | `auto_brim` | 1 | 30° | 2.5 mm | on |
-| 4 | `brim_ears` | 1 | 35° | 2.0 mm | on |
-| 5 | `outer_only` | 2 | 40° | 2.0 mm | (unchanged) |
+| R | `brim_type` (ceiling, only with Q18) | `skirt_loops` (ceiling) | `only_one_wall_first_layer` |
+|---|---|---|---|
+| 0 | `no_brim` | 0 | on |
+| 1 | `no_brim` | 1 | on |
+| 2 | `auto_brim` | 1 | off |
+| 3 | `auto_brim` | 1 | off |
+| 4 | `brim_ears` | 1 | off |
+| 5 | `outer_only` | 2 | off |
 
-**Brim and skirt only go down.** For materials that do not warp, the brim column is only applied when it uses less than the current brim (`no_brim` < `auto_brim` < `brim_ears` < `outer_only`): Orca's auto brim already decides where a part needs one. The skirt column is likewise a ceiling, since the start G-code primes the nozzle. Materials that warp (ABS/ASA, PA, PC) get their brim from section 7.
+**Nothing that holds the print up is reduced on a guess.**
 
-`only_one_wall_first_layer` is on at R ≤ 1 (one wall on the first layer, slightly weaker base outline) and off from R = 2.
+- **Brim and raft** only go down when the user says the part holds on the bed by itself (question Q18, section 6), and never for materials that warp (ABS/ASA, PA, PC), which get their brim from section 7. With the answer, the brim column is applied when it uses less than the current brim (`no_brim` < `auto_brim` < `brim_ears` < `outer_only` < `outer_and_inner`), and the raft is removed at R ≤ 4. Painted, inner-only and leading-edge brims are never replaced.
+- **Supports are never reduced, at any R**: the threshold angle, ignoring small overhangs, the support style, the base pattern and its spacing, and the tree support walls stay as the user set them. Whether an overhang needs that support depends on the part, which the plugin does not guess. Only the support **interface** follows the Finish slider (section 4), since it sets how the supported surface looks, plus the PETG minimums (section 7).
+- **Skirt** only goes down (the start G-code primes the nozzle); `skirt_height` goes to 1 when there is a skirt and `draft_shield` is `disabled`.
+- **Prime tower brim** (`prime_tower_brim_width`): lowered to Orca's default of 3 mm at R ≤ 3 when wider; kept from R = 4. Only with more than one filament and the prime tower on; `-1` (auto) is left alone.
 
-Support settings are only suggested when supports are enabled. `support_base_pattern_spacing` applies to normal supports (Orca's default is 2.5 mm). `support_style` is only changed when the new style uses less material, as Orca describes them: tree `tree_strong`/`tree_hybrid` → `organic` at R ≤ 3 (Orca's `default` tree style is already organic), and normal `default`/`grid` → `snug` at R ≤ 1 (less stable). Brim ears (`brim_ears`) put brim only on sharp corners, which is where parts lift.
+**Certainty rule.** The plugin only suggests changes whose effect is known: they use less filament with a known cost, and Orca still decides where they apply. It never guesses whether the part needs something (supports, brim, raft).
 
-**Certainty rule.** The plugin only suggests changes whose effect is known: they use less filament (or time) with a known cost, and Orca still decides where they apply. It never guesses whether the part needs something. For that reason `support_on_build_plate_only` was removed: it left overhangs above the part unsupported without knowing whether they needed support. Disabling supports from mesh analysis is out for the same reason.
-
-`support_threshold_angle` measures the overhang slope **from the horizontal**: Orca generates support when the slope is below the threshold. Lower value = less support. Orca's default is 30°. To convert an angle measured "from the vertical" (as in question Q13): `threshold = 90 − angle`.
-
-More settings that follow R and never use more filament than the current value:
-
-| Setting | Rule |
-|---|---|
-| `prime_tower_brim_width` | At most 0 mm at R = 0, 1 mm at R = 1, 2 mm at R = 2–3; kept from R = 4. Only with more than one filament and the prime tower on; `-1` (auto) is left alone |
-| `raft_layers` | 0 at R ≤ 4. A raft prints several layers under the whole part; at R = 5 the current raft is kept, and it is never removed for materials that warp (ABS/ASA, PA, PC) |
-| `skirt_height` | 1 when there is a skirt and `draft_shield` is `disabled` (more skirt layers only make sense as a draft shield) |
-| `support_base_pattern` (normal supports) | `lightning` at R ≤ 1, the lightest support body, less stable |
-| `support_base_pattern` (tree supports) | `hollow` at R ≤ 3 when another pattern is set. Orca's `default` for tree supports is already hollow, so it is left alone |
-| `tree_support_wall_count` | 2 → 1 at R ≤ 3 (0 means auto and is left alone) |
-
-Low R saves on brim and supports but raises the risk of failure. **A failed print wipes out all the savings.**
+Low R saves on the skirt and, with Q18, on brim and raft. **A failed print wipes out all the savings.**
 
 ---
 
@@ -164,6 +152,7 @@ Low R saves on brim and supports but raises the risk of failure. **A failed prin
 | Q15 | Material | — | **Not asked.** Read from the filament profile, see section 7 |
 | Q16 | Reliable printer | No | Effective R +1 |
 | Q17 | Multicolor | Purging into the infill is OK | `flush_into_infill = true`. **Implemented** |
+| Q18 | The part holds on the bed by itself | Yes (checkbox) | Brim and raft may go down with R (section 5); never for materials that warp. **Implemented** |
 | Q17b | Multicolor | Purging into the supports is OK | `flush_into_support = true`. **Implemented** |
 
 ### Implemented questions (plugin)

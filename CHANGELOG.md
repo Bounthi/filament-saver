@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.2 (2026-11-01)
+
+Nothing that holds the print up is reduced on a guess, and Undo or Restore never overwrite your own edits.
+
+- Brim and raft are no longer reduced unless you check the new question **The part holds on the bed by itself**, and never for materials that warp. Whether a part needs them depends on its geometry and the bed, which the plugin does not guess.
+- Supports are no longer reduced: the threshold angle, ignoring small overhangs, the support style, the base pattern and spacing, and the tree support walls stay as you set them, since whether an overhang needs that support depends on the part. Only the support interface still follows the Finish slider.
+- The prime tower brim is never lowered below Orca's default of 3 mm.
+- Undo and Restore originals now keep the values of each process preset apart: restoring in one preset no longer writes values that belonged to another.
+- **Apply all** and **Apply savings** no longer apply rows you skipped.
+- Undo and Restore originals leave a setting alone if you changed it by hand after the plugin applied it, instead of overwriting your edit with the older value.
+- A note says when an object has its own layer height, since top and bottom layer counts are worked out for the process layer height.
+- The estimate card shows a time difference under a minute in seconds (it showed "+0m"), and a difference too small to show reads as no change.
+
 ## 0.1.1 (2026-11-01)
 
 Safer suggestions: nothing the plugin suggests may make a print more likely to fail.

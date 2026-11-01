@@ -7,7 +7,7 @@
 # name = "Filament Saver"
 # description = "Suggests print settings that save filament for what you are printing, and applies the ones you accept."
 # author = "bounthi"
-# version = "0.1.1"
+# version = "0.1.2"
 # ///
 # Copyright (c) 2026 bounthi. MIT License, see LICENSE.
 # SPDX-License-Identifier: MIT
@@ -48,7 +48,7 @@ import urllib.request
 import orca
 
 
-VERSION = "0.1.1"  # keep in sync with the header above
+VERSION = "0.1.2"  # keep in sync with the header above
 BUNDLE_ID = "filament-saver"
 BUNDLE_NAME = "Filament Saver"
 PRESET_SUFFIX = " - Filament Saver"
@@ -128,15 +128,16 @@ FINISH = [
     (1, "0", 3),
 ]
 
-# Reliability (R): brim type, brim width (mm), skirt loops, support threshold angle,
-# normal support base spacing (mm). Brim and skirt only ever go down for materials that do not warp.
+# Reliability (R): brim type and skirt loops, both ceilings (they only ever go down). The brim
+# column only applies when the user says the part holds on the bed by itself (QUESTIONS), and
+# never to materials that warp. Supports are not reduced at any R (see suggest()).
 RELIABILITY = [
-    ("no_brim", None, 0, 20, 3.5),
-    ("no_brim", None, 1, 25, 3.0),
-    ("auto_brim", None, 1, 30, 2.5),
-    ("auto_brim", None, 1, 30, 2.5),
-    ("brim_ears", 5, 1, 35, 2.0),
-    ("outer_only", 5, 2, 40, 2.0),
+    ("no_brim", 0),
+    ("no_brim", 1),
+    ("auto_brim", 1),
+    ("auto_brim", 1),
+    ("brim_ears", 1),
+    ("outer_only", 2),
 ]
 BRIM_TEXT = {"no_brim": "no brim", "auto_brim": "brim only where Orca thinks it is needed",
              "brim_ears": "brim ears on sharp corners only", "outer_only": "full outer brim"}
@@ -176,7 +177,7 @@ GAP_FILL_ORDER = ["nowhere", "topbottom", "everywhere"]
 # Reliability (R): a single wall on the first layer.
 RELIABILITY_FIRST_LAYER = ["1", "1", "0", "0", "0", "0"]
 # Reliability (R): largest prime tower brim (mm); None keeps the current one. "-1" (auto) is left alone.
-RELIABILITY_TOWER_BRIM = [0, 1, 2, 2, None, None]
+RELIABILITY_TOWER_BRIM = [3, 3, 3, 3, None, None]  # Orca's default is 3 mm
 # Finish (V): minimum spacing (mm) between top support interface lines; None keeps the current one.
 FINISH_INTERFACE_SPACING = [0.8, 0.6, None, None, None, None]
 
@@ -260,7 +261,7 @@ HIGHER_SAVES = {"support_top_z_distance", "support_base_pattern_spacing", "suppo
 # Extra process keys the engine reads but never changes.
 CONTEXT_KEYS = ["support_type", "layer_height", "enable_prime_tower", "draft_shield"]
 # Questions only the user can answer (section 6). Unchecked means "not sure": nothing changes.
-QUESTIONS = ("top_hidden", "vase", "purge_infill", "purge_support")
+QUESTIONS = ("top_hidden", "vase", "holds_on_bed", "purge_infill", "purge_support")
 # Shell thickness reasons, one per side so each reads naturally once translated.
 SHELL_THICKNESS_TOP = ("%g mm forces %d top layers at %g mm layer height, overriding the %d layers above. "
                        "%g mm keeps %d layers.")
@@ -364,6 +365,7 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
         {family} | {material_family(t_, n_) for t_, n_ in other_filaments} - {"support"}
     targets, reasons, effects, groups = {}, {}, {}, {}
     notes = []
+    answers = answers or {}
 
     def put(key, value, why):
         targets[key] = str(value)
@@ -404,14 +406,16 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
         t("Finish %d/5: %s.") % (finish, t("one wall on flat tops saves filament" if one_wall == "1" else "full walls on top for a cleaner surface")))
 
     # Reliability (R).
-    brim, brim_width, skirt, threshold, base_spacing = RELIABILITY[eff_r]
+    brim, skirt = RELIABILITY[eff_r]
     r_text = t("Reliability %d/5") % eff_r + (t(" (raised for %s)") % t(FAMILY_LABELS[raised_by]) if eff_r != reliability else "")
     warping = families & {"abs_asa", "pa", "pc"}
-    # Brim and skirt only go down here: Orca's auto brim already decides where a part needs one,
-    # and the start G-code primes the nozzle. Materials that warp get their brim in section 7.
+    # Brim and raft hold the part on the bed: they only go down when the user says the part holds
+    # by itself, and never for materials that warp (section 7). Skirt only goes down: the start
+    # G-code primes the nozzle.
+    holds = answers.get("holds_on_bed") and not warping
     current_brim = current.get("brim_type")
-    if not warping and current_brim in BRIM_ORDER and BRIM_ORDER.index(brim) < BRIM_ORDER.index(current_brim):
-        put("brim_type", brim, t("%s: %s.") % (r_text, t(BRIM_TEXT[brim])))
+    if holds and current_brim in BRIM_ORDER and BRIM_ORDER.index(brim) < BRIM_ORDER.index(current_brim):
+        put("brim_type", brim, t("You said the part holds on the bed by itself. %s: %s.") % (r_text, t(BRIM_TEXT[brim])))
     current_skirt = _number(current.get("skirt_loops"))
     if current_skirt is not None and skirt < current_skirt:
         put("skirt_loops", skirt, t("%s: %d skirt loop(s).") % (r_text, skirt))
@@ -428,40 +432,16 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
             and current_tower_brim is not None and current_tower_brim > tower_brim:
         put("prime_tower_brim_width", tower_brim,
             t("%s: %d mm brim around the prime tower; a wider one only matters for tall, narrow towers.") % (r_text, tower_brim))
-    # Materials that warp may use the raft to stay flat, so it is kept for them.
-    if (_number(current.get("raft_layers")) or 0) > 0 and eff_r <= 4 and not warping:
-        put("raft_layers", 0, t("%s: no raft, which prints several layers under the whole part.") % r_text)
+    if holds and (_number(current.get("raft_layers")) or 0) > 0 and eff_r <= 4:
+        put("raft_layers", 0, t("You said the part holds on the bed by itself. %s: no raft, which prints several layers under the whole part.") % r_text)
 
     supports_on = current.get("enable_support") == "1"
     if supports_on:
-        tree = str(current.get("support_type", "")).startswith("tree")
-        put("support_threshold_angle", threshold,
-            t("%s: support under overhangs flatter than %d° from the horizontal.") % (r_text, threshold))
+        # Where supports go and how they are built (threshold, small overhangs, style, base pattern
+        # and spacing, tree walls) is never reduced: whether an overhang needs that support depends
+        # on the part, which the plugin does not guess. Only the interface, which sets how the
+        # supported surface looks, follows the Finish slider.
         put("support_interface_top_layers", interface, t("Finish %d/5: %d support interface layers.") % (finish, interface))
-        if eff_r <= 4:
-            put("support_remove_small_overhang", "1", t("%s: small overhangs that print fine on their own get no support.") % r_text)
-        base_pattern = current.get("support_base_pattern")
-        style = current.get("support_style")
-        if tree:
-            # Orca's "default" tree style is organic, which merges branches to save material;
-            # strong and hybrid trees use more.
-            if style in ("tree_strong", "tree_hybrid") and eff_r <= 3:
-                put("support_style", "organic", t("%s: organic tree supports, which merge branches to save material.") % r_text)
-                effects["support_style"] = "saves"
-            # For tree supports Orca's "default" base pattern is already hollow.
-            if base_pattern not in (None, "default", "hollow") and eff_r <= 3:
-                put("support_base_pattern", "hollow", t("%s: hollow tree supports, with no pattern inside the branches.") % r_text)
-            if _number(current.get("tree_support_wall_count")) == 2 and eff_r <= 3:
-                put("tree_support_wall_count", 1, t("%s: one wall around tree supports instead of two.") % r_text)
-        else:
-            put("support_base_pattern_spacing", "%g" % base_spacing,
-                t("%s: %g mm between support lines (Orca's default is 2.5 mm).") % (r_text, base_spacing))
-            if style in ("default", "grid") and eff_r <= 1:
-                put("support_style", "snug", t("%s: snug supports, which use less material than a grid but are less stable.") % r_text)
-                effects["support_style"] = "saves"
-            if base_pattern not in (None, "lightning") and eff_r <= 1:
-                put("support_base_pattern", "lightning",
-                    t("%s: lightning support body, the lightest one; supports are less stable.") % r_text)
         bottom_interface = current.get("support_interface_bottom_layers")
         if bottom_interface not in (None, "0") and finish <= 3:
             put("support_interface_bottom_layers", 0, t("Finish %d/5: no interface where supports rest on the part.") % finish)
@@ -598,7 +578,6 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
         minimums["support_interface_top_layers"] = ("2", t("PETG sticks to supports: at least 2 interface layers."))
 
     # Answers the user confirmed (section 6). Nothing here is inferred from the model.
-    answers = answers or {}
     if filaments > 1 and (answers.get("purge_infill") or answers.get("purge_support")):
         if current.get("enable_prime_tower") == "0":
             notes.append(t("Orca only purges into infill or supports when the prime tower is on, so the purge answers changed nothing."))
@@ -1052,7 +1031,7 @@ def _object_overrides():
             keys = set(_call(obj, "config_keys") or [])
             for volume in obj.volumes():
                 keys |= set(_call(volume, "config_keys") or [])
-            for key in keys & set(LABELS):
+            for key in keys & (set(LABELS) | {"layer_height"}):
                 found.setdefault(key, []).append(str(getattr(obj, "name", "") or "?"))
     except Exception:
         traceback.print_exc()
@@ -1094,26 +1073,35 @@ def _remember_form(fingerprint, form):
 
 
 def _read_originals():
-    """Values to restore, kept across Orca and plugin reloads."""
+    """Values to restore, per process preset, kept across Orca and plugin reloads:
+    {"presets": {preset: {"originals": {key: value}, "applied": {key: value}}}, "bundle_values": {...}}."""
     try:
         with open(_storage_path(ORIGINALS_FILE), "r", encoding="utf-8") as stream:
             data = json.load(stream)
     except (FileNotFoundError, ValueError, OSError):
-        return {"source": None, "originals": {}, "bundle_values": {}, "applied": {}}
+        data = {}
     data = data if isinstance(data, dict) else {}
+
     # Only settings the plugin manages: whatever else is in the file (e.g. post_process, which
     # runs scripts after export) must never reach a preset through Restore.
-    pick = lambda name: {str(k): str(v) for k, v in (data.get(name) or {}).items() if k in LABELS} \
-        if isinstance(data.get(name), dict) else {}
-    source = data.get("source")
-    return {"source": source if isinstance(source, str) else None,
-            "originals": pick("originals"), "bundle_values": pick("bundle_values"), "applied": pick("applied")}
+    def pick(values):
+        return {str(k): str(v) for k, v in values.items() if k in LABELS} if isinstance(values, dict) else {}
+
+    presets = {}
+    for name, store in (data.get("presets") or {}).items() if isinstance(data.get("presets"), dict) else ():
+        if isinstance(name, str) and isinstance(store, dict) and pick(store.get("originals")):
+            presets[name] = {"originals": pick(store.get("originals")), "applied": pick(store.get("applied"))}
+    # Files written before per-preset storage kept one preset's values at the top level.
+    if isinstance(data.get("source"), str) and pick(data.get("originals")) and data["source"] not in presets:
+        presets[data["source"]] = {"originals": pick(data.get("originals")), "applied": pick(data.get("applied"))}
+    return {"presets": presets, "bundle_values": pick(data.get("bundle_values"))}
 
 
-def _write_originals(source, originals, bundle_values, applied=None):
-    _write_json_atomic(_storage_path(ORIGINALS_FILE), {
-        "source": source if originals else None, "originals": originals, "bundle_values": bundle_values,
-        "applied": {k: v for k, v in (applied or {}).items() if k in originals}})
+def _write_originals(presets, bundle_values):
+    kept = {name: {"originals": store["originals"],
+                   "applied": {k: v for k, v in store["applied"].items() if k in store["originals"]}}
+            for name, store in presets.items() if store["originals"]}
+    _write_json_atomic(_storage_path(ORIGINALS_FILE), {"presets": kept, "bundle_values": bundle_values})
 
 
 # --- translations --------------------------------------------------------------
@@ -1208,10 +1196,6 @@ TRANSLATIONS = {
         "gap fill only on top and bottom surfaces, not on internal solid infill":
             "preenchimento de vão só nas superfícies de topo e base, não no preenchimento sólido interno",
         "Strength %d/5 and finish %d/5: %s.": "Resistência %d/5 e acabamento %d/5: %s.",
-        "%s: organic tree supports, which merge branches to save material.":
-            "%s: suportes em árvore orgânicos, que juntam os galhos para economizar material.",
-        "%s: snug supports, which use less material than a grid but are less stable.":
-            "%s: suportes justos (snug), que usam menos material que a grade, mas são menos estáveis.",
         SHELL_THICKNESS_TOP_MIN:
             "%g mm forçam %d camadas de topo com altura de camada de %g mm, anulando as %d camadas acima. "
             "%g mm, o padrão do Orca, ainda mantém o topo grosso o bastante com camadas finas.",
@@ -1243,21 +1227,13 @@ TRANSLATIONS = {
         "%s: %s.": "%s: %s.",
         "%s: %d mm brim.": "%s: borda de %d mm.",
         "%s: %d skirt loop(s).": "%s: %d volta(s) de saia.",
-        "%s: support under overhangs flatter than %d° from the horizontal.":
-            "%s: suporte sob saliências com menos de %d° em relação à horizontal.",
-        "%s: small overhangs that print fine on their own get no support.":
-            "%s: pequenas saliências que imprimem bem sozinhas ficam sem suporte.",
-        "%s: %g mm between support lines (Orca's default is 2.5 mm).":
-            "%s: %g mm entre as linhas do suporte (o padrão do Orca é 2.5 mm).",
+        "You said the part holds on the bed by itself. %s: %s.": "Você disse que a peça fica firme na mesa sem ajuda. %s: %s.",
+        "You said the part holds on the bed by itself. %s: no raft, which prints several layers under the whole part.":
+            "Você disse que a peça fica firme na mesa sem ajuda. %s: sem jangada, que imprime várias camadas embaixo da peça inteira.",
+        "%s has its own layer height: top and bottom layer counts were worked out for the process layer height.":
+            "%s tem altura de camada própria: as camadas de topo e de base foram calculadas para a altura do perfil de processo.",
         "%s: one skirt layer is enough without a draft shield.":
             "%s: uma camada de saia basta sem a proteção contra correntes de ar.",
-        "%s: no raft, which prints several layers under the whole part.":
-            "%s: sem jangada, que imprime várias camadas embaixo da peça inteira.",
-        "%s: hollow tree supports, with no pattern inside the branches.":
-            "%s: suportes em árvore ocos, sem padrão dentro dos galhos.",
-        "%s: one wall around tree supports instead of two.": "%s: uma parede em volta dos suportes em árvore em vez de duas.",
-        "%s: lightning support body, the lightest one; supports are less stable.":
-            "%s: corpo do suporte em relâmpago, o mais leve; os suportes ficam menos estáveis.",
         "Finish %d/5: no interface where supports rest on the part.":
             "Acabamento %d/5: sem interface onde o suporte apoia na peça.",
         "Finish %d/5: %g mm between support interface lines; the underside of overhangs is rougher.":
@@ -1337,10 +1313,10 @@ TRANSLATIONS = {
             "Salvo no perfil de processo '%s'. Selecione-o na lista de processos e fatie de novo.",
         "Could not apply: %s": "Não foi possível aplicar: %s",
         "Applying %d change(s)…": "Aplicando %d mudança(s)…",
-        "These changes were made to '%s'. Select it again to restore them.":
-            "Estas mudanças foram feitas em '%s'. Selecione-o de novo para restaurá-las.",
         "Restored %d setting(s) to their values before the suggestions.":
             "%d configuração(ões) voltaram aos valores de antes das sugestões.",
+        "%d setting(s) were left as they are: they changed after Filament Saver applied them, or what it applied is not on record.":
+            "%d configuração(ões) ficaram como estão: mudaram depois que o Filament Saver as aplicou, ou o valor que ele aplicou não está registrado.",
         "Could not restore: %s": "Não foi possível restaurar: %s",
         "Restoring %d setting(s)…": "Restaurando %d configuração(ões)…",
         "Could not save the original values: %s": "Não foi possível salvar os valores originais: %s",
@@ -1388,6 +1364,9 @@ TRANSLATIONS = {
             "preenchimento, sem suporte.",
         "vase mode, applied together": "modo vaso, aplicado em conjunto",
         "Purge into the infill": "Purgar no preenchimento",
+        "The part holds on the bed by itself": "A peça fica firme na mesa sem ajuda",
+        "Wide, low base with no thin corners that lift, or you have printed this part without raft or brim and it stayed down.":
+            "Base larga e baixa, sem cantos finos que levantam, ou você já imprimiu esta peça sem raft nem brim e ela não soltou.",
         "The walls are opaque, so mixed colors inside the part will not show.":
             "As paredes são opacas, então as cores misturadas dentro da peça não aparecem.",
         "Purge into the supports": "Purgar nos suportes",
@@ -1628,11 +1607,13 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
         self.jobs = None
         self.worker = None
         self.pending_gcode = None
-        self.originals = {}          # key -> value before Filament Saver first changed it
+        # Per process preset: values before Filament Saver changed them, and the values it wrote.
+        self.stores = {}
+        self.originals = {}          # the store of originals_source: key -> value to go back to
         self.originals_source = None  # preset those values belong to
         self.bundle_values = {}      # settings managed in the local-bundle preset (fallback mode)
         self.loaded = False          # originals read from plugin storage
-        self.applied = {}
+        self.applied = {}            # the store of originals_source: key -> value the plugin wrote
         self.lang = "en"             # follows Orca's language, see _detect_language
         self.parts = None            # fingerprint of the parts last seen, see _sync_parts
         self.form_version = 0        # bumped when the form changes on this side, so the page reloads it
@@ -1789,6 +1770,9 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
         for change in result["changes"]:
             if overrides.get(change["key"]):
                 change["overridden_by"] = overrides[change["key"]]
+        if overrides.get("layer_height"):
+            result["notes"].append(self._t("%s has its own layer height: top and bottom layer counts were worked out "
+                                           "for the process layer height.") % ", ".join(overrides["layer_height"]))
         if any(change.get("overridden_by") for change in result["changes"]):
             result["notes"].append(self._t("Some objects set their own value for a suggested setting; "
                                            "changing the process preset does not reach them."))
@@ -1897,6 +1881,7 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
             return
 
         def done(target):
+            self._use_preset(self.source)
             for change in changes:
                 change["status"] = "applied"
                 change.pop("error", None)
@@ -1907,7 +1892,6 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
                 if key not in self.originals or self.applied.get(key) != change["current"]:
                     self.originals[key] = change["current"]
                 self.applied[key] = change["suggested"]
-            self.originals_source = self.source
             self._save_originals()
             self.message = (self._t("Applied %d change(s) to '%s'. Slice again to see the new estimate.") % (len(changes), target)
                             if self.mode() == "in_place" else
@@ -1926,29 +1910,52 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
         """Put the settings Filament Saver changed back to their values before the suggestions."""
         if self.busy:
             raise RuntimeError(self._t("Still applying the previous changes."))
+        # Each process preset has its own values to go back to: restore those of the one in use.
+        self._use_preset(self._selected_preset())
+        store = self.originals
         if keys is not None:
             keys = list(keys) + [c["key"] for c in self._changes(keys)]
-        keys = list(dict.fromkeys(k for k in (keys if keys is not None else list(self.originals)) if k in self.originals))
-        if not keys:
-            return
+        keys = list(dict.fromkeys(k for k in (keys if keys is not None else list(store)) if k in store))
+        # A setting edited by hand after the plugin changed it keeps the user's value: only settings
+        # that still hold what the plugin wrote are put back. Files from 0.1.0 did not record what
+        # the plugin wrote, so those settings cannot be checked and are left alone too.
+        edited = []
         if self.mode() == "in_place":
-            selected = orca.host.preset_bundle().prints.selected_preset().name
-            if selected != self.originals_source:
-                raise RuntimeError(self._t("These changes were made to '%s'. Select it again to restore them.") % self.originals_source)
-        pairs = [(key, self.originals[key]) for key in keys if key in LABELS]
+            try:
+                current = self._context()["current"]
+            except Exception:
+                traceback.print_exc()
+                current = None
+            if current is not None:
+                edited = [k for k in keys if k not in self.applied or not _same(current.get(k, ""), self.applied[k])]
+        if edited:
+            for key in edited:
+                store.pop(key, None)
+                self.applied.pop(key, None)
+                for change in (self.result or {}).get("changes", []):
+                    if change["key"] == key:
+                        change["current"] = current.get(key, "")
+                        change["status"] = "pending"
+            self._save_originals()
+            keys = [k for k in keys if k not in edited]
+            kept = self._t("%d setting(s) were left as they are: they changed after Filament Saver applied them, or what it applied is not on record.") % len(edited)
+            if not keys:
+                self.message = kept
+                return
+        pairs = [(key, store[key]) for key in keys if key in LABELS]
 
         def done(target):
             for key in keys:
-                original = self.originals.pop(key)
+                original = store.pop(key)
                 self.applied.pop(key, None)
                 for change in (self.result or {}).get("changes", []):
                     if change["key"] == key:
                         change["current"] = original
                         change["status"] = "pending"
-            if not self.originals:
-                self.originals_source = None
             self._save_originals()
             self.message = self._t("Restored %d setting(s) to their values before the suggestions.") % len(keys)
+            if edited:
+                self.message += " " + kept
 
         def failed(error):
             self.error = self._t("Could not restore: %s") % error
@@ -1959,15 +1966,28 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
         if self.loaded:
             return
         saved = _read_originals()
-        self.originals = saved["originals"]
-        self.originals_source = saved["source"]
+        self.stores = saved["presets"]
         self.bundle_values = saved["bundle_values"]
-        self.applied = saved["applied"]  # value the plugin last wrote for each setting
         self.loaded = True
+        self._use_preset(self.originals_source)
+
+    def _use_preset(self, name):
+        """Point originals/applied at the store of one process preset."""
+        store = self.stores.setdefault(name, {"originals": {}, "applied": {}}) if name else {"originals": {}, "applied": {}}
+        self.originals_source = name
+        self.originals = store["originals"]
+        self.applied = store["applied"]
+
+    def _selected_preset(self):
+        try:
+            return orca.host.preset_bundle().prints.selected_preset().name
+        except Exception:
+            traceback.print_exc()
+            return self.source
 
     def _save_originals(self):
         try:
-            _write_originals(self.originals_source, self.originals, self.bundle_values, self.applied)
+            _write_originals(self.stores, self.bundle_values)
         except Exception as error:
             traceback.print_exc()
             self.error = self._t("Could not save the original values: %s") % error
@@ -2136,6 +2156,9 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
                 self._detect_language()
                 self._sync_parts()
                 self.info = self._read_info()
+                # Show what can be restored in the process preset in use.
+                if self.info.get("process"):
+                    self._use_preset(self.info["process"])
             self.post_message(self._state())
         except Exception:
             traceback.print_exc()
@@ -2342,6 +2365,8 @@ const QUESTIONS = [
    hint: 'E.g. the back of a wall sign printed face down. Not for boxes, figures or parts with visible ledges.'},
   {id: 'vase', label: 'Print as a vase',
    hint: 'Open container (vase, cup, pot) printed as one continuous outer wall: no top, no infill, no supports.'},
+  {id: 'holds_on_bed', label: 'The part holds on the bed by itself',
+   hint: 'Wide, low base with no thin corners that lift, or you have printed this part without raft or brim and it stayed down.'},
   {id: 'purge_infill', label: 'Purge into the infill', multi: true,
    hint: 'The walls are opaque, so mixed colors inside the part will not show.'},
   {id: 'purge_support', label: 'Purge into the supports', multi: true, supports: true,
@@ -2353,6 +2378,7 @@ const send = msg => orca.postMessage(msg);
 
 function fmtTime(s) {
   if (s == null) return '—';
+  if (s < 60) return Math.round(s) + 's';  // a difference of under a minute is not "0m"
   const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
   return (d ? d + 'd ' : '') + (d || h ? h + 'h ' : '') + m + 'm';
 }
@@ -2376,7 +2402,8 @@ function delta(el, latest, previous, fmt) {
   el.textContent = ''; el.className = 'delta';
   if (latest == null || previous == null) return;
   const diff = latest - previous;
-  if (Math.abs(diff) < 1e-9) { el.textContent = T('no change'); return; }
+  // A difference too small to show (e.g. R$ 0,004) reads as no change, not as "+R$ 0,00".
+  if (Math.abs(diff) < 1e-9 || fmt(Math.abs(diff)) === fmt(0)) { el.textContent = T('no change'); return; }
   el.textContent = T('{diff} vs previous slice', {diff: (diff < 0 ? '−' : '+') + fmt(Math.abs(diff))});
   el.classList.add(diff < 0 ? 'saves' : 'costs');
 }
@@ -2474,10 +2501,11 @@ function renderForm() {
 function renderChanges() {
   const result = state.result, list = $('changes');
   $('notes').innerHTML = result ? result.notes.map(n => '<li>' + esc(n) + '</li>').join('') : '';
-  const pending = result ? result.changes.filter(c => c.status !== 'applied') : [];
   const blocked = state.busy || state.stale;
-  $('apply-all').disabled = blocked || !pending.length;
-  $('apply-savings').disabled = blocked || !pending.some(c => c.effect !== 'costs');
+  // Skipped rows stay out of both buttons until "Undo skip".
+  const toApply = result ? result.changes.filter(c => c.status === 'pending' || c.status === 'error') : [];
+  $('apply-all').disabled = blocked || !toApply.length;
+  $('apply-savings').disabled = blocked || !toApply.some(c => c.effect !== 'costs');
   $('skip-all').disabled = blocked || !result || !result.changes.some(c => c.status === 'pending');
   const restorable = state.restorable || [];
   $('restore-all').disabled = state.busy || !restorable.length;
@@ -2568,11 +2596,11 @@ $('questions').addEventListener('change', e => {
 for (const k of ['S', 'V', 'R']) $(k).addEventListener('input', e => { form[k] = Number(e.target.value); $(k + '-out').textContent = form[k]; });
 $('suggest').addEventListener('click', () => send(Object.assign({cmd: 'suggest'}, form)));
 $('apply-savings').addEventListener('click', () => {
-  const ids = state.result.changes.filter(c => c.status !== 'applied' && c.effect !== 'costs').map(c => c.id);
+  const ids = state.result.changes.filter(c => (c.status === 'pending' || c.status === 'error') && c.effect !== 'costs').map(c => c.id);
   if (ids.length) send({cmd: 'apply', ids});
 });
 $('apply-all').addEventListener('click', () => {
-  const ids = state.result.changes.filter(c => c.status !== 'applied').map(c => c.id);
+  const ids = state.result.changes.filter(c => c.status === 'pending' || c.status === 'error').map(c => c.id);
   if (ids.length) send({cmd: 'apply', ids});
 });
 $('skip-all').addEventListener('click', () => send({cmd: 'skip', ids: state.result.changes.filter(c => c.status === 'pending').map(c => c.id)}));

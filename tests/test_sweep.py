@@ -98,6 +98,28 @@ class SweepTest(unittest.TestCase):
             if final.get("top_surface_density") == "0%" and cur.get("top_surface_density") != "0%":
                 eff_top = max(int(final["top_shell_layers"]), math.ceil(float(final["top_shell_thickness"]) / lh - 1e-9))
                 if eff_top < 3: bad("hidden top with too few layers", (eff_top, info))
+            # Adhesion only goes down when the user says the part holds on the bed by itself.
+            if not answers["holds_on_bed"]:
+                order = fs.BRIM_ORDER
+                if cur["brim_type"] in order and final["brim_type"] in order and \
+                        order.index(final["brim_type"]) < order.index(cur["brim_type"]):
+                    bad("brim reduced without the answer", (cur["brim_type"], final["brim_type"], info))
+                if int(final["raft_layers"]) < int(cur["raft_layers"]): bad("raft removed without the answer", info)
+            # What holds a print up never goes below Orca's defaults.
+            if final["support_threshold_angle"] != cur["support_threshold_angle"] and int(final["support_threshold_angle"]) < 30:
+                bad("support threshold below 30", (cur["support_threshold_angle"], final["support_threshold_angle"], info))
+            if float(final["support_base_pattern_spacing"]) > max(2.5, float(cur["support_base_pattern_spacing"])):
+                bad("support lines sparser than 2.5 mm", info)
+            if final["prime_tower_brim_width"] != cur["prime_tower_brim_width"] and float(final["prime_tower_brim_width"]) < 3:
+                bad("tower brim below 3 mm", info)
+            # Where supports go and how they are built is never reduced (vase mode turns supports off).
+            for key in ("support_threshold_angle", "support_remove_small_overhang", "support_style",
+                        "support_base_pattern", "support_base_pattern_spacing", "tree_support_wall_count"):
+                if key in ch: bad("support changed " + key, (ch[key]["current"], ch[key]["suggested"], info))
+            if not vase and final["enable_support"] != cur["enable_support"]: bad("supports switched", info)
+            for key in ("support_style", "support_base_pattern", "tree_support_wall_count"):
+                if key in ch and ch[key]["suggested"] in ("snug", "lightning", "1", "tree_slim"):
+                    bad("less stable support " + key, (ch[key]["current"], ch[key]["suggested"], info))
             if fams & {"abs_asa", "pa", "pc"}:
                 order = fs.BRIM_ORDER
                 if cur["brim_type"] not in order and final["brim_type"] != cur["brim_type"]:

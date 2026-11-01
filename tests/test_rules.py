@@ -164,7 +164,7 @@ class MaterialFamilyTest(unittest.TestCase):
         self.assertEqual(fs.material_family("PLA", "Elegoo PLA Silk"), "silk")
 
     def _result(self, primary, others, r=2, override=None):
-        current = {**BASE, "enable_support": "1", "support_top_z_distance": "0.2", "support_threshold_angle": "45"}
+        current = {**BASE, "enable_support": "1", "support_top_z_distance": "0.2", "skirt_loops": "3"}
         return fs.suggest(current, "functional", 3, 2, r, primary, primary, family=override,
                           filaments=1 + len(others), other_filaments=[(kind, kind) for kind in others])
 
@@ -173,8 +173,8 @@ class MaterialFamilyTest(unittest.TestCase):
         targets = {c["key"]: c["suggested"] for c in result["changes"]}
         self.assertEqual((targets["brim_type"], targets["brim_width"]), ("outer_only", "8"))  # PC
         self.assertEqual(targets["support_top_z_distance"], "0.25")  # PETG
-        threshold = next(c for c in result["changes"] if c["key"] == "support_threshold_angle")
-        self.assertIn("Reliability 4/5 (raised for PC)", threshold["reason"])
+        skirt = next(c for c in result["changes"] if c["key"] == "skirt_loops")
+        self.assertIn("Reliability 4/5 (raised for PC)", skirt["reason"])
         self.assertEqual(result["families"], ["pc", "petg", "pla"])
         self.assertTrue(any("Several materials" in n for n in result["notes"]))
 
@@ -259,15 +259,26 @@ class QuestionsTest(unittest.TestCase):
 class SupportRaftSkirtTest(unittest.TestCase):
     """Raft, skirt height and support body follow the sliders, and only ever use less filament."""
 
-    def _targets(self, s=1, v=4, r=3, **overrides):
-        result = fs.suggest({**BASE, **EXTRA, **overrides}, "decoration", s, v, r, "PLA")
+    def _targets(self, s=1, v=4, r=3, holds=False, material="PLA", **overrides):
+        result = fs.suggest({**BASE, **EXTRA, **overrides}, "decoration", s, v, r, material,
+                            answers={"holds_on_bed": holds})
         return {c["key"]: (c["suggested"], c["effect"]) for c in result["changes"]}
 
     def test_brim_and_skirt_only_go_down(self):
         self.assertNotIn("skirt_loops", self._targets(r=4, skirt_loops="0"))
         self.assertEqual(self._targets(r=0, skirt_loops="3")["skirt_loops"], ("0", "saves"))
-        self.assertNotIn("brim_type", self._targets(r=5))  # Orca's auto brim stays for PLA
-        self.assertEqual(self._targets(r=0)["brim_type"], ("no_brim", "saves"))
+        self.assertNotIn("brim_type", self._targets(r=5, holds=True))  # Orca's auto brim stays for PLA
+
+    def test_brim_and_raft_only_go_down_when_the_part_holds_by_itself(self):
+        for r in (0, 2, 4):
+            unanswered = self._targets(r=r, brim_type="outer_only")
+            self.assertFalse({"brim_type", "raft_layers"} & set(unanswered), r)
+        answered = self._targets(r=0, holds=True, brim_type="outer_only")
+        self.assertEqual((answered["brim_type"], answered["raft_layers"]), (("no_brim", "saves"), ("0", "saves")))
+        self.assertEqual(self._targets(r=3, holds=True, brim_type="outer_only")["brim_type"], ("auto_brim", "saves"))
+        # Materials that warp keep raft and brim even then.
+        abs_targets = self._targets(r=3, holds=True, material="ABS", brim_type="outer_only")
+        self.assertFalse({"brim_type", "raft_layers"} & set(abs_targets))
 
     def test_raft_kept_for_materials_that_warp(self):
         result = fs.suggest({**BASE, **EXTRA}, "functional", 3, 2, 3, "PC")
@@ -278,40 +289,42 @@ class SupportRaftSkirtTest(unittest.TestCase):
         self.assertEqual(targets["top_shell_thickness"][0], "0.6")
         self.assertNotIn("top_shell_thickness", self._targets(v=0, layer_height="0.12", top_shell_thickness="0.6"))
 
-    def test_support_style_only_when_it_saves(self):
-        tree = dict(enable_support="1", support_type="tree(auto)")
-        self.assertNotIn("support_style", self._targets(r=3, support_style="default", **tree))
-        self.assertEqual(self._targets(r=3, support_style="tree_strong", **tree)["support_style"], ("organic", "saves"))
-        self.assertEqual(self._targets(r=0, enable_support="1", support_style="default")["support_style"], ("snug", "saves"))
-        self.assertNotIn("support_style", self._targets(r=3, enable_support="1", support_style="default"))
+    def test_supports_are_never_reduced(self):
+        """Where supports go and how they are built depends on the part: never reduced, at any R."""
+        support_keys = {"support_threshold_angle", "support_remove_small_overhang", "support_style",
+                        "support_base_pattern", "support_base_pattern_spacing", "tree_support_wall_count"}
+        strong = dict(enable_support="1", support_threshold_angle="45", support_remove_small_overhang="0",
+                      support_base_pattern="rectilinear", support_base_pattern_spacing="1.5", tree_support_wall_count="2")
+        for support_type, style in (("normal(auto)", "grid"), ("tree(auto)", "tree_strong"), ("normal(manual)", "default")):
+            for r in range(6):
+                targets = self._targets(v=0, r=r, support_type=support_type, support_style=style, **strong)
+                self.assertFalse(support_keys & set(targets), (support_type, r))
 
     def test_raft_off_below_top_reliability(self):
-        self.assertEqual(self._targets(r=4)["raft_layers"], ("0", "saves"))
-        self.assertNotIn("raft_layers", self._targets(r=5))
+        self.assertEqual(self._targets(r=4, holds=True)["raft_layers"], ("0", "saves"))
+        self.assertNotIn("raft_layers", self._targets(r=5, holds=True))
 
     def test_skirt_height_needs_draft_shield_off(self):
         self.assertEqual(self._targets(skirt_loops="1")["skirt_height"], ("1", "saves"))
         self.assertNotIn("skirt_height", self._targets(skirt_loops="1", draft_shield="enabled"))
         self.assertNotIn("skirt_height", self._targets(r=0))  # no skirt at all
 
-    def test_normal_support_body_and_interfaces(self):
+    def test_support_interfaces_follow_finish(self):
         low = self._targets(v=0, r=0, enable_support="1")
-        self.assertEqual(low["support_base_pattern"], ("lightning", "saves"))
+        self.assertEqual(low["support_interface_top_layers"], ("1", "saves"))
         self.assertEqual(low["support_interface_bottom_layers"], ("0", "saves"))
         self.assertEqual(low["support_interface_spacing"], ("0.8", "saves"))
         high = self._targets(v=5, r=5, enable_support="1")
-        for key in ("support_base_pattern", "support_interface_bottom_layers", "support_interface_spacing"):
+        for key in ("support_interface_bottom_layers", "support_interface_spacing"):
             self.assertNotIn(key, high)
 
     def test_wider_interface_spacing_is_kept(self):
         self.assertNotIn("support_interface_spacing", self._targets(v=0, enable_support="1", support_interface_spacing="1.2"))
 
-    def test_tree_support_body(self):
-        tree = self._targets(r=3, enable_support="1", support_type="tree(auto)")
-        self.assertEqual(tree["support_base_pattern"], ("hollow", "saves"))
-        self.assertEqual(tree["tree_support_wall_count"], ("1", "saves"))
-        self.assertNotIn("support_base_pattern", self._targets(r=3, enable_support="1", support_type="tree(auto)",
-                                                               support_base_pattern="default"))
+    def test_manual_supports_skip_threshold_rules(self):
+        targets = self._targets(r=0, enable_support="1", support_type="normal(manual)", support_threshold_angle="45",
+                                support_remove_small_overhang="0")
+        self.assertFalse({"support_threshold_angle", "support_remove_small_overhang"} & set(targets))
 
     def test_support_rules_need_supports_on(self):
         targets = self._targets(v=0, r=0)
@@ -421,11 +434,16 @@ class TranslationTest(unittest.TestCase):
 
 
 class OriginalsStorageTest(unittest.TestCase):
-    """Values to restore survive a reload of Orca or the plugin."""
+    """Values to restore are kept per process preset and survive a reload of Orca or the plugin."""
 
     def setUp(self):
         self.storage = tempfile.mkdtemp()
-        fs.orca.host = types.SimpleNamespace(plugin=types.SimpleNamespace(storage=lambda: self.storage))
+        self.selected = "A"
+        fs.orca.host = types.SimpleNamespace(
+            plugin=types.SimpleNamespace(storage=lambda: self.storage),
+            preset_bundle=lambda: types.SimpleNamespace(prints=types.SimpleNamespace(
+                selected_preset=lambda: types.SimpleNamespace(name=self.selected))))
+        self.written = []
 
     def tearDown(self):
         del fs.orca.host
@@ -433,62 +451,105 @@ class OriginalsStorageTest(unittest.TestCase):
 
     def _page(self):
         page = fs.FilamentSaverPage()
+        page.post_message = lambda message: None
+        page.mode = lambda: "in_place"
+
+        def write(pairs, done, failed, message):
+            self.written.append((self.selected, list(pairs)))
+            done(self.selected)
+        page._write = write
         page._load_originals()
         return page
 
+    def _apply(self, page, key, current, suggested):
+        page.source = self.selected
+        page.result = {"changes": [{"id": key, "key": key, "current": current, "suggested": suggested, "status": "pending"}]}
+        page._apply([key])
+
     def test_empty_without_file(self):
         page = self._page()
-        self.assertEqual((page.originals, page.originals_source, page.bundle_values), ({}, None, {}))
+        self.assertEqual((page.originals, page.stores, page.bundle_values), ({}, {}, {}))
 
     def test_round_trip(self):
         page = self._page()
-        page.originals = {"wall_loops": "3", "sparse_infill_density": "15%"}
-        page.originals_source = "0.20mm Standard @Elegoo CC"
-        page.bundle_values = {"wall_loops": "2"}
-        page._save_originals()
+        self._apply(page, "wall_loops", "3", "2")
         reloaded = self._page()
-        self.assertEqual(reloaded.originals, page.originals)
-        self.assertEqual(reloaded.originals_source, page.originals_source)
-        self.assertEqual(reloaded.bundle_values, page.bundle_values)
+        reloaded._use_preset("A")
+        self.assertEqual((reloaded.originals, reloaded.applied), ({"wall_loops": "3"}, {"wall_loops": "2"}))
 
-    def test_source_cleared_when_nothing_to_restore(self):
-        fs._write_originals("Some preset", {}, {})
-        self.assertIsNone(self._page().originals_source)
+    def test_presets_are_kept_apart(self):
+        page = self._page()
+        self._apply(page, "wall_loops", "3", "2")              # preset A
+        self.selected = "B"
+        self._apply(page, "sparse_infill_density", "15%", "8%")  # preset B
+        page._restore()                                          # B in use: only B's value goes back
+        self.assertEqual(self.written[-1], ("B", [("sparse_infill_density", "15%")]))
+        self.selected = "A"
+        page._restore()
+        self.assertEqual(self.written[-1], ("A", [("wall_loops", "3")]))
+        self.assertEqual(fs._read_originals()["presets"], {})
 
     def test_undo_respects_edits_made_after_the_plugin(self):
         """Undo goes back to the value before the plugin's change; if the user edited the setting
         after an earlier plugin change, their edit is that value."""
         page = self._page()
-        page.post_message = lambda message: None
-        page._write = lambda pairs, done, failed, message: done("P")
-        page.mode = lambda: "bundle"
-        page.source = "P"
-
-        def apply(current, suggested):
-            page.result = {"changes": [{"id": "sparse_infill_density", "key": "sparse_infill_density", "current": current,
-                                        "suggested": suggested, "status": "pending"}]}
-            page._apply(["sparse_infill_density"])
-
-        apply("15%", "10%")  # the plugin writes 10%
-        apply("10%", "5%")   # re-suggest on the plugin's own value: the original stays 15%
+        self._apply(page, "sparse_infill_density", "15%", "10%")  # the plugin writes 10%
+        self._apply(page, "sparse_infill_density", "10%", "5%")   # on its own value: the original stays 15%
         self.assertEqual(page.originals["sparse_infill_density"], "15%")
-        apply("12%", "5%")   # the user set 12% by hand in between
+        self._apply(page, "sparse_infill_density", "12%", "5%")   # the user set 12% by hand in between
         self.assertEqual(page.originals["sparse_infill_density"], "12%")
-        reloaded = self._page()  # survives a reload
+        reloaded = self._page()
+        reloaded._use_preset("A")
         self.assertEqual((reloaded.originals, reloaded.applied), ({"sparse_infill_density": "12%"}, {"sparse_infill_density": "5%"}))
+
+    def test_restore_keeps_edits_made_after_the_plugin(self):
+        """Restore only puts back settings that still hold the plugin's value: a hand edit made
+        after Apply is kept, never overwritten with the older value."""
+        page = self._page()
+        self._apply(page, "wall_loops", "3", "2")
+        self._apply(page, "sparse_infill_density", "15%", "10%")
+        page._context = lambda: {"current": {"wall_loops": "4", "sparse_infill_density": "10%"}}  # walls edited by hand
+        self.written.clear()
+        page._restore()
+        self.assertEqual(self.written, [("A", [("sparse_infill_density", "15%")])])
+        self.assertEqual((page.originals, page.applied), ({}, {}))
+        self.assertIn("1", page.message)
+        page._context = lambda: {"current": {}}
+        self._apply(page, "wall_loops", "4", "2")
+        page._context = lambda: {"current": {"wall_loops": "3"}}
+        self.written.clear()
+        page._restore(["wall_loops"])  # only an edited setting: nothing is written
+        self.assertEqual((self.written, page.originals), ([], {}))
+
+    def test_restore_leaves_settings_without_a_record_of_the_plugin_value(self):
+        """0.1.0 files kept only the originals: the setting may have been edited since, so it stays."""
+        with open(os.path.join(self.storage, fs.ORIGINALS_FILE), "w") as stream:
+            json.dump({"source": "A", "originals": {"wall_loops": "3"}, "bundle_values": {}}, stream)
+        page = self._page()
+        page._context = lambda: {"current": {"wall_loops": "5"}}
+        page._restore()
+        self.assertEqual((self.written, page.originals), ([], {}))
+        self.assertEqual(fs._read_originals()["presets"], {})
+
+    def test_older_file_is_read(self):
+        with open(os.path.join(self.storage, fs.ORIGINALS_FILE), "w") as stream:
+            json.dump({"source": "A", "originals": {"wall_loops": "3"}, "bundle_values": {}}, stream)
+        self.assertEqual(fs._read_originals()["presets"], {"A": {"originals": {"wall_loops": "3"}, "applied": {}}})
 
     def test_only_known_settings_are_restored(self):
         """A tampered file must not turn Restore into a way to set post_process (runs scripts)."""
         with open(os.path.join(self.storage, fs.ORIGINALS_FILE), "w") as stream:
-            json.dump({"source": "P", "originals": {"post_process": "/tmp/evil.sh", "wall_loops": "3"},
+            json.dump({"presets": {"A": {"originals": {"post_process": "/tmp/evil.sh", "wall_loops": "3"}}},
                        "bundle_values": {"process_change_extrusion_role_gcode": "M999", "wall_loops": "2"}}, stream)
         page = self._page()
-        self.assertEqual((page.originals, page.bundle_values), ({"wall_loops": "3"}, {"wall_loops": "2"}))
+        page._restore()
+        self.assertEqual(self.written, [("A", [("wall_loops", "3")])])
+        self.assertEqual(page.bundle_values, {"wall_loops": "2"})
 
     def test_corrupt_file_is_ignored(self):
         with open(os.path.join(self.storage, fs.ORIGINALS_FILE), "w") as stream:
             stream.write("{not json")
-        self.assertEqual(self._page().originals, {})
+        self.assertEqual(self._page().stores, {})
 
 
 def _volume(facets=12, size=1.0, scale=(1.0, 1.0, 1.0), kind="MODEL_PART"):
@@ -739,14 +800,15 @@ class PrimeTowerBrimTest(unittest.TestCase):
         return {c["key"]: (c["suggested"], c["effect"]) for c in result["changes"]}
 
     def test_follows_reliability_and_only_goes_down(self):
-        self.assertEqual(self._targets(0)["prime_tower_brim_width"], ("0", "saves"))
-        self.assertEqual(self._targets(3)["prime_tower_brim_width"], ("2", "saves"))
-        self.assertNotIn("prime_tower_brim_width", self._targets(4))
+        # Never below Orca's default of 3 mm, so the tower does not tip over.
+        self.assertNotIn("prime_tower_brim_width", self._targets(0))
+        self.assertEqual(self._targets(0, prime_tower_brim_width="6")["prime_tower_brim_width"], ("3", "saves"))
+        self.assertNotIn("prime_tower_brim_width", self._targets(4, prime_tower_brim_width="6"))
         self.assertNotIn("prime_tower_brim_width", self._targets(3, prime_tower_brim_width="1.5"))  # already narrower
 
     def test_needs_a_prime_tower_in_use(self):
-        self.assertNotIn("prime_tower_brim_width", self._targets(0, filaments=1))
-        self.assertNotIn("prime_tower_brim_width", self._targets(0, enable_prime_tower="0"))
+        self.assertNotIn("prime_tower_brim_width", self._targets(0, filaments=1, prime_tower_brim_width="6"))
+        self.assertNotIn("prime_tower_brim_width", self._targets(0, enable_prime_tower="0", prime_tower_brim_width="6"))
         self.assertNotIn("prime_tower_brim_width", self._targets(0, prime_tower_brim_width="-1"))  # auto
 
 
@@ -770,7 +832,8 @@ class RememberedFormTest(unittest.TestCase):
     def test_clean_form(self):
         self.assertEqual(fs.clean_form({"purpose": "bogus", "S": "9", "V": "x", "material": "pla", "answers": {"vase": 1}}),
                          {"purpose": "decoration", "material": "pla", "S": 5, "V": 4, "R": 3,
-                          "answers": {"top_hidden": False, "vase": True, "purge_infill": False, "purge_support": False}})
+                          "answers": {"top_hidden": False, "vase": True, "holds_on_bed": False, "purge_infill": False,
+                                      "purge_support": False}})
 
     def test_choices_come_back_with_the_same_parts(self):
         choices = {"purpose": "mechanical", "S": 5, "V": 1, "R": 4, "material": "petg", "answers": {"top_hidden": True}}
