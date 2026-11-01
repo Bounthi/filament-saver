@@ -1,5 +1,40 @@
 # Changelog
 
+## 0.1.1 (2026-11-01)
+
+Safer suggestions: nothing the plugin suggests may make a print more likely to fail.
+
+### Profiles you already tuned are kept
+
+- A change that uses more filament is only suggested when the current value is below what the purpose or the material needs, and only up to that minimum. Those changes have their own section, **Needed for the purpose or the material**, and a new **Apply savings** button applies only the savings (**Apply all** still applies both).
+- Undo and Restore originals go back to the value the setting had before the plugin's last change: an edit you made by hand after an earlier plugin change is no longer overwritten.
+- Rows say when objects have their own value for the setting, which the process preset does not reach.
+
+### No trade of something important for a little filament
+
+- Layer and wall counts keep the same thickness at any layer height and nozzle (calibrated at 0.2 mm layers and a 0.4 mm nozzle): fine layers no longer get thin shells, and big nozzles no longer get extra walls. At least 2 shell layers and 2 walls. Reasons explain the count ("That is 1 mm: 4 layers at 0.28 mm layer height").
+- The top shell keeps Orca's 0.6 mm minimum thickness.
+- Sloped-wall reinforcement follows the higher of Strength and Finish, so visible parts keep it.
+- At least 1 support interface layer at the lowest finish.
+- "Faces pointing up will be hidden" counts the top layers that will actually print, so it never leaves fewer than 2 solid layers under the skipped one.
+- Skirt and gap fill only go down; for materials that do not warp, the brim only goes down too (Orca's auto brim decides where it is needed).
+
+### Materials
+
+- For materials that warp (ABS/ASA, PA, PC), the brim is only raised to the minimum: a fuller or wider brim is kept, and a painted, inner-only, leading-edge or outer-and-inner brim is never replaced. The raft is kept for them too.
+- PA11, PAHT and PPA (with CF/GF) follow the nylon rules; HIPS follows the ABS/ASA rules instead of being treated as a support material.
+- Several filaments: support filaments (PVA, BVOH, or flagged as support) are skipped, and the strictest rule across all part filaments applies, instead of only the first filament's.
+
+### Removed or fixed
+
+- Suggestions that do not save filament: top surface pattern, and tree support style changes that did nothing (Orca's default is organic). Support style now only changes to a style that uses less material.
+- Infill patterns the rules do not rank (triangles, cubic, crosshatch, …) are no longer swapped for another pattern of unknown filament use; only a pattern the purpose forbids is replaced, by the cheapest allowed one.
+- The gap fill reason: it covers solid surfaces, not the gaps between walls.
+
+### Tests
+
+- A randomized test (`tests/test_sweep.py`) checks the plugin's guarantees on random profiles over Orca's full value ranges, and that suggesting again after applying everything suggests nothing more.
+
 ## 0.1.0 (2026-11-01)
 
 First release.

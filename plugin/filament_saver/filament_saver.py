@@ -7,7 +7,7 @@
 # name = "Filament Saver"
 # description = "Suggests print settings that save filament for what you are printing, and applies the ones you accept."
 # author = "bounthi"
-# version = "0.1.0"
+# version = "0.1.1"
 # ///
 # Copyright (c) 2026 bounthi. MIT License, see LICENSE.
 # SPDX-License-Identifier: MIT
@@ -48,7 +48,7 @@ import urllib.request
 import orca
 
 
-VERSION = "0.1.0"  # keep in sync with the header above
+VERSION = "0.1.1"  # keep in sync with the header above
 BUNDLE_ID = "filament-saver"
 BUNDLE_NAME = "Filament Saver"
 PRESET_SUFFIX = " - Filament Saver"
@@ -118,25 +118,25 @@ STRENGTH = [
     (5, 30, "gyroid", 6, 5),
 ]
 
-# Finish (V): top layer delta, top surface pattern, one wall on top, support interface layers.
+# Finish (V): top layer delta, one wall on top, support interface layers.
 FINISH = [
-    (-1, "monotonicline", "1", 0),
-    (-1, "monotonicline", "1", 1),
-    (0, "monotonic", "1", 2),
-    (0, "monotonic", "0", 2),
-    (1, "monotonic", "0", 3),
-    (1, "monotonic", "0", 3),
+    (-1, "1", 1),
+    (-1, "1", 1),
+    (0, "1", 2),
+    (0, "0", 2),
+    (1, "0", 3),
+    (1, "0", 3),
 ]
 
-# Reliability (R): brim type, brim width (mm), skirt loops, support threshold angle, tree support style,
-# normal support base spacing (mm).
+# Reliability (R): brim type, brim width (mm), skirt loops, support threshold angle,
+# normal support base spacing (mm). Brim and skirt only ever go down for materials that do not warp.
 RELIABILITY = [
-    ("no_brim", None, 0, 20, "tree_slim", 3.5),
-    ("no_brim", None, 1, 25, "tree_slim", 3.0),
-    ("auto_brim", None, 1, 30, "organic", 2.5),
-    ("auto_brim", None, 1, 30, "organic", 2.5),
-    ("brim_ears", 5, 1, 35, "organic", 2.0),
-    ("outer_only", 5, 2, 40, "tree_strong", 2.0),
+    ("no_brim", None, 0, 20, 3.5),
+    ("no_brim", None, 1, 25, 3.0),
+    ("auto_brim", None, 1, 30, 2.5),
+    ("auto_brim", None, 1, 30, 2.5),
+    ("brim_ears", 5, 1, 35, 2.0),
+    ("outer_only", 5, 2, 40, 2.0),
 ]
 BRIM_TEXT = {"no_brim": "no brim", "auto_brim": "brim only where Orca thinks it is needed",
              "brim_ears": "brim ears on sharp corners only", "outer_only": "full outer brim"}
@@ -150,7 +150,9 @@ PATTERN_NOTES = {
     "adaptivecubic": "dense near the surfaces, sparse in the core",
     "gyroid": "strong in every direction",
 }
-BRIM_ORDER = ["no_brim", "auto_brim", "brim_ears", "outer_only"]
+BRIM_ORDER = ["no_brim", "auto_brim", "brim_ears", "outer_only", "outer_and_inner"]
+# Brim types the user shapes by hand or for a special case; the plugin never replaces them.
+OWN_BRIMS = ("painted", "inner_only", "leading_edge_only")
 
 # Strength (S), solid fill Orca adds on its own: extra solid infill along sloped walls
 # (ensure_vertical_shell_thickness), which surfaces get gap fill, and the sparse area (mm²)
@@ -183,11 +185,15 @@ FINISH_INTERFACE_SPACING = [0.8, 0.6, None, None, None, None]
 VASE_REQUIRES = [("wall_loops", "1"), ("top_shell_layers", "0"), ("sparse_infill_density", "0%"),
                  ("enable_support", "0"), ("enforce_support_layers", "0"), ("detect_thin_wall", "0"),
                  ("overhang_reverse", "0"), ("timelapse_type", "0"), ("enable_wrapping_detection", "0")]
-VASE_DROPS = ("sparse_infill_pattern", "top_shell_thickness", "top_surface_pattern", "top_surface_density",
+VASE_DROPS = ("sparse_infill_pattern", "top_shell_thickness", "top_surface_density",
               "only_one_wall_top", "minimum_sparse_infill_area", "ensure_vertical_shell_thickness",
               "flush_into_infill", "flush_into_support")
 
 MAX_WALLS = 6
+# The tables count layers at this layer height (mm) and walls for this nozzle (mm); other layer
+# heights and nozzles get the same thickness.
+REFERENCE_LAYER = 0.2
+REFERENCE_NOZZLE = 0.4
 MAX_INFILL = 40
 
 FAMILY_LABELS = {
@@ -207,7 +213,6 @@ SETTINGS = [
     ("top_shell_thickness", "Top shell thickness"),
     ("bottom_shell_layers", "Bottom shell layers"),
     ("bottom_shell_thickness", "Bottom shell thickness"),
-    ("top_surface_pattern", "Top surface pattern"),
     ("top_surface_density", "Top surface density"),
     ("ensure_vertical_shell_thickness", "Ensure vertical shell thickness"),
     ("minimum_sparse_infill_area", "Minimum sparse infill area"),
@@ -259,6 +264,10 @@ QUESTIONS = ("top_hidden", "vase", "purge_infill", "purge_support")
 # Shell thickness reasons, one per side so each reads naturally once translated.
 SHELL_THICKNESS_TOP = ("%g mm forces %d top layers at %g mm layer height, overriding the %d layers above. "
                        "%g mm keeps %d layers.")
+# Orca's default top shell thickness: below it, thin layers would leave a weak, pillowed top.
+TOP_SHELL_MIN = 0.6
+SHELL_THICKNESS_TOP_MIN = ("%g mm forces %d top layers at %g mm layer height, overriding the %d layers above. "
+                           "%g mm, Orca's default, still keeps the top thick enough with thin layers.")
 SHELL_THICKNESS_BOTTOM = ("%g mm forces %d bottom layers at %g mm layer height, overriding the %d layers above. "
                           "%g mm keeps %d layers.")
 
@@ -267,17 +276,17 @@ def material_family(filament_type, preset_name=""):
     kind = (filament_type or "").strip().upper()
     name = (preset_name or "").upper()
     base = kind.split("-")[0]
-    if kind in ("PVA", "BVOH", "HIPS"):
+    if kind in ("PVA", "BVOH"):
         return "support"
     if base in ("PLA", "PLA+"):
         return "silk" if "SILK" in kind or "SILK" in name else "pla"
     if base in ("PETG", "PET", "PCTG"):
         return "petg"
-    if base in ("ABS", "ASA"):
+    if base in ("ABS", "ASA", "HIPS"):  # HIPS warps like ABS when it is the part's material
         return "abs_asa"
     if base in ("TPU", "TPE", "FLEX"):
         return "tpu"
-    if base in ("PA", "PA6", "PA12", "NYLON"):
+    if base in ("PA", "PA6", "PA11", "PA12", "PAHT", "PPA", "NYLON"):
         return "pa"
     if base == "PC":
         return "pc"
@@ -331,13 +340,15 @@ def _effect(key, current, target):
 
 
 def suggest(current, purpose, strength, finish, reliability, filament_type="", filament_name="", family=None,
-            answers=None, filaments=1, same_family=True, lang="en"):
+            answers=None, filaments=1, same_family=True, lang="en", other_filaments=()):
     """Suggested changes for the current settings.
 
     ``current`` maps setting keys to Orca's string values. ``family`` overrides
     the material family detected from the filament profile. ``answers`` holds the
     questions the user confirmed (QUESTIONS); ``filaments`` is the number of
     filaments in the project and ``same_family`` whether they all share one family.
+    ``other_filaments`` lists (filament_type, preset_name) of the project's other part filaments
+    (not support materials): the strictest rule across all of them applies.
     ``lang`` picks the language of labels, reasons and notes (LANGUAGES).
     Returns a list of dicts with key, label, current, suggested, reason and
     effect, in display order, containing only settings that would change.
@@ -346,17 +357,24 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
     spec = PURPOSES[purpose]
     floors = spec["floors"]
     detected = material_family(filament_type, filament_name)
-    family = family if family in FAMILY_LABELS else detected
+    overridden = family in FAMILY_LABELS
+    family = family if overridden else detected
+    # Every part material of the project; the user's pick in the material selector replaces them.
+    families = {family} if overridden else \
+        {family} | {material_family(t_, n_) for t_, n_ in other_filaments} - {"support"}
     targets, reasons, effects, groups = {}, {}, {}, {}
+    notes = []
 
     def put(key, value, why):
         targets[key] = str(value)
         reasons[key] = why
 
     # Material limits that act on the sliders themselves.
-    min_r = {"abs_asa": 3, "pa": 3, "pc": 4}.get(family, 0)
-    if family == "unknown":
-        min_r = min(reliability + 1, 5)
+    raised_by, min_r = family, 0
+    for each in sorted(families):
+        need = min(reliability + 1, 5) if each == "unknown" else {"abs_asa": 3, "pa": 3, "pc": 4}.get(each, 0)
+        if need > min_r:
+            raised_by, min_r = each, need
     eff_r = max(reliability, min_r)
 
     # Strength (S).
@@ -365,30 +383,39 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
     put("sparse_infill_density", "%d%%" % density, t("Strength %d/5: %d%% sparse infill.") % (strength, density))
     put("sparse_infill_pattern", pattern, t("Strength %d/5: %s, %s.") % (strength, pattern, t(PATTERN_NOTES[pattern])))
     put("bottom_shell_layers", bottom, t("Strength %d/5: %d bottom layers.") % (strength, bottom))
-    vertical_shell, gap_fill, min_sparse_area = STRENGTH_SOLID[strength]
+    _, gap_fill, min_sparse_area = STRENGTH_SOLID[strength]
+    # Sloped surfaces are visible, so a high finish keeps them reinforced even at low strength.
+    vertical_shell = STRENGTH_SOLID[max(strength, finish)][0]
     put("ensure_vertical_shell_thickness", vertical_shell,
-        t("Strength %d/5: %s.") % (strength, t(VERTICAL_SHELL_TEXT[vertical_shell])))
-    put("gap_fill_target", gap_fill,
-        t("Strength %d/5: %s.") % (strength, t("gap fill only in top and bottom surfaces, not between walls"
-                                  if gap_fill == "topbottom" else "gap fill wherever there are gaps")))
+        t("Strength %d/5 and finish %d/5: %s.") % (strength, finish, t(VERTICAL_SHELL_TEXT[vertical_shell])))
+    # Gap fill only goes down: Orca's default is none, and more of it adds filament for little strength.
+    current_gap = current.get("gap_fill_target")
+    if current_gap in GAP_FILL_ORDER and GAP_FILL_ORDER.index(gap_fill) < GAP_FILL_ORDER.index(current_gap):
+        put("gap_fill_target", gap_fill,
+            t("Strength %d/5: %s.") % (strength, t("gap fill only on top and bottom surfaces, not on internal solid infill")))
     put("minimum_sparse_infill_area", min_sparse_area,
         t("Strength %d/5: only sparse areas under %d mm² become solid infill.") % (strength, min_sparse_area))
 
     # Finish (V).
-    top_delta, top_pattern, one_wall, interface = FINISH[finish]
+    top_delta, one_wall, interface = FINISH[finish]
     top_layers = max(3, top + top_delta) if top_delta < 0 else top + top_delta
     put("top_shell_layers", top_layers, t("Strength %d/5 and finish %d/5: %d top layers.") % (strength, finish, top_layers))
-    put("top_surface_pattern", top_pattern, t("Finish %d/5: %s top surface.") % (finish, top_pattern))
     put("only_one_wall_top", one_wall,
         t("Finish %d/5: %s.") % (finish, t("one wall on flat tops saves filament" if one_wall == "1" else "full walls on top for a cleaner surface")))
 
     # Reliability (R).
-    brim, brim_width, skirt, threshold, tree_style, base_spacing = RELIABILITY[eff_r]
-    r_text = t("Reliability %d/5") % eff_r + (t(" (raised for %s)") % t(FAMILY_LABELS[family]) if eff_r != reliability else "")
-    put("brim_type", brim, t("%s: %s.") % (r_text, t(BRIM_TEXT[brim])))
-    if brim_width is not None:
-        put("brim_width", brim_width, t("%s: %d mm brim.") % (r_text, brim_width))
-    put("skirt_loops", skirt, t("%s: %d skirt loop(s).") % (r_text, skirt))
+    brim, brim_width, skirt, threshold, base_spacing = RELIABILITY[eff_r]
+    r_text = t("Reliability %d/5") % eff_r + (t(" (raised for %s)") % t(FAMILY_LABELS[raised_by]) if eff_r != reliability else "")
+    warping = families & {"abs_asa", "pa", "pc"}
+    # Brim and skirt only go down here: Orca's auto brim already decides where a part needs one,
+    # and the start G-code primes the nozzle. Materials that warp get their brim in section 7.
+    current_brim = current.get("brim_type")
+    if not warping and current_brim in BRIM_ORDER and BRIM_ORDER.index(brim) < BRIM_ORDER.index(current_brim):
+        put("brim_type", brim, t("%s: %s.") % (r_text, t(BRIM_TEXT[brim])))
+    current_skirt = _number(current.get("skirt_loops"))
+    if current_skirt is not None and skirt < current_skirt:
+        put("skirt_loops", skirt, t("%s: %d skirt loop(s).") % (r_text, skirt))
+    skirt = min(skirt, current_skirt) if current_skirt is not None else skirt
     first_layer = RELIABILITY_FIRST_LAYER[eff_r]
     put("only_one_wall_first_layer", first_layer,
         t("%s: %s.") % (r_text, t("one wall on the first layer; its outline is slightly weaker" if first_layer == "1"
@@ -401,7 +428,8 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
             and current_tower_brim is not None and current_tower_brim > tower_brim:
         put("prime_tower_brim_width", tower_brim,
             t("%s: %d mm brim around the prime tower; a wider one only matters for tall, narrow towers.") % (r_text, tower_brim))
-    if (_number(current.get("raft_layers")) or 0) > 0 and eff_r <= 4:
+    # Materials that warp may use the raft to stay flat, so it is kept for them.
+    if (_number(current.get("raft_layers")) or 0) > 0 and eff_r <= 4 and not warping:
         put("raft_layers", 0, t("%s: no raft, which prints several layers under the whole part.") % r_text)
 
     supports_on = current.get("enable_support") == "1"
@@ -413,8 +441,13 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
         if eff_r <= 4:
             put("support_remove_small_overhang", "1", t("%s: small overhangs that print fine on their own get no support.") % r_text)
         base_pattern = current.get("support_base_pattern")
+        style = current.get("support_style")
         if tree:
-            put("support_style", tree_style, t("%s: %s tree supports.") % (r_text, tree_style))
+            # Orca's "default" tree style is organic, which merges branches to save material;
+            # strong and hybrid trees use more.
+            if style in ("tree_strong", "tree_hybrid") and eff_r <= 3:
+                put("support_style", "organic", t("%s: organic tree supports, which merge branches to save material.") % r_text)
+                effects["support_style"] = "saves"
             # For tree supports Orca's "default" base pattern is already hollow.
             if base_pattern not in (None, "default", "hollow") and eff_r <= 3:
                 put("support_base_pattern", "hollow", t("%s: hollow tree supports, with no pattern inside the branches.") % r_text)
@@ -423,6 +456,9 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
         else:
             put("support_base_pattern_spacing", "%g" % base_spacing,
                 t("%s: %g mm between support lines (Orca's default is 2.5 mm).") % (r_text, base_spacing))
+            if style in ("default", "grid") and eff_r <= 1:
+                put("support_style", "snug", t("%s: snug supports, which use less material than a grid but are less stable.") % r_text)
+                effects["support_style"] = "saves"
             if base_pattern not in (None, "lightning") and eff_r <= 1:
                 put("support_base_pattern", "lightning",
                     t("%s: lightning support body, the lightest one; supports are less stable.") % r_text)
@@ -439,23 +475,38 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
     forbidden = set(floors["forbid"])
     label = t(FAMILY_LABELS[family])
     purpose_label = t(spec["label"])
-    if family == "petg" and supports_on:
+    if "petg" in families and supports_on:
         if (_number(current.get("support_top_z_distance")) or 0) < 0.25:
             put("support_top_z_distance", "0.25", t("PETG sticks to supports: at least a 0.25 mm gap."))
         if int(targets["support_interface_top_layers"]) < 2:
             put("support_interface_top_layers", 2, t("PETG sticks to supports: at least 2 interface layers."))
-    min_brim = {"abs_asa": 5, "pa": 5, "pc": 8}.get(family)
-    if min_brim:
-        if family == "pc" or eff_r == 5:
-            put("brim_type", "outer_only", t("%s warps: a full outer brim is required.") % label)
-        else:
-            put("brim_type", "brim_ears",
-                t("%s warps at the corners: brim ears hold them down with far less filament than a full brim.") % label)
-        put("brim_width", max(min_brim, int(_number(targets.get("brim_width")) or 0)),
-            t("%s warps: brim of at least %d mm.") % (label, min_brim))
-    if family == "silk" and purpose in ("functional", "mechanical") and int(targets["wall_loops"]) < 3:
+    warping = [(each, {"abs_asa": 5, "pa": 5, "pc": 8}[each]) for each in sorted(families) if each in ("abs_asa", "pa", "pc")]
+    brim_minimums = {}
+    if warping:
+        warp_family, min_brim = max(warping, key=lambda item: item[1])
+        warp_label = t(FAMILY_LABELS[warp_family])
+        # Only raised to the minimum: a wider or fuller brim the user set against warping is kept.
+        current_brim = current.get("brim_type")
+        needed = "outer_only" if "pc" in families or eff_r == 5 else "brim_ears"
+        brim_minimums = {
+            "brim_type": (needed, t("%s warps: a full outer brim is required.") % warp_label if needed == "outer_only" else
+                          t("%s warps at the corners: brim ears hold them down with far less filament than a full brim.") % warp_label),
+            "brim_width": (str(min_brim), t("%s warps: brim of at least %d mm.") % (warp_label, min_brim)),
+        }
+        if current_brim in OWN_BRIMS:
+            notes.append(t("Your %s brim is kept. %s warps: make sure it holds the corners down.") % (current_brim, warp_label))
+        elif current_brim not in BRIM_ORDER or BRIM_ORDER.index(current_brim) < BRIM_ORDER.index(needed):
+            if needed == "outer_only":
+                put("brim_type", "outer_only", t("%s warps: a full outer brim is required.") % warp_label)
+            else:
+                put("brim_type", "brim_ears",
+                    t("%s warps at the corners: brim ears hold them down with far less filament than a full brim.") % warp_label)
+        current_width = _number(current.get("brim_width"))
+        if current_width is None or current_width < min_brim:
+            put("brim_width", min_brim, t("%s warps: brim of at least %d mm.") % (warp_label, min_brim))
+    if "silk" in families and purpose in ("functional", "mechanical") and int(targets["wall_loops"]) < 3:
         put("wall_loops", 3, t("Silk PLA has weak layer adhesion: at least 3 walls for a functional part."))
-    if family == "tpu":
+    if "tpu" in families:
         forbidden.add("lightning")
         for key in ("sparse_infill_density", "sparse_infill_pattern", "minimum_sparse_infill_area"):
             targets.pop(key, None)
@@ -483,16 +534,71 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
     if int(targets["bottom_shell_layers"]) < floors["bottom"]:
         put("bottom_shell_layers", floors["bottom"], t("%s needs at least %d bottom layers.") % (purpose_label, floors["bottom"]))
 
+    # Same thickness at other layer heights and nozzles: fine layers keep a solid shell, coarse
+    # ones do not waste filament.
+    layer_height = _number(current.get("layer_height"))
+    nozzle = _number(str(current.get("nozzle_diameter") or "").split(",")[0])
+    scale_layers = layer_height and abs(layer_height - REFERENCE_LAYER) > 1e-6
+    scale_walls = nozzle and abs(nozzle - REFERENCE_NOZZLE) > 1e-6
+
+    def shell_layers(reference):
+        # At least 2 layers: a single layer would be the only solid layer over the infill.
+        return max(2, math.ceil(reference * REFERENCE_LAYER / layer_height - 1e-9)) if scale_layers else reference
+
+    def wall_count(reference):
+        return max(min(reference, 2), math.ceil(reference * REFERENCE_NOZZLE / nozzle - 1e-9)) if scale_walls else reference
+
+    for side in ("top", "bottom"):
+        key = "%s_shell_layers" % side
+        reference = int(targets[key])
+        if shell_layers(reference) != reference:
+            put(key, shell_layers(reference), reasons[key] + " " + t("That is %g mm: %d layers at %g mm layer height.")
+                % (round(reference * REFERENCE_LAYER, 2), shell_layers(reference), layer_height))
+    if "wall_loops" in targets and wall_count(int(targets["wall_loops"])) != int(targets["wall_loops"]):
+        reference = int(targets["wall_loops"])
+        put("wall_loops", wall_count(reference), reasons["wall_loops"] + " " + t("That is %g mm of wall: %d walls with a %g mm nozzle.")
+            % (round(reference * REFERENCE_NOZZLE, 2), wall_count(reference), nozzle))
+
+    # Minimums of the purpose and the material. Slider values above them only ever save filament:
+    # a setting already leaner than the slider, but at or above its minimum, is left as it is.
+    def layers_reason(text, reference):
+        # The floors count layers at 0.2 mm: say what that is at this layer height.
+        if shell_layers(reference) == reference:
+            return text
+        return text + " " + t("That is %g mm: %d layers at %g mm layer height.") % (
+            round(reference * REFERENCE_LAYER, 2), shell_layers(reference), layer_height)
+
+    def walls_reason(text, reference):
+        if wall_count(reference) == reference:
+            return text
+        return text + " " + t("That is %g mm of wall: %d walls with a %g mm nozzle.") % (
+            round(reference * REFERENCE_NOZZLE, 2), wall_count(reference), nozzle)
+
+    minimums = {
+        **brim_minimums,
+        "wall_loops": (wall_count(floors["walls"]),
+                       walls_reason(t("%s needs at least %d walls.") % (purpose_label, floors["walls"]), floors["walls"])),
+        "top_shell_layers": (shell_layers(floors["top"]), layers_reason(
+            t("%s needs at least %d top layers.") % (purpose_label, floors["top"]), floors["top"])),
+        "bottom_shell_layers": (shell_layers(floors["bottom"]), layers_reason(
+            t("%s needs at least %d bottom layers.") % (purpose_label, floors["bottom"]), floors["bottom"])),
+    }
+    if "silk" in families and purpose in ("functional", "mechanical") and floors["walls"] < 3:
+        minimums["wall_loops"] = (wall_count(3), walls_reason(
+            t("Silk PLA has weak layer adhesion: at least 3 walls for a functional part."), 3))
+    if "sparse_infill_density" in targets:
+        minimums["sparse_infill_density"] = ("%d%%" % floors["infill"],
+                                             t("%s needs at least %d%% infill.") % (purpose_label, floors["infill"]))
+        if current.get("sparse_infill_pattern") in forbidden:
+            allowed = next(p for p in PATTERN_ORDER if p not in forbidden)
+            chosen = current["sparse_infill_pattern"]
+            minimums["sparse_infill_pattern"] = (allowed, t("%s is not allowed for %s; using %s, %s.") % (
+                chosen, purpose_label if chosen in floors["forbid"] else label, allowed, t(PATTERN_NOTES[allowed])))
+    if "petg" in families and supports_on:
+        minimums["support_interface_top_layers"] = ("2", t("PETG sticks to supports: at least 2 interface layers."))
+
     # Answers the user confirmed (section 6). Nothing here is inferred from the model.
     answers = answers or {}
-    notes = []
-    if answers.get("top_hidden"):
-        # Orca applies the density to every top surface, but only to its last layer; the
-        # solid layers below it still close the part.
-        targets.pop("top_surface_pattern", None)
-        if int(targets["top_shell_layers"]) >= 3:
-            put("top_surface_density", "0%",
-                t("You said the faces pointing up while printing will be hidden: skip their last layer. The %d solid layers below it still close the part.") % (int(targets["top_shell_layers"]) - 1))
     if filaments > 1 and (answers.get("purge_infill") or answers.get("purge_support")):
         if current.get("enable_prime_tower") == "0":
             notes.append(t("Orca only purges into infill or supports when the prime tower is on, so the purge answers changed nothing."))
@@ -514,11 +620,17 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
             layers = int(targets["%s_shell_layers" % side])
             thickness = _number(current.get("%s_shell_thickness" % side))
             matching = round(layers * layer_height, 2)
-            if thickness is not None and thickness > matching + 1e-6:
+            # The top keeps Orca's minimum thickness, which protects thin layer heights.
+            target = max(matching, TOP_SHELL_MIN) if side == "top" else matching
+            if thickness is not None and thickness > target + 1e-6:
                 forced = math.ceil(thickness / layer_height - 1e-9)
-                template = (SHELL_THICKNESS_TOP if side == "top" else SHELL_THICKNESS_BOTTOM)
-                put("%s_shell_thickness" % side, "%g" % matching,
-                    t(template) % (thickness, forced, layer_height, layers, matching, layers))
+                if target > matching:
+                    put("top_shell_thickness", "%g" % target,
+                        t(SHELL_THICKNESS_TOP_MIN) % (thickness, forced, layer_height, layers, target))
+                else:
+                    template = (SHELL_THICKNESS_TOP if side == "top" else SHELL_THICKNESS_BOTTOM)
+                    put("%s_shell_thickness" % side, "%g" % matching,
+                        t(template) % (thickness, forced, layer_height, layers, matching, layers))
 
     # Vase mode (section 6), last so that no floor brings back walls, infill or top layers.
     if answers.get("vase"):
@@ -534,6 +646,35 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
         effects["enable_support"] = "saves"
         notes.append(t("Vase mode prints only the outside of the part, one wall thick, with an open top. "
                        "A model with thick walls or an inner cavity comes out as a thin shell."))
+
+    # Only changes that save filament, plus increases up to a minimum: a change that uses more
+    # filament, or whose effect is not known (e.g. from a pattern the tables do not rank), is kept
+    # only when the current value is below what the purpose or the material needs, and then only
+    # up to that minimum.
+    for key in list(targets):
+        if key not in current or key in effects or key in groups:
+            continue
+        if _effect(key, current[key], targets[key]) == "saves":
+            continue
+        minimum = minimums.get(key)
+        below = minimum is not None and (key == "sparse_infill_pattern" or _effect(key, current[key], minimum[0]) == "costs")
+        if not below:
+            targets.pop(key)
+            reasons.pop(key)
+        elif key == "sparse_infill_pattern" or _effect(key, minimum[0], targets[key]) == "costs":
+            put(key, minimum[0], minimum[1])
+
+    if answers.get("top_hidden") and not answers.get("vase"):
+        # Orca applies the density to every top surface, but only to its last layer; the solid
+        # layers below it still close the part. Counted on the final settings, after the filter
+        # above, including the layers a shell thickness forces.
+        top_layers = int(_number(targets.get("top_shell_layers", current.get("top_shell_layers"))) or 0)
+        thickness = _number(targets.get("top_shell_thickness", current.get("top_shell_thickness"))) or 0
+        if layer_height:
+            top_layers = max(top_layers, math.ceil(thickness / layer_height - 1e-9))
+        if top_layers >= 3:
+            put("top_surface_density", "0%",
+                t("You said the faces pointing up while printing will be hidden: skip their last layer. The %d solid layers below it still close the part.") % (top_layers - 1))
 
     changes = []
     for key, label_text in SETTINGS:
@@ -557,15 +698,21 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
         })
     if family != detected:
         notes.append(t("Using %s instead of the detected %s.") % (label, t(FAMILY_LABELS[detected])))
-    if family == "tpu":
+    if len(families) > 1:
+        notes.append(t("Several materials (%s): the strictest rule of each applies.")
+                     % ", ".join(t(FAMILY_LABELS[each]) for each in sorted(families)))
+    if "tpu" in families:
         notes.append(t("TPU: infill sets the hardness of the part, so infill is left unchanged."))
-    if family == "unknown":
-        notes.append(t("Unknown material '%s': PLA rules with extra reliability.") % (filament_type or "?"))
-    if family == "silk" and purpose in ("functional", "mechanical"):
+    if "unknown" in families:
+        unknown = [kind for kind, name in [(filament_type, filament_name)] + list(other_filaments)
+                   if material_family(kind, name) == "unknown"] if not overridden else [filament_type]
+        notes.append(t("Unknown material '%s': PLA rules with extra reliability.") % (", ".join(k or "?" for k in unknown) or "?"))
+    if "silk" in families and purpose in ("functional", "mechanical"):
         notes.append(t("Silk PLA is not recommended for functional parts."))
-    if family == "pa":
+    if "pa" in families:
         notes.append(t("Nylon absorbs moisture: dry the filament before printing."))
-    return {"family": family, "family_label": label, "detected": detected, "changes": changes, "notes": notes}
+    return {"family": family, "family_label": label, "detected": detected, "families": sorted(families),
+            "changes": changes, "notes": notes}
 
 
 # --- print estimate from exported G-code -------------------------------------
@@ -896,6 +1043,22 @@ def _parts_fingerprint():
         return None
 
 
+def _object_overrides():
+    """{setting: [object names]} for settings that objects or their parts set themselves, which the
+    process preset then does not reach. UI thread only."""
+    found = {}
+    try:
+        for obj in orca.host.model().objects():
+            keys = set(_call(obj, "config_keys") or [])
+            for volume in obj.volumes():
+                keys |= set(_call(volume, "config_keys") or [])
+            for key in keys & set(LABELS):
+                found.setdefault(key, []).append(str(getattr(obj, "name", "") or "?"))
+    except Exception:
+        traceback.print_exc()
+    return found
+
+
 def clean_form(data):
     """Purpose, material, sliders and answers from the page, with anything invalid replaced."""
     data = data if isinstance(data, dict) else {}
@@ -936,7 +1099,7 @@ def _read_originals():
         with open(_storage_path(ORIGINALS_FILE), "r", encoding="utf-8") as stream:
             data = json.load(stream)
     except (FileNotFoundError, ValueError, OSError):
-        return {"source": None, "originals": {}, "bundle_values": {}}
+        return {"source": None, "originals": {}, "bundle_values": {}, "applied": {}}
     data = data if isinstance(data, dict) else {}
     # Only settings the plugin manages: whatever else is in the file (e.g. post_process, which
     # runs scripts after export) must never reach a preset through Restore.
@@ -944,12 +1107,13 @@ def _read_originals():
         if isinstance(data.get(name), dict) else {}
     source = data.get("source")
     return {"source": source if isinstance(source, str) else None,
-            "originals": pick("originals"), "bundle_values": pick("bundle_values")}
+            "originals": pick("originals"), "bundle_values": pick("bundle_values"), "applied": pick("applied")}
 
 
-def _write_originals(source, originals, bundle_values):
+def _write_originals(source, originals, bundle_values, applied=None):
     _write_json_atomic(_storage_path(ORIGINALS_FILE), {
-        "source": source if originals else None, "originals": originals, "bundle_values": bundle_values})
+        "source": source if originals else None, "originals": originals, "bundle_values": bundle_values,
+        "applied": {k: v for k, v in (applied or {}).items() if k in originals}})
 
 
 # --- translations --------------------------------------------------------------
@@ -968,7 +1132,6 @@ TRANSLATIONS = {
         "Top shell thickness": "Espessura da casca do topo",
         "Bottom shell layers": "Camadas da casca de base",
         "Bottom shell thickness": "Espessura da casca de base",
-        "Top surface pattern": "Padrão de superfície superior",
         "Top surface density": "Densidade da superfície superior",
         "Ensure vertical shell thickness": "Garantir a espessura vertical da casca",
         "Minimum sparse infill area": "Limiar mínimo de preenchimento esparso",
@@ -1042,9 +1205,16 @@ TRANSLATIONS = {
         "moderate extra solid infill along sloped walls": "preenchimento sólido extra moderado junto às paredes inclinadas",
         "extra solid infill wherever sloped walls would get thin":
             "preenchimento sólido extra onde as paredes inclinadas ficariam finas",
-        "gap fill only in top and bottom surfaces, not between walls":
-            "preenchimento de vão só nas superfícies de topo e base, não entre paredes",
-        "gap fill wherever there are gaps": "preenchimento de vão onde houver vãos",
+        "gap fill only on top and bottom surfaces, not on internal solid infill":
+            "preenchimento de vão só nas superfícies de topo e base, não no preenchimento sólido interno",
+        "Strength %d/5 and finish %d/5: %s.": "Resistência %d/5 e acabamento %d/5: %s.",
+        "%s: organic tree supports, which merge branches to save material.":
+            "%s: suportes em árvore orgânicos, que juntam os galhos para economizar material.",
+        "%s: snug supports, which use less material than a grid but are less stable.":
+            "%s: suportes justos (snug), que usam menos material que a grade, mas são menos estáveis.",
+        SHELL_THICKNESS_TOP_MIN:
+            "%g mm forçam %d camadas de topo com altura de camada de %g mm, anulando as %d camadas acima. "
+            "%g mm, o padrão do Orca, ainda mantém o topo grosso o bastante com camadas finas.",
         "one wall on flat tops saves filament": "uma parede só nos topos planos economiza filamento",
         "full walls on top for a cleaner surface": "paredes completas no topo para uma superfície mais limpa",
         "no brim": "sem borda",
@@ -1068,7 +1238,6 @@ TRANSLATIONS = {
         "Strength %d/5: only sparse areas under %d mm² become solid infill.":
             "Resistência %d/5: só áreas esparsas abaixo de %d mm² viram preenchimento sólido.",
         "Strength %d/5 and finish %d/5: %d top layers.": "Resistência %d/5 e acabamento %d/5: %d camadas de topo.",
-        "Finish %d/5: %s top surface.": "Acabamento %d/5: superfície superior %s.",
         "Finish %d/5: %s.": "Acabamento %d/5: %s.",
         "Finish %d/5: %d support interface layers.": "Acabamento %d/5: %d camadas de interface do suporte.",
         "%s: %s.": "%s: %s.",
@@ -1078,7 +1247,6 @@ TRANSLATIONS = {
             "%s: suporte sob saliências com menos de %d° em relação à horizontal.",
         "%s: small overhangs that print fine on their own get no support.":
             "%s: pequenas saliências que imprimem bem sozinhas ficam sem suporte.",
-        "%s: %s tree supports.": "%s: suportes em árvore %s.",
         "%s: %g mm between support lines (Orca's default is 2.5 mm).":
             "%s: %g mm entre as linhas do suporte (o padrão do Orca é 2.5 mm).",
         "%s: one skirt layer is enough without a draft shield.":
@@ -1106,6 +1274,8 @@ TRANSLATIONS = {
         "%s warps at the corners: brim ears hold them down with far less filament than a full brim.":
             "%s empena nos cantos: orelhas de borda seguram os cantos com bem menos filamento que uma borda completa.",
         "%s warps: brim of at least %d mm.": "%s empena: borda de pelo menos %d mm.",
+        "Your %s brim is kept. %s warps: make sure it holds the corners down.":
+            "Sua borda %s foi mantida. %s empena: confira se ela segura os cantos.",
         "Silk PLA has weak layer adhesion: at least 3 walls for a functional part.":
             "PLA Silk tem adesão fraca entre camadas: pelo menos 3 paredes numa peça funcional.",
         "%s needs at least %d walls.": "%s precisa de pelo menos %d paredes.",
@@ -1151,7 +1321,9 @@ TRANSLATIONS = {
         "A model with thick walls or an inner cavity comes out as a thin shell.":
             "O modo vaso imprime só o lado de fora da peça, com uma parede e o topo aberto. "
             "Um modelo com paredes grossas ou cavidade interna sai como uma casca fina.",
-        "Several filaments: rules use the first one (%s).": "Vários filamentos: as regras usam o primeiro (%s).",
+        "Several materials (%s): the strictest rule of each applies.":
+            "Vários materiais (%s): vale a regra mais rígida de cada um.",
+        "%s is a support material; the rules follow %s.": "%s é material de suporte; as regras seguem %s.",
 
         # Messages.
         "The process preset changed. Click Suggest changes again.":
@@ -1228,6 +1400,11 @@ TRANSLATIONS = {
             "As mudanças são salvas num perfil de processo \"… - Filament Saver\".",
         "Suggested changes": "Mudanças sugeridas",
         "Apply all": "Aplicar todas",
+        "Apply savings": "Aplicar economias",
+        "Save filament": "Economizam filamento",
+        "Needed for the purpose or the material": "Necessárias para o propósito ou o material",
+        "Your current value is below what the purpose or the material needs. Apply all also applies these.":
+            "Seu valor atual está abaixo do que o propósito ou o material precisa. Aplicar todas também aplica estas.",
         "Skip all": "Pular todas",
         "Restore originals": "Restaurar originais",
         "Restore originals ({n})": "Restaurar originais ({n})",
@@ -1245,6 +1422,11 @@ TRANSLATIONS = {
         "On": "Ligado",
         "Off": "Desligado",
         "(edited)": "(editado)",
+        "That is %g mm: %d layers at %g mm layer height.": "Isso dá %g mm: %d camadas com altura de camada de %g mm.",
+        "That is %g mm of wall: %d walls with a %g mm nozzle.": "Isso dá %g mm de parede: %d paredes com bico de %g mm.",
+        "Some objects set their own value for a suggested setting; changing the process preset does not reach them.":
+            "Alguns objetos têm valor próprio para uma configuração sugerida; mudar o perfil de processo não os afeta.",
+        "Not used by objects with their own value: {names}": "Não vale para objetos com valor próprio: {names}",
         "Brought back the choices you last used with these parts.":
             "As escolhas que você usou da última vez com estas peças foram recuperadas.",
         "Save the current process settings as a new preset": "Salvar as configurações de processo atuais como um preset novo",
@@ -1450,6 +1632,7 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
         self.originals_source = None  # preset those values belong to
         self.bundle_values = {}      # settings managed in the local-bundle preset (fallback mode)
         self.loaded = False          # originals read from plugin storage
+        self.applied = {}
         self.lang = "en"             # follows Orca's language, see _detect_language
         self.parts = None            # fingerprint of the parts last seen, see _sync_parts
         self.form_version = 0        # bumped when the form changes on this side, so the page reloads it
@@ -1557,8 +1740,18 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
             value = edited.config_value(key)
             if value not in (None, ""):
                 current[key] = value
+        if "nozzle_diameter" not in current:  # a printer setting, needed to scale wall counts
+            try:
+                nozzle = bundle.printers.edited_preset().config_value("nozzle_diameter")
+                if nozzle:
+                    current["nozzle_diameter"] = nozzle
+            except Exception:
+                traceback.print_exc()
         filaments = [p for p in bundle.current_filament_presets() if p is not None]
-        filament = filaments[0] if filaments else None
+        # Rules follow the part's materials: support filaments (PVA, BVOH, or flagged as support) are skipped.
+        parts = [p for p in filaments if material_family(p.config_value("filament_type"), p.name) != "support"
+                 and not str(p.config_value("filament_is_support") or "0").startswith("1")]
+        filament = (parts or filaments or [None])[0]
         return {
             "bundle": bundle,
             "edited": edited,
@@ -1567,6 +1760,9 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
             "filament_type": filament.config_value("filament_type") if filament else "",
             "filament_name": filament.name if filament else "",
             "filament_count": len(filaments),
+            "other_filaments": [(p.config_value("filament_type"), p.name) for p in parts if p is not filament],
+            "skipped_support": filament is not None and bool(filaments) and filaments[0] is not filament,
+            "first_filament_name": filaments[0].name if filaments else "",
             "filament_names": [p.name for p in filaments],
             "filament_costs": [p.config_value("filament_cost") for p in filaments],
             "same_family": len({material_family(p.config_value("filament_type"), p.name) for p in filaments}) <= 1,
@@ -1587,9 +1783,18 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
                          context["filament_type"], context["filament_name"],
                          family=None if material == "auto" else material,
                          answers=answers, filaments=context["filament_count"],
-                         same_family=context["same_family"], lang=self.lang)
-        if context["filament_count"] > 1:
-            result["notes"].append(self._t("Several filaments: rules use the first one (%s).") % context["filament_name"])
+                         same_family=context["same_family"], lang=self.lang,
+                         other_filaments=context["other_filaments"])
+        overrides = _object_overrides()
+        for change in result["changes"]:
+            if overrides.get(change["key"]):
+                change["overridden_by"] = overrides[change["key"]]
+        if any(change.get("overridden_by") for change in result["changes"]):
+            result["notes"].append(self._t("Some objects set their own value for a suggested setting; "
+                                           "changing the process preset does not reach them."))
+        if context["skipped_support"]:
+            result["notes"].append(self._t("%s is a support material; the rules follow %s.")
+                                   % (context["first_filament_name"], context["filament_name"]))
         self.result = result
         self.source = context["selected"].name
         self.stale = False
@@ -1695,8 +1900,13 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
             for change in changes:
                 change["status"] = "applied"
                 change.pop("error", None)
-                # Keep the value from before the first suggestion, even across re-suggests.
-                self.originals.setdefault(change["key"], change["current"])
+                # Keep the value from before the first suggestion across re-suggests, but only while
+                # the setting still holds what the plugin wrote: if the user changed it since,
+                # their value is the one to go back to.
+                key = change["key"]
+                if key not in self.originals or self.applied.get(key) != change["current"]:
+                    self.originals[key] = change["current"]
+                self.applied[key] = change["suggested"]
             self.originals_source = self.source
             self._save_originals()
             self.message = (self._t("Applied %d change(s) to '%s'. Slice again to see the new estimate.") % (len(changes), target)
@@ -1730,6 +1940,7 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
         def done(target):
             for key in keys:
                 original = self.originals.pop(key)
+                self.applied.pop(key, None)
                 for change in (self.result or {}).get("changes", []):
                     if change["key"] == key:
                         change["current"] = original
@@ -1751,11 +1962,12 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
         self.originals = saved["originals"]
         self.originals_source = saved["source"]
         self.bundle_values = saved["bundle_values"]
+        self.applied = saved["applied"]  # value the plugin last wrote for each setting
         self.loaded = True
 
     def _save_originals(self):
         try:
-            _write_originals(self.originals_source, self.originals, self.bundle_values)
+            _write_originals(self.originals_source, self.originals, self.bundle_values, self.applied)
         except Exception as error:
             traceback.print_exc()
             self.error = self._t("Could not save the original values: %s") % error
@@ -2016,7 +2228,10 @@ button.ghost { background: transparent; color: var(--fg); border: 1px solid var(
 button:disabled { opacity: .45; cursor: default; }
 .row-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
-.changes { display: grid; gap: 8px; }
+.changes { display: grid; gap: 14px; }
+.section { display: grid; gap: 8px; }
+.section-title { font-weight: 650; }
+.section .hint { margin-top: -4px; }
 .change { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center;
           padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
 .change.applied { opacity: .7; } .change.skipped { opacity: .5; }
@@ -2095,7 +2310,8 @@ button:disabled { opacity: .45; cursor: default; }
     <div class="toolbar">
       <h2 style="margin:0" data-t>Suggested changes</h2>
       <div class="row-actions">
-        <button id="apply-all" disabled data-t>Apply all</button>
+        <button id="apply-savings" disabled data-t>Apply savings</button>
+        <button id="apply-all" class="ghost" disabled data-t>Apply all</button>
         <button id="skip-all" class="ghost" disabled data-t>Skip all</button>
         <button id="restore-all" class="ghost" disabled>Restore originals</button>
       </div>
@@ -2261,6 +2477,7 @@ function renderChanges() {
   const pending = result ? result.changes.filter(c => c.status !== 'applied') : [];
   const blocked = state.busy || state.stale;
   $('apply-all').disabled = blocked || !pending.length;
+  $('apply-savings').disabled = blocked || !pending.some(c => c.effect !== 'costs');
   $('skip-all').disabled = blocked || !result || !result.changes.some(c => c.status === 'pending');
   const restorable = state.restorable || [];
   $('restore-all').disabled = state.busy || !restorable.length;
@@ -2269,7 +2486,7 @@ function renderChanges() {
   if (!result) return;
   const canRestore = new Set(restorable.map(r => r.key));
   if (!result.changes.length) { list.innerHTML = '<div class="empty">' + esc(T('Nothing to change for this profile.')) + '</div>'; return; }
-  list.innerHTML = result.changes.map(c => {
+  const row = c => {
     const badge = (c.effect ? '<span class="badge ' + c.effect + '">' + esc(T(c.effect === 'saves' ? 'saves filament' : 'uses more')) + '</span>' : '') +
       (c.group === 'vase' ? '<span class="badge state">' + esc(T('vase mode, applied together')) + '</span>' : '');
     let actions;
@@ -2279,10 +2496,21 @@ function renderChanges() {
     else actions = '<button data-act="apply" data-id="' + esc(c.id) + '"' + (blocked ? ' disabled' : '') + '>' + esc(T('Apply')) + '</button>' +
                    '<button class="ghost" data-act="skip" data-id="' + esc(c.id) + '"' + (blocked ? ' disabled' : '') + '>' + esc(T('Skip')) + '</button>';
     const err = c.status === 'error' ? '<div class="why" style="color:var(--error)">' + esc(c.error || T('Failed')) + '</div>' : '';
+    const overridden = (c.overridden_by || []).length
+      ? '<div class="why" style="color:var(--cost)">' + esc(T('Not used by objects with their own value: {names}', {names: c.overridden_by.join(', ')})) + '</div>' : '';
     return '<div class="change ' + esc(c.status) + '"><div><div class="name">' + esc(c.label) + badge + '</div>' +
       '<div class="values"><span class="from">' + esc(fmtValue(c, c.current)) + '</span> → <span class="to">' + esc(fmtValue(c, c.suggested)) + '</span></div>' +
-      '<div class="why">' + esc(c.reason) + '</div>' + err + '</div><div class="row-actions">' + actions + '</div></div>';
-  }).join('');
+      '<div class="why">' + esc(c.reason) + '</div>' + overridden + err + '</div><div class="row-actions">' + actions + '</div></div>';
+  };
+  // Increases only show up when the current value is below what the purpose or the material
+  // needs; they get their own section so "Apply savings" never raises filament use.
+  const savings = result.changes.filter(c => c.effect !== 'costs');
+  const needed = result.changes.filter(c => c.effect === 'costs');
+  const section = (title, hint, rows) => !rows.length ? '' : '<div class="section"><div class="section-title">' + esc(title) +
+    '</div>' + (hint ? '<div class="hint">' + esc(hint) + '</div>' : '') + rows.map(row).join('') + '</div>';
+  list.innerHTML = section(T('Save filament'), '', savings) +
+    section(T('Needed for the purpose or the material'),
+            T('Your current value is below what the purpose or the material needs. Apply all also applies these.'), needed);
 }
 
 function render() {
@@ -2339,6 +2567,10 @@ $('questions').addEventListener('change', e => {
 });
 for (const k of ['S', 'V', 'R']) $(k).addEventListener('input', e => { form[k] = Number(e.target.value); $(k + '-out').textContent = form[k]; });
 $('suggest').addEventListener('click', () => send(Object.assign({cmd: 'suggest'}, form)));
+$('apply-savings').addEventListener('click', () => {
+  const ids = state.result.changes.filter(c => c.status !== 'applied' && c.effect !== 'costs').map(c => c.id);
+  if (ids.length) send({cmd: 'apply', ids});
+});
 $('apply-all').addEventListener('click', () => {
   const ids = state.result.changes.filter(c => c.status !== 'applied').map(c => c.id);
   if (ids.length) send({cmd: 'apply', ids});

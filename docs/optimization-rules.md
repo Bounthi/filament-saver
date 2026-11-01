@@ -44,6 +44,8 @@ Each stage overrides the previous one. Floors always win, except against an expl
 
 A single table for all presets. The preset applies later, through floors and overrides.
 
+**Counts are thicknesses.** Layer counts (here and in section 4) are calibrated at 0.2 mm layers, and wall counts for a 0.4 mm nozzle. At other layer heights and nozzles the plugin keeps the same thickness: `layers = ceil(count × 0.2 / layer_height)`, at least 2, and `walls = ceil(count × 0.4 / nozzle)`, never fewer than 2 (or the count, if it is lower). So 3 top layers at 0.2 mm become 8 layers at 0.08 mm, and 2 walls become 4 walls with a 0.2 mm nozzle; a 0.8 mm nozzle needs fewer walls for the same strength. The nozzle comes from the printer preset.
+
 | S | `wall_loops` | `sparse_infill_density` | `sparse_infill_pattern` | `top_shell_layers` | `bottom_shell_layers` |
 |---|---|---|---|---|---|
 | 0 | 2 | 5% | `lightning` | 3 | 2 |
@@ -64,7 +66,11 @@ Solid fill that Orca adds on its own also follows S:
 | 4 | `ensure_all` | `everywhere` | 15 mm² |
 | 5 | `ensure_all` | `everywhere` | 15 mm² |
 
-S = 4–5 keep Orca's defaults. Each one only removes solid fill, with a known cost: sloped walls a bit thinner, small gaps left between walls, small sparse areas no longer turned solid. Orca still decides where any of it applies. TPU keeps `minimum_sparse_infill_area` (infill sets its hardness).
+- `ensure_vertical_shell_thickness` uses the row of **max(S, V)**: sloped surfaces are visible, so a high finish keeps them reinforced even at low strength (a decoration at S1/V4 keeps `ensure_all`).
+- `gap_fill_target` **only goes down**: Orca's default is `nowhere`, and more gap fill adds filament for little strength. It controls gap fill on top, bottom and internal **solid** surfaces, not between walls. At S ≤ 2 it becomes `topbottom` (no gap fill on internal solid infill).
+- `minimum_sparse_infill_area` follows S in both directions.
+
+Each change has a known cost: sloped walls a bit thinner, small gaps in internal solid infill, small sparse areas no longer turned solid. Orca still decides where any of it applies. TPU keeps `minimum_sparse_infill_area` (infill sets its hardness).
 
 Rationale:
 - **Walls give more strength per gram than infill.** From S=3 up, walls increase before density does.
@@ -76,18 +82,19 @@ Rationale:
 
 ## 4. Finish slider (V)
 
-| V | `top_shell_layers` | `top_surface_pattern` | `only_one_wall_top` | `support_interface_top_layers` | `ironing_type` |
-|---|---|---|---|---|---|
-| 0 | −1 (min. 3) | `monotonicline` | `true` | 0 | `no ironing` |
-| 1 | −1 (min. 3) | `monotonicline` | `true` | 1 | `no ironing` |
-| 2 | +0 | `monotonic` | `true` | 2 | `no ironing` |
-| 3 | +0 | `monotonic` | `false` | 2 | `no ironing` |
-| 4 | +1 | `monotonic` | `false` | 3 | `top` (suggestion) |
-| 5 | +1 | `monotonic` | `false` | 3 | `top` (suggestion) |
+| V | `top_shell_layers` | `only_one_wall_top` | `support_interface_top_layers` |
+|---|---|---|---|
+| 0 | −1 (min. 3) | `true` | 1 |
+| 1 | −1 (min. 3) | `true` | 1 |
+| 2 | +0 | `true` | 2 |
+| 3 | +0 | `false` | 2 |
+| 4 | +1 | `false` | 3 |
+| 5 | +1 | `false` | 3 |
+
+`top_surface_pattern` and ironing are not suggested: they change the look or the time, not the filament.
 
 - Signed values (+1, −1) are **deltas** on top of the S table.
-- **Shell thickness overrides the layer count.** Orca prints `max(top_shell_layers, ceil(top_shell_thickness / layer_height))` top layers (same for bottom). With `top_shell_thickness = 1` mm at 0.2 mm layers, any suggestion below 5 top layers has no effect. When the current thickness is larger than `layers × layer_height`, the engine also suggests lowering `top_shell_thickness` / `bottom_shell_thickness` to exactly that value.
-- Ironing uses almost no filament, only time. It is a suggestion, not enforced.
+- **Shell thickness overrides the layer count.** Orca prints `max(top_shell_layers, ceil(top_shell_thickness / layer_height))` top layers (same for bottom). With `top_shell_thickness = 1` mm at 0.2 mm layers, any suggestion below 5 top layers has no effect. When the current thickness is larger than `layers × layer_height`, the engine also suggests lowering `top_shell_thickness` / `bottom_shell_thickness` to that value. The top never goes below **0.6 mm** (Orca's default), which keeps thin layer heights from leaving a weak, pillowed top: at 0.12 mm layers that still means 5 top layers.
 - Support interface improves the supported face but costs material. Reduce it at low V.
 - With supports on, two more interface settings follow V, and only ever go down:
   - `support_interface_bottom_layers` (interface where supports rest on the part; `-1` means "same as top"): 0 at V ≤ 3.
@@ -97,18 +104,20 @@ Rationale:
 
 ## 5. Reliability slider (R)
 
-| R | `brim_type` | `brim_width` | `skirt_loops` | `support_threshold_angle` | `support_style` (tree) | `support_base_pattern_spacing` (normal) | `support_remove_small_overhang` |
-|---|---|---|---|---|---|---|---|
-| 0 | `no_brim` | — | 0 | 20° | `tree_slim` | 3.5 mm | on |
-| 1 | `no_brim` | — | 1 | 25° | `tree_slim` | 3.0 mm | on |
-| 2 | `auto_brim` | — | 1 | 30° | `organic` | 2.5 mm | on |
-| 3 | `auto_brim` | — | 1 | 30° | `organic` | 2.5 mm | on |
-| 4 | `brim_ears` | 5 mm | 1 | 35° | `organic` | 2.0 mm | on |
-| 5 | `outer_only` | 5 mm | 2 | 40° | `tree_strong` | 2.0 mm | (unchanged) |
+| R | `brim_type` | `skirt_loops` | `support_threshold_angle` | `support_base_pattern_spacing` (normal) | `support_remove_small_overhang` |
+|---|---|---|---|---|---|
+| 0 | `no_brim` | 0 | 20° | 3.5 mm | on |
+| 1 | `no_brim` | 1 | 25° | 3.0 mm | on |
+| 2 | `auto_brim` | 1 | 30° | 2.5 mm | on |
+| 3 | `auto_brim` | 1 | 30° | 2.5 mm | on |
+| 4 | `brim_ears` | 1 | 35° | 2.0 mm | on |
+| 5 | `outer_only` | 2 | 40° | 2.0 mm | (unchanged) |
+
+**Brim and skirt only go down.** For materials that do not warp, the brim column is only applied when it uses less than the current brim (`no_brim` < `auto_brim` < `brim_ears` < `outer_only`): Orca's auto brim already decides where a part needs one. The skirt column is likewise a ceiling, since the start G-code primes the nozzle. Materials that warp (ABS/ASA, PA, PC) get their brim from section 7.
 
 `only_one_wall_first_layer` is on at R ≤ 1 (one wall on the first layer, slightly weaker base outline) and off from R = 2.
 
-Support settings are only suggested when supports are enabled. `support_style` applies to tree supports, `support_base_pattern_spacing` to normal supports (Orca's default is 2.5 mm). Brim ears (`brim_ears`) put brim only on sharp corners, which is where parts lift.
+Support settings are only suggested when supports are enabled. `support_base_pattern_spacing` applies to normal supports (Orca's default is 2.5 mm). `support_style` is only changed when the new style uses less material, as Orca describes them: tree `tree_strong`/`tree_hybrid` → `organic` at R ≤ 3 (Orca's `default` tree style is already organic), and normal `default`/`grid` → `snug` at R ≤ 1 (less stable). Brim ears (`brim_ears`) put brim only on sharp corners, which is where parts lift.
 
 **Certainty rule.** The plugin only suggests changes whose effect is known: they use less filament (or time) with a known cost, and Orca still decides where they apply. It never guesses whether the part needs something. For that reason `support_on_build_plate_only` was removed: it left overhangs above the part unsupported without knowing whether they needed support. Disabling supports from mesh analysis is out for the same reason.
 
@@ -119,7 +128,7 @@ More settings that follow R and never use more filament than the current value:
 | Setting | Rule |
 |---|---|
 | `prime_tower_brim_width` | At most 0 mm at R = 0, 1 mm at R = 1, 2 mm at R = 2–3; kept from R = 4. Only with more than one filament and the prime tower on; `-1` (auto) is left alone |
-| `raft_layers` | 0 at R ≤ 4. A raft prints several layers under the whole part; at R = 5 the current raft is kept |
+| `raft_layers` | 0 at R ≤ 4. A raft prints several layers under the whole part; at R = 5 the current raft is kept, and it is never removed for materials that warp (ABS/ASA, PA, PC) |
 | `skirt_height` | 1 when there is a skirt and `draft_shield` is `disabled` (more skirt layers only make sense as a draft shield) |
 | `support_base_pattern` (normal supports) | `lightning` at R ≤ 1, the lightest support body, less stable |
 | `support_base_pattern` (tree supports) | `hollow` at R ≤ 3 when another pattern is set. Orca's `default` for tree supports is already hollow, so it is left alone |
@@ -139,7 +148,7 @@ Low R saves on brim and supports but raises the risk of failure. **A failed prin
 | Q3 | Screw holes / heat-set inserts | Yes | `wall_loops` +1 globally. Reinforcing only around the holes is not possible: the API cannot create modifiers (see section 13) |
 | Q4 | Flexible (TPU) | Yes | Infill ≤ 15%; walls drive stiffness; no `lightning` |
 | Q5 | Visible faces | Top/front only | Support and bottom allowed at effective V −2 |
-| Q5b | Faces pointing up while printing will be hidden | Yes (checkbox) | `top_surface_density = 0%`, `top_surface_pattern` left alone. **Implemented** |
+| Q5b | Faces pointing up while printing will be hidden | Yes (checkbox) | `top_surface_density = 0%`. **Implemented** |
 | Q6 | Post-processing | Sanding | `wall_loops` +1, `top_shell_layers` +1 |
 | Q6 | Post-processing | Painting | Effective V −1 |
 | Q7 | Watertight | Yes | `wall_loops` ≥ 3; `bottom_shell_layers` ≥ 4 |
@@ -161,7 +170,7 @@ Low R saves on brim and supports but raises the risk of failure. **A failed prin
 
 The tab shows these as checkboxes under the sliders, titled "Only check what you are sure of". Unchecked means "not sure": the setting is not touched. They follow the certainty rule: the effect is known, and only the user knows whether it is acceptable, so the plugin never infers the answer from the model.
 
-- **Q5b, faces pointing up while printing will be hidden** (always shown). "Top" is the orientation on the bed, not in use, and it covers every upward-facing area: the top of the part, ledges, and the floor of any pocket. Use it for, e.g., the back of a wall sign printed face down, a spacer glued between parts, or a part closed inside an enclosure. Not for boxes (inner floor and rim are top surfaces), figures, parts with visible ledges, or faces that slide, press or fit tightly against something. Orca applies `top_surface_density` to every top surface, but only to its last layer (`Fill.cpp`: external top surfaces use it, internal solid infill stays at 100%), and 0% prints only the walls on that layer. The suggestion keeps at least 2 solid layers underneath (the top layer count is always ≥ 3), so the part stays closed. The finish slider's `top_surface_pattern` change is dropped because that layer is no longer printed. The bottom surface is not offered: `bottom_surface_density` also applies to the first layer, and Orca warns it may hurt bed adhesion, so its effect is not certain.
+- **Q5b, faces pointing up while printing will be hidden** (always shown). "Top" is the orientation on the bed, not in use, and it covers every upward-facing area: the top of the part, ledges, and the floor of any pocket. Use it for, e.g., the back of a wall sign printed face down, a spacer glued between parts, or a part closed inside an enclosure. Not for boxes (inner floor and rim are top surfaces), figures, parts with visible ledges, or faces that slide, press or fit tightly against something. Orca applies `top_surface_density` to every top surface, but only to its last layer (`Fill.cpp`: external top surfaces use it, internal solid infill stays at 100%), and 0% prints only the walls on that layer. The suggestion keeps at least 2 solid layers underneath (the top layer count is always ≥ 3), so the part stays closed. The bottom surface is not offered: `bottom_surface_density` also applies to the first layer, and Orca warns it may hurt bed adhesion, so its effect is not certain.
 - **Q17, purge into the infill** (shown with more than one filament). The walls are opaque, so mixed colors inside will not show (Orca's tooltip warns about transparent walls). It only uses infill Orca already prints, so it never adds material. Not suggested when the sparse infill density is 0%, or when the project's filaments belong to different families (they may not bond inside the part; a note explains it).
 - **Q17b, purge into the supports** (shown with more than one filament and supports on). Orca's default is already on, so this only changes presets that turned it off.
 - Both purge options only work with the prime tower on (`enable_prime_tower`). When it is off, nothing changes and a note says why.
@@ -189,20 +198,21 @@ Read through `orca.host.preset_bundle().current_filament_presets()` → `config_
 
 ### Family classification
 
-`filament_type` is an open list: users can type anything. Normalize to uppercase and map by prefix/suffix:
+`filament_type` is an open list, but Orca offers a fixed set of types (`src/libslic3r/MaterialType.cpp`). The plugin uppercases the type, takes the part before the first `-` and maps it:
 
 | Family | Matches | Notes |
 |---|---|---|
-| `pla` | `PLA`, `PLA+`, `PLA-*` without fiber | |
+| `pla` | `PLA`, `PLA+`, `PLA-CF`, `PLA-AERO` | |
 | `silk` | `pla` family with "SILK" in the type **or in the preset name** | Silk is often registered as `PLA` |
-| `petg` | `PETG`, `PET`, `PCTG` | |
-| `abs_asa` | `ABS`, `ASA` | ASA flagged as UV resistant |
+| `petg` | `PETG`, `PET`, `PCTG`, with `-CF`/`-GF` | |
+| `abs_asa` | `ABS`, `ASA` (with `-CF`, `-GF`, `-AERO`), `HIPS` | HIPS warps like ABS when it is the part's material |
 | `tpu` | `TPU`, `TPE`, `FLEX` | |
-| `pa` | `PA`, `PA6`, `PA12`, `NYLON` | |
-| `pc` | `PC`, `PC-*`, except `PCTG` | |
-| `fiber` | `-CF` or `-GF` suffix | Inherits the base family's rules (`PA-CF` → `pa` + `fiber`) |
-| `support` | `PVA`, `BVOH`, `HIPS`, or `filament_is_support = true` | |
-| `unknown` | anything else | `pla` rules + effective R +1 + warning |
+| `pa` | `PA`, `PA6`, `PA11`, `PA12`, `PAHT`, `PPA`, `NYLON`, with `-CF`/`-GF` | |
+| `pc` | `PC`, `PC-ABS`, `PC-CF`, `PC-PBT` | `PCTG` is `petg` |
+| `support` | `PVA`, `BVOH` | Never used for the rules (see Multi-material) |
+| `unknown` | anything else (PEEK, PEI, PPS, PP, PE, …) | `pla` rules + effective R +1 + warning |
+
+Fiber-filled types (`-CF`, `-GF`) follow their base family. The material selector in the tab replaces the detected families with the one picked.
 
 ### Rules per family
 
@@ -210,21 +220,23 @@ Read through `orca.host.preset_bundle().current_filament_presets()` → `config_
 |---|---|---|---|
 | `pla` | — | None (it is the reference for the tables) | — |
 | `silk` | In `functional`/`mechanical`: `wall_loops` ≥ 3 | Warning: weak layer adhesion, not recommended for functional parts | — |
-| `petg` | `support_top_z_distance` ≥ 0.25 mm | `support_interface_top_layers` ≥ 2 (PETG sticks to supports) | — |
-| `abs_asa` | `brim_type = brim_ears` (or `outer_only` at R = 5), `brim_width` ≥ 5 mm; effective R ≥ 3 | ASA: in Q10, UV exposure does not raise the floor (heat still does) | `no_brim` |
-| `tpu` | Infill **locked** at its current value unless the user unlocks it (extra question: "may the part's hardness change?") | Support off whenever possible. Warn if the part needs support | `lightning` |
-| `pa` | `brim_type = brim_ears` (or `outer_only` at R = 5), `brim_width` ≥ 5 mm; effective R ≥ 3 | Warning: dry the filament before printing | `no_brim` |
+| `petg` | With supports: `support_top_z_distance` ≥ 0.25 mm | `support_interface_top_layers` ≥ 2 (PETG sticks to supports) | — |
+| `abs_asa` | `brim_type` at least `brim_ears` (or `outer_only` at R = 5), `brim_width` ≥ 5 mm; effective R ≥ 3 | — | `no_brim` |
+| `tpu` | Infill **left unchanged** (density, pattern and minimum sparse area): it sets the hardness of the part | Note in the tab | `lightning` |
+| `pa` | `brim_type` at least `brim_ears` (or `outer_only` at R = 5), `brim_width` ≥ 5 mm; effective R ≥ 3 | Warning: dry the filament before printing | `no_brim` |
 | `pc` | `brim_type = outer_only`, `brim_width` ≥ 8 mm; effective R ≥ 4 | — | `no_brim` |
-| `fiber` | Inherited from the base family | Sort the diff by money saved (expensive material) | — |
-| `support` | — | Economy rules apply to support only (`support_base_pattern_spacing`). Do not touch the part | — |
 
-Per-material strength-per-gram adjustment (e.g. nylon holds up with fewer walls) is deferred to v2, after calibrating with real parts.
+For materials that warp, the brim is only ever **raised** to these minimums: a fuller brim type or a wider brim that the user set is kept. Painted, inner-only and leading-edge brims are never replaced; a note asks to check they hold the corners.
+| `unknown` | Effective R = R + 1 | Warning with the type | — |
+
+Not implemented, on purpose: turning supports off for TPU (it guesses what the part needs, see the certainty rule), a question to unlock TPU infill, and sorting fiber-filled materials by money saved. Per-material strength-per-gram adjustment (e.g. nylon holds up with fewer walls) is deferred until it can be calibrated with real parts.
 
 ### Multi-material
 
-- **Object family:** the API does not document which filament each object uses. In v1, apply the **most restrictive** rule across all filaments in the project.
-- **Purging between different families:** do not reduce flush volumes. Use `flush_into_infill` and `flush_into_objects` only when the filaments belong to the same family (different materials may not bond).
-- **Pairs that do not bond** (e.g. PLA + PETG): warn when they share a part. As a support interface, this is an advantage.
+- **Support filaments are skipped.** Filaments of the `support` family or with `filament_is_support` set are not used for the rules. When the first filament is one, a note says which filament the rules follow.
+- **Strictest rule across part filaments.** The API does not say which object uses which filament, so every part filament counts: the highest reliability floor (and the family that raised it), the widest brim (and `outer_only` with any PC), the PETG support gap, the silk wall floor and the TPU infill lock all apply when any part filament needs them. A note lists the materials.
+- **Purging between different families:** do not reduce flush volumes. Purge into the infill is only suggested when all filaments belong to the same family (different materials may not bond).
+- **Pairs that do not bond** (e.g. PLA + PETG) are not warned about yet.
 
 ### Money saved
 
@@ -265,6 +277,10 @@ Limits no slider can break. Only a manual override can, with a warning.
 | `large` | 2 | 5% | 4 | 3 | — |
 
 Ceilings (keep the tool from making usage worse): `wall_loops` ≤ 6, infill ≤ 40%. Above that, the user sets values manually.
+
+**The slider tables are ceilings; these floors are the only minimums.** A change that would use more filament is only suggested when the current value is below a minimum of the purpose (this table, scaled to the layer height and nozzle) or of the material (section 7: PETG interface layers, the brim of materials that warp, Silk PLA walls, a forbidden infill pattern), and then only up to that minimum: mechanical with 2 walls is raised to 3, not to the 5 of Strength 5. A profile already leaner than the sliders but at or above the minimums is left as it is. Every other increase the sliders would ask for (more top layers at a high finish, a steeper support angle at a high reliability, and so on) is not suggested.
+
+In the tab, those increases have their own section, **Needed for the purpose or the material**, below **Save filament**. **Apply savings** applies only the savings; **Apply all** applies both sections.
 
 **Combining with material:** the final floor for each key is the **safest** of the preset floor and the material family floor (section 7). Forbidden patterns add up.
 

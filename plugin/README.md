@@ -1,6 +1,6 @@
 <p align="center"><img src="../assets/logo.png" alt="Filament Saver logo" width="128"></p>
 
-# Filament Saver plugin (v0.1.0)
+# Filament Saver plugin (v0.1.1)
 
 OrcaSlicer 2.5 plugin that adds a **Filament Saver** tab to the main window. It implements the rules from [`docs/optimization-rules.md`](../docs/optimization-rules.md): presets, the three sliders, material rules and the per-purpose floors (sections 2–5, 7 and 9), plus three of the questions from section 6 (hidden top surfaces and multicolor purge). The other questions and the geometry rules are not implemented yet. Changes per version are in [`CHANGELOG.md`](../CHANGELOG.md).
 
@@ -14,8 +14,8 @@ OrcaSlicer 2.5 plugin that adds a **Filament Saver** tab to the main window. It 
 2. **What are you printing?**: pick a purpose (Decoration, Functional, Prototype, Mechanical, Container, Miniature, Large part). The sliders jump to that purpose's defaults; adjust Strength, Finish and Reliability if needed, then click **Suggest changes**. The **Material** selector shows the family detected from the filament profile; pick another one if the profile is generic or wrong. Under the sliders, check only what you are sure of: **Faces pointing up while printing will be hidden** skips the last top layer (for example the back of a wall sign printed face down; not for boxes, figures or parts with visible ledges), and with more than one filament **Purge into the infill** / **Purge into the supports** send color-change purge there instead of the prime tower. Unchecked boxes change nothing. **Print as a vase** turns on spiral vase mode for an open container, together with the settings Orca requires for it; those rows are applied, skipped and undone as one group.
 
    Besides walls, infill and shells, the suggestions cover shell thickness (which otherwise overrides the layer count), brim ears for materials that warp, no raft below top reliability, a single skirt layer when there is no draft shield, and, when supports are on, sparser support, a lighter support body and interface, and ignoring small overhangs. Solid fill Orca adds on its own (sloped-wall reinforcement, gap fill between walls, small solid areas) and the first-layer walls follow the sliders too. The plugin never guesses whether the part needs something, such as supports; Orca keeps deciding where every setting applies.
-3. **Suggested changes**: one row per setting, showing current → suggested value, the reason, and whether it saves filament or uses more. Use **Apply** / **Skip** per row, or **Apply all** / **Skip all**.
-4. **Restore**: **Undo** on an applied row, or **Restore originals** for all of them, puts back the value each setting had before Filament Saver first changed it. Only settings changed by Filament Saver are restored, and the original values are kept even if you click **Suggest changes** again. They are saved in the plugin's storage folder (`originals.json`), so they survive a restart of Orca or a reload of the plugin. In place, restoring only works on the preset the changes were made to.
+3. **Suggested changes**: one row per setting, showing current → suggested value, the reason, and whether it saves filament or uses more. Changes are split into **Save filament** and **Needed for the purpose or the material**: an increase only appears when the current value is below what the purpose or the material needs, and then only up to that minimum, so a profile you already made leaner is kept. Use **Apply** / **Skip** per row, **Apply savings** for the first section, or **Apply all** / **Skip all**.
+4. **Restore**: **Undo** on an applied row, or **Restore originals** for all of them, puts back the value each setting had before Filament Saver first changed it. Only settings changed by Filament Saver are restored. The original value is the one before Filament Saver's change; it is kept if you click **Suggest changes** again, but if you edit a setting by hand after the plugin changed it, your edit becomes the value to go back to. They are saved in the plugin's storage folder (`originals.json`), so they survive a restart of Orca or a reload of the plugin. In place, restoring only works on the preset the changes were made to.
 5. **Save as a new preset**: below the suggestions, type a name (or keep the suggested one) and click **Save preset**. The process settings as they are now, unsaved edits and applied suggestions included, are saved as a process preset in the Filament Saver group of the process list, on top of the same system preset. Saving again under a name the plugin created updates it; names of other presets are refused. The OrcaSlicer plugin API cannot save presets itself, so this uses the local bundle (see below).
 
 Applying uses one of two paths, shown under the sliders:
@@ -24,6 +24,8 @@ Applying uses one of two paths, shown under the sliders:
 - **Preset bundle** (fallback): accepted changes are written to a process preset `<system preset> - Filament Saver` in the local bundle `filament-saver`, together with your existing edits. Select that preset in the process list.
 
 If you switch process presets, the suggestions are marked out of date until you click **Suggest changes** again.
+
+**Object settings.** When an object (or one of its parts) has its own value for a suggested setting, for example its own wall loops, the process preset does not reach it. The row says which objects keep their own value, and a note explains it.
 
 **Choices per set of parts.** Each time you click **Suggest changes**, the purpose, material, sliders and answers are saved for the parts in Orca (the same fingerprint the estimate uses). When you open the project again, or come back to those parts, the tab brings those choices back. Up to 50 sets of parts are remembered (`forms.json` in the plugin storage).
 
@@ -102,7 +104,7 @@ The rules engine and the G-code reader run outside Orca:
 python3 -m unittest discover -s tests
 ```
 
-The suggestions are pinned, in English, by `tests/filament_snapshot.json` (every purpose × material × settings variant). The tests also check that every text has a pt_BR translation with the same placeholders, and that settings removed on purpose (layer height, speeds, ironing, infill combination, supports on build plate only) are never suggested. Regenerate the snapshot with `python3 tests/test_rules.py --update-snapshot` only when a filament rule changes on purpose.
+The suggestions are pinned, in English, by `tests/filament_snapshot.json` (every purpose × material × settings variant). The tests also check that every text has a pt_BR translation with the same placeholders, and that settings removed on purpose (layer height, speeds, ironing, infill combination, supports on build plate only) are never suggested. `tests/test_sweep.py` runs 2000 random profiles over Orca's full value ranges and checks the plugin's guarantees (minimums kept, brims of materials that warp never reduced, TPU infill untouched, a stable result after applying everything). Regenerate the snapshot with `python3 tests/test_rules.py --update-snapshot` only when a filament rule changes on purpose.
 
 ## Try it
 

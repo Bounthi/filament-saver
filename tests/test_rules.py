@@ -121,8 +121,8 @@ class SuggestionsTest(unittest.TestCase):
 class SolidFillTest(unittest.TestCase):
     """Solid fill Orca adds on its own follows the Strength and Reliability sliders."""
 
-    def _targets(self, s, r, material="PETG"):
-        result = fs.suggest(dict(BASE), "decoration", s, 4, r, material)
+    def _targets(self, s, r, material="PETG", v=None):
+        result = fs.suggest(dict(BASE), "decoration", s, s if v is None else v, r, material)
         return {c["key"]: c["suggested"] for c in result["changes"] if c["key"] in SOLID_KEYS}
 
     def test_lowest_strength_and_reliability(self):
@@ -133,8 +133,74 @@ class SolidFillTest(unittest.TestCase):
     def test_highest_strength_keeps_orca_defaults(self):
         self.assertEqual(self._targets(5, 5), {})
 
+    def test_high_finish_keeps_sloped_walls_reinforced(self):
+        self.assertNotIn("ensure_vertical_shell_thickness", self._targets(0, 0, v=4))
+
+    def test_gap_fill_only_goes_down(self):
+        result = fs.suggest({**BASE, "gap_fill_target": "nowhere"}, "mechanical", 5, 1, 4, "PLA")
+        self.assertNotIn("gap_fill_target", {c["key"] for c in result["changes"]})
+
     def test_tpu_keeps_minimum_sparse_infill_area(self):
         self.assertNotIn("minimum_sparse_infill_area", self._targets(0, 0, "TPU"))
+
+
+class MaterialFamilyTest(unittest.TestCase):
+    """Orca's material types (src/libslic3r/MaterialType.cpp) map to the right rules."""
+
+    def test_orca_material_types(self):
+        expected = {
+            "pa": ["PA", "PA-CF", "PA6-GF", "PA11", "PA11-CF", "PA12-CF", "PAHT", "PAHT-GF", "PPA-CF", "PPA-GF"],
+            "abs_asa": ["ABS", "ABS-GF", "ASA", "ASA-AERO", "HIPS"],
+            "support": ["PVA", "BVOH"],
+            "petg": ["PETG", "PETG-CF", "PET", "PCTG"],
+            "pc": ["PC", "PC-ABS", "PC-CF"],
+            "tpu": ["TPU", "FLEX"],
+            "pla": ["PLA", "PLA-CF", "PLA-AERO"],
+            "unknown": ["PEEK", "PPS", "PP", "PEI-1010"],
+        }
+        for family, kinds in expected.items():
+            for kind in kinds:
+                self.assertEqual(fs.material_family(kind), family, kind)
+        self.assertEqual(fs.material_family("PLA", "Elegoo PLA Silk"), "silk")
+
+    def _result(self, primary, others, r=2, override=None):
+        current = {**BASE, "enable_support": "1", "support_top_z_distance": "0.2", "support_threshold_angle": "45"}
+        return fs.suggest(current, "functional", 3, 2, r, primary, primary, family=override,
+                          filaments=1 + len(others), other_filaments=[(kind, kind) for kind in others])
+
+    def test_strictest_rule_across_part_filaments(self):
+        result = self._result("PLA", ["PETG", "PC"])
+        targets = {c["key"]: c["suggested"] for c in result["changes"]}
+        self.assertEqual((targets["brim_type"], targets["brim_width"]), ("outer_only", "8"))  # PC
+        self.assertEqual(targets["support_top_z_distance"], "0.25")  # PETG
+        threshold = next(c for c in result["changes"] if c["key"] == "support_threshold_angle")
+        self.assertIn("Reliability 4/5 (raised for PC)", threshold["reason"])
+        self.assertEqual(result["families"], ["pc", "petg", "pla"])
+        self.assertTrue(any("Several materials" in n for n in result["notes"]))
+
+    def test_single_filament_is_unchanged(self):
+        self.assertEqual(self._result("PETG", [])["families"], ["petg"])
+
+    def test_override_replaces_every_material(self):
+        result = self._result("PLA", ["PC"], override="petg")
+        self.assertEqual(result["families"], ["petg"])
+
+    def test_support_filaments_are_skipped(self):
+        cfg = dict(BASE)
+        make = lambda name, kind, support="0": types.SimpleNamespace(
+            name=name, config_value={"filament_type": kind, "filament_is_support": support}.get)
+        preset = types.SimpleNamespace(name="P", is_dirty=False, config_value=cfg.get)
+        bundle = types.SimpleNamespace(
+            prints=types.SimpleNamespace(edited_preset=lambda: preset, selected_preset=lambda: preset),
+            current_filament_presets=lambda: [make("Soluble", "PVA"), make("Breakaway", "PLA", "1"),
+                                              make("Elegoo PETG", "PETG"), make("Elegoo ABS", "ABS")])
+        fs.orca.host = types.SimpleNamespace(preset_bundle=lambda: bundle)
+        try:
+            context = fs.FilamentSaverPage()._context()
+        finally:
+            del fs.orca.host
+        self.assertEqual((context["filament_name"], context["other_filaments"], context["skipped_support"]),
+                         ("Elegoo PETG", [("ABS", "Elegoo ABS")], True))
 
 
 class QuestionsTest(unittest.TestCase):
@@ -197,13 +263,35 @@ class SupportRaftSkirtTest(unittest.TestCase):
         result = fs.suggest({**BASE, **EXTRA, **overrides}, "decoration", s, v, r, "PLA")
         return {c["key"]: (c["suggested"], c["effect"]) for c in result["changes"]}
 
+    def test_brim_and_skirt_only_go_down(self):
+        self.assertNotIn("skirt_loops", self._targets(r=4, skirt_loops="0"))
+        self.assertEqual(self._targets(r=0, skirt_loops="3")["skirt_loops"], ("0", "saves"))
+        self.assertNotIn("brim_type", self._targets(r=5))  # Orca's auto brim stays for PLA
+        self.assertEqual(self._targets(r=0)["brim_type"], ("no_brim", "saves"))
+
+    def test_raft_kept_for_materials_that_warp(self):
+        result = fs.suggest({**BASE, **EXTRA}, "functional", 3, 2, 3, "PC")
+        self.assertNotIn("raft_layers", {c["key"] for c in result["changes"]})
+
+    def test_top_keeps_orca_minimum_thickness(self):
+        targets = self._targets(v=0, layer_height="0.12", top_shell_thickness="1")
+        self.assertEqual(targets["top_shell_thickness"][0], "0.6")
+        self.assertNotIn("top_shell_thickness", self._targets(v=0, layer_height="0.12", top_shell_thickness="0.6"))
+
+    def test_support_style_only_when_it_saves(self):
+        tree = dict(enable_support="1", support_type="tree(auto)")
+        self.assertNotIn("support_style", self._targets(r=3, support_style="default", **tree))
+        self.assertEqual(self._targets(r=3, support_style="tree_strong", **tree)["support_style"], ("organic", "saves"))
+        self.assertEqual(self._targets(r=0, enable_support="1", support_style="default")["support_style"], ("snug", "saves"))
+        self.assertNotIn("support_style", self._targets(r=3, enable_support="1", support_style="default"))
+
     def test_raft_off_below_top_reliability(self):
         self.assertEqual(self._targets(r=4)["raft_layers"], ("0", "saves"))
         self.assertNotIn("raft_layers", self._targets(r=5))
 
     def test_skirt_height_needs_draft_shield_off(self):
-        self.assertEqual(self._targets()["skirt_height"], ("1", "saves"))
-        self.assertNotIn("skirt_height", self._targets(draft_shield="enabled"))
+        self.assertEqual(self._targets(skirt_loops="1")["skirt_height"], ("1", "saves"))
+        self.assertNotIn("skirt_height", self._targets(skirt_loops="1", draft_shield="enabled"))
         self.assertNotIn("skirt_height", self._targets(r=0))  # no skirt at all
 
     def test_normal_support_body_and_interfaces(self):
@@ -292,6 +380,8 @@ class TranslationTest(unittest.TestCase):
                     current = {**VARIANTS[variant], **EXTRA, "enable_prime_tower": tower}
                     fs.suggest(current, purpose, s, v, r, material, material, family=override, answers=answers,
                                filaments=2, same_family=same_family, lang="pt_BR")
+            # Thickness scaling only shows at other layer heights and nozzles.
+            fs.suggest({**BASE, "layer_height": "0.12", "nozzle_diameter": "0.2"}, "miniature", 1, 5, 3, "PLA", lang="pt_BR")
         finally:
             fs.translator = original
         return requested
@@ -324,7 +414,7 @@ class TranslationTest(unittest.TestCase):
                          ["pt_BR", "pt_BR", "en", "en", "en", "en"])
 
     def test_suggestions_in_portuguese(self):
-        result = fs.suggest(dict(BASE), "functional", 3, 2, 3, "PETG", lang="pt_BR")
+        result = fs.suggest({**BASE, "wall_loops": "5"}, "functional", 3, 2, 3, "PETG", lang="pt_BR")
         walls = next(c for c in result["changes"] if c["key"] == "wall_loops")
         self.assertEqual(walls["label"], "Voltas da parede")
         self.assertTrue(walls["reason"].startswith("Resistência 3/5"))
@@ -364,6 +454,28 @@ class OriginalsStorageTest(unittest.TestCase):
     def test_source_cleared_when_nothing_to_restore(self):
         fs._write_originals("Some preset", {}, {})
         self.assertIsNone(self._page().originals_source)
+
+    def test_undo_respects_edits_made_after_the_plugin(self):
+        """Undo goes back to the value before the plugin's change; if the user edited the setting
+        after an earlier plugin change, their edit is that value."""
+        page = self._page()
+        page.post_message = lambda message: None
+        page._write = lambda pairs, done, failed, message: done("P")
+        page.mode = lambda: "bundle"
+        page.source = "P"
+
+        def apply(current, suggested):
+            page.result = {"changes": [{"id": "sparse_infill_density", "key": "sparse_infill_density", "current": current,
+                                        "suggested": suggested, "status": "pending"}]}
+            page._apply(["sparse_infill_density"])
+
+        apply("15%", "10%")  # the plugin writes 10%
+        apply("10%", "5%")   # re-suggest on the plugin's own value: the original stays 15%
+        self.assertEqual(page.originals["sparse_infill_density"], "15%")
+        apply("12%", "5%")   # the user set 12% by hand in between
+        self.assertEqual(page.originals["sparse_infill_density"], "12%")
+        reloaded = self._page()  # survives a reload
+        self.assertEqual((reloaded.originals, reloaded.applied), ({"sparse_infill_density": "12%"}, {"sparse_infill_density": "5%"}))
 
     def test_only_known_settings_are_restored(self):
         """A tampered file must not turn Restore into a way to set post_process (runs scripts)."""
@@ -529,6 +641,95 @@ class SpoolPriceTest(unittest.TestCase):
         finally:
             del fs.orca.host
             shutil.rmtree(storage)
+
+
+class ThicknessScalingTest(unittest.TestCase):
+    """Layer and wall counts keep the same thickness at other layer heights and nozzles."""
+
+    def _targets(self, purpose="prototype", **overrides):
+        spec = fs.PURPOSES[purpose]
+        current = {**BASE, "top_shell_thickness": "0", **overrides}
+        result = fs.suggest(current, purpose, spec["S"], spec["V"], spec["R"], "PLA")
+        return {c["key"]: c["suggested"] for c in result["changes"]}
+
+    def test_fine_layers_get_more_layers(self):
+        # Raised only to the prototype's minimum (2 layers = 0.4 mm), not to the slider's 3.
+        targets = self._targets(layer_height="0.08")
+        self.assertEqual((targets["top_shell_layers"], targets["bottom_shell_layers"]), ("5", "5"))
+        # From above, the slider value is kept as the ceiling: 3 layers = 0.6 mm.
+        targets = self._targets(layer_height="0.08", top_shell_layers="12", bottom_shell_layers="12")
+        self.assertEqual((targets["top_shell_layers"], targets["bottom_shell_layers"]), ("8", "5"))
+
+    def test_coarse_layers_get_fewer_layers(self):
+        targets = self._targets(layer_height="0.4", top_shell_layers="5", bottom_shell_layers="4")
+        self.assertEqual((targets["top_shell_layers"], targets["bottom_shell_layers"]), ("2", "2"))  # never 1
+
+    def test_small_nozzle_gets_more_walls(self):
+        # Mechanical needs at least 3 walls of 0.4 mm: 6 walls with a 0.2 mm nozzle.
+        self.assertEqual(self._targets("mechanical", nozzle_diameter="0.2", wall_loops="2")["wall_loops"], "6")
+
+    def test_big_nozzle_keeps_at_least_two_walls(self):
+        self.assertNotIn("wall_loops", self._targets(nozzle_diameter="0.8", wall_loops="2"))
+        self.assertEqual(self._targets("mechanical", nozzle_diameter="0.8", wall_loops="6")["wall_loops"], "3")
+
+    def test_minimum_reason_explains_the_scaled_count(self):
+        result = fs.suggest({**BASE, "layer_height": "0.25", "top_shell_layers": "3", "top_shell_thickness": "0"},
+                            "mechanical", 5, 1, 4, "PLA")
+        top = next(c for c in result["changes"] if c["key"] == "top_shell_layers")
+        self.assertEqual(top["suggested"], "4")
+        self.assertIn("That is 1 mm: 4 layers at 0.25 mm layer height.", top["reason"])
+
+    def test_reference_printer_is_unchanged(self):
+        self.assertEqual(self._targets(), self._targets(layer_height="0.2", nozzle_diameter="0.4"))
+
+
+class WarpingBrimTest(unittest.TestCase):
+    def test_wider_or_fuller_brim_is_kept(self):
+        for material in ("ABS", "PA", "PC"):
+            result = fs.suggest({**BASE, "brim_type": "outer_only", "brim_width": "10"}, "functional", 3, 2, 3, material)
+            self.assertFalse({"brim_type", "brim_width"} & {c["key"] for c in result["changes"]}, material)
+
+    def test_raised_to_the_minimum(self):
+        result = fs.suggest({**BASE, "brim_type": "no_brim", "brim_width": "2"}, "functional", 3, 2, 3, "PC")
+        targets = {c["key"]: c["suggested"] for c in result["changes"]}
+        self.assertEqual((targets["brim_type"], targets["brim_width"]), ("outer_only", "8"))
+
+
+class SafetyTest(unittest.TestCase):
+    """Cases found by a randomized sweep over Orca's full value ranges."""
+
+    def test_hand_made_brims_are_kept_for_materials_that_warp(self):
+        for brim in ("painted", "inner_only", "leading_edge_only", "outer_and_inner"):
+            result = fs.suggest({**BASE, "brim_type": brim}, "functional", 3, 2, 3, "ABS")
+            self.assertNotIn("brim_type", {c["key"] for c in result["changes"]}, brim)
+
+    def test_unranked_pattern_is_not_swapped(self):
+        # gyroid instead of triangles: the effect on filament is not known, so nothing is suggested.
+        result = fs.suggest({**BASE, "sparse_infill_pattern": "triangles"}, "mechanical", 5, 1, 4, "PLA")
+        self.assertNotIn("sparse_infill_pattern", {c["key"] for c in result["changes"]})
+
+    def test_forbidden_pattern_is_replaced_by_the_cheapest_allowed(self):
+        result = fs.suggest(dict(BASE), "mechanical", 5, 1, 4, "PLA")  # BASE uses lightning
+        pattern = next(c for c in result["changes"] if c["key"] == "sparse_infill_pattern")
+        self.assertEqual(pattern["suggested"], "adaptivecubic")
+
+    def test_hidden_top_counts_the_final_layers(self):
+        # Two top layers stay (no increase is suggested): too few to skip the last one.
+        result = fs.suggest({**BASE, "top_shell_layers": "2", "top_shell_thickness": "0", "top_surface_density": "100%"},
+                            "prototype", 0, 0, 2, "PLA", answers={"top_hidden": True})
+        self.assertNotIn("top_surface_density", {c["key"] for c in result["changes"]})
+
+
+class ObjectOverrideTest(unittest.TestCase):
+    def test_objects_with_their_own_settings_are_flagged(self):
+        volume = types.SimpleNamespace(config_keys=lambda: ["sparse_infill_density", "extruder"])
+        obj = types.SimpleNamespace(name="Bracket", config_keys=lambda: ["wall_loops"], volumes=lambda: [volume])
+        plain = types.SimpleNamespace(name="Lid", config_keys=lambda: [], volumes=lambda: [])
+        fs.orca.host = types.SimpleNamespace(model=lambda: types.SimpleNamespace(objects=lambda: [obj, plain]))
+        try:
+            self.assertEqual(fs._object_overrides(), {"wall_loops": ["Bracket"], "sparse_infill_density": ["Bracket"]})
+        finally:
+            del fs.orca.host
 
 
 class PrimeTowerBrimTest(unittest.TestCase):
