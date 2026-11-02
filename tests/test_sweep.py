@@ -72,8 +72,9 @@ class SweepTest(unittest.TestCase):
             purpose = rnd.choice(list(fs.PURPOSES)); S, V, R = (rnd.randint(0, 5) for _ in range(3))
             mat = rnd.choice(MATS); others = rnd.sample(MATS, rnd.choice([0, 0, 1]))
             answers = {q: rnd.random() < 0.2 for q in fs.QUESTIONS}
-            res = fs.suggest(dict(cur), purpose, S, V, R, mat, mat, answers=answers, filaments=1 + len(others),
-                             same_family=not others, other_filaments=[(o, o) for o in others])
+            soluble = rnd.random() < 0.2
+            res = fs.suggest(dict(cur), purpose, S, V, R, mat, mat, answers=answers, filaments=1 + len(others) + soluble,
+                             same_family=not others, other_filaments=[(o, o) for o in others], support_filament=soluble)
             ch = {c["key"]: c for c in res["changes"]}
             final = {**cur, **{k: c["suggested"] for k, c in ch.items()}}
             fams = set(res["families"]); vase = answers["vase"]
@@ -128,7 +129,10 @@ class SweepTest(unittest.TestCase):
                     bad("warping brim reduced", (cur["brim_type"], final["brim_type"], info))
                 if float(final["brim_width"]) < float(cur["brim_width"]): bad("warping brim width reduced", (cur["brim_width"], final["brim_width"], info))
                 if int(final["raft_layers"]) < int(cur["raft_layers"]): bad("raft removed for warping", info)
-            if "petg" in fams and final["enable_support"] == "1" and not vase:
+                if cur["brim_type"] == "auto_brim" and (final["brim_type"], final["brim_width"]) != (cur["brim_type"], cur["brim_width"]):
+                    bad("warping auto brim changed", (final["brim_type"], final["brim_width"], info))
+            if soluble and "support_top_z_distance" in ch: bad("gap changed with a support material", info)
+            if "petg" in fams and final["enable_support"] == "1" and not vase and not soluble:
                 if float(final["support_top_z_distance"]) < min(0.25, float(cur["support_top_z_distance"])): bad("petg z gap lowered", info)
                 if int(final["support_interface_top_layers"]) < min(2, int(cur["support_interface_top_layers"])): bad("petg interface lowered", info)
             if "tpu" in fams:
@@ -141,8 +145,8 @@ class SweepTest(unittest.TestCase):
             if "support_interface_top_layers" in ch and int(ch["support_interface_top_layers"]["suggested"]) < 1 and int(cur["support_interface_top_layers"]) >= 1:
                 bad("interface removed", info)
             # stability: apply everything, suggest again
-            res2 = fs.suggest(dict(final), purpose, S, V, R, mat, mat, answers=answers, filaments=1 + len(others),
-                              same_family=not others, other_filaments=[(o, o) for o in others])
+            res2 = fs.suggest(dict(final), purpose, S, V, R, mat, mat, answers=answers, filaments=1 + len(others) + soluble,
+                              same_family=not others, other_filaments=[(o, o) for o in others], support_filament=soluble)
             again = [(c["key"], c["current"], c["suggested"]) for c in res2["changes"]]
             if again: bad("not stable after applying", (again[:3], info))
 

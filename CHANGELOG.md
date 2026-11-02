@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.3 (2026-11-01)
+
+Rules follow the filaments the parts really print with, and Apply never writes suggestions worked out from settings that changed since.
+
+- **Apply** refuses suggestions worked out from settings or filaments that changed in Orca since **Suggest changes**, instead of overwriting a hand edit or missing a material rule (for example, switching from PLA to ABS after the brim was reduced).
+- Switching the filament or printer preset marks the suggestions out of date, like switching the process preset already did.
+- PETG with a support material loaded (PVA, BVOH, or a filament flagged as support) keeps its support gap: those are printed with no gap on purpose.
+- For materials that warp, Orca's auto brim is kept: Orca sizes it from the material and the part, so brim ears or a fixed width could hold less.
+- Material rules only follow the filaments the parts print with: a filament that is loaded but used by no object (for example a PC kept in slot 2) no longer forces its brim and reliability on every part. Objects, parts, modifiers and the per-feature wall and infill filaments are read; with multi-material painting every loaded filament still counts. **Apply** also refuses suggestions if an object was moved to another filament since.
+- With **Print as a vase**, a note says up front when Orca will refuse to slice it: more than one copy on a plate without the By object print sequence, or an object that prints with more than one filament.
+- New running total under the estimate: the filament, time and cost saved between slices of the same parts before and after applying (or undoing) suggestions, with a **Reset** button.
+- A note when the project mixes part materials that bond poorly (PLA or Silk PLA with PETG or ABS/ASA, PETG with ABS/ASA, nylon with any other), since a part can split where they meet.
+- A damaged estimate file no longer leaves the tab blank.
+- Releases check that `plugin/README.md` and `CHANGELOG.md` match the version, and the workflow uses `actions/checkout@v5`.
+
 ## 0.1.2 (2026-11-01)
 
 Nothing that holds the print up is reduced on a guess, and Undo or Restore never overwrite your own edits.

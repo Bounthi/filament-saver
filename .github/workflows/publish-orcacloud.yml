@@ -20,18 +20,21 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Check the plugin version matches the tag
         run: |
           set -euo pipefail
           header="$(sed -n 's/^# version = "\(.*\)"$/\1/p' plugin/filament_saver/filament_saver.py)"
           constant="$(sed -n 's/^VERSION = "\([^"]*\)".*/\1/p' plugin/filament_saver/filament_saver.py)"
+          readme="$(sed -n 's/^# Filament Saver plugin (v\(.*\))$/\1/p' plugin/README.md)"
           tag="${GITHUB_REF_NAME#v}"
-          if [ "$header" != "$tag" ] || [ "$constant" != "$tag" ]; then
-            echo "Tag $GITHUB_REF_NAME does not match the plugin version (header $header, VERSION $constant)" >&2
+          if [ "$header" != "$tag" ] || [ "$constant" != "$tag" ] || [ "$readme" != "$tag" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match the plugin version (header $header, VERSION $constant, plugin/README.md $readme)" >&2
             exit 1
           fi
+          # The changelog must have a section for this version.
+          grep -q "^## $tag " CHANGELOG.md || { echo "CHANGELOG.md has no section for $tag" >&2; exit 1; }
 
       - name: Run the tests
         run: python3 -m unittest discover -s tests

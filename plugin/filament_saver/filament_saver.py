@@ -7,7 +7,7 @@
 # name = "Filament Saver"
 # description = "Suggests print settings that save filament for what you are printing, and applies the ones you accept."
 # author = "bounthi"
-# version = "0.1.2"
+# version = "0.1.3"
 # ///
 # Copyright (c) 2026 bounthi. MIT License, see LICENSE.
 # SPDX-License-Identifier: MIT
@@ -48,7 +48,7 @@ import urllib.request
 import orca
 
 
-VERSION = "0.1.2"  # keep in sync with the header above
+VERSION = "0.1.3"  # keep in sync with the header above
 BUNDLE_ID = "filament-saver"
 BUNDLE_NAME = "Filament Saver"
 PRESET_SUFFIX = " - Filament Saver"
@@ -190,6 +190,11 @@ VASE_DROPS = ("sparse_infill_pattern", "top_shell_thickness", "top_surface_densi
               "only_one_wall_top", "minimum_sparse_infill_area", "ensure_vertical_shell_thickness",
               "flush_into_infill", "flush_into_support")
 
+# Part materials that bond poorly to each other: where they meet inside one part, it can split.
+# Only a note; which filament prints which part is not known to the plugin.
+POOR_BONDS = [({"pla", "silk"}, {"petg"}), ({"pla", "silk"}, {"abs_asa"}), ({"petg"}, {"abs_asa"}),
+              ({"pa"}, {"pla", "silk", "petg", "abs_asa", "tpu", "pc"})]
+
 MAX_WALLS = 6
 # The tables count layers at this layer height (mm) and walls for this nozzle (mm); other layer
 # heights and nozzles get the same thickness.
@@ -259,7 +264,9 @@ VALUE_NAMES = {"timelapse_type": {"0": "Traditional", "1": "Smooth"}}
 # Numeric settings where a higher value uses less filament.
 HIGHER_SAVES = {"support_top_z_distance", "support_base_pattern_spacing", "support_interface_spacing"}
 # Extra process keys the engine reads but never changes.
-CONTEXT_KEYS = ["support_type", "layer_height", "enable_prime_tower", "draft_shield"]
+CONTEXT_KEYS = ["support_type", "layer_height", "enable_prime_tower", "draft_shield", "print_sequence"]
+# Process keys that give part features their own filament (1-based; 0 means the object's filament).
+FEATURE_FILAMENT_KEYS = ("wall_filament", "sparse_infill_filament", "solid_infill_filament")
 # Questions only the user can answer (section 6). Unchecked means "not sure": nothing changes.
 QUESTIONS = ("top_hidden", "vase", "holds_on_bed", "purge_infill", "purge_support")
 # Shell thickness reasons, one per side so each reads naturally once translated.
@@ -341,7 +348,7 @@ def _effect(key, current, target):
 
 
 def suggest(current, purpose, strength, finish, reliability, filament_type="", filament_name="", family=None,
-            answers=None, filaments=1, same_family=True, lang="en", other_filaments=()):
+            answers=None, filaments=1, same_family=True, lang="en", other_filaments=(), support_filament=False):
     """Suggested changes for the current settings.
 
     ``current`` maps setting keys to Orca's string values. ``family`` overrides
@@ -350,7 +357,8 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
     filaments in the project and ``same_family`` whether they all share one family.
     ``other_filaments`` lists (filament_type, preset_name) of the project's other part filaments
     (not support materials): the strictest rule across all of them applies.
-    ``lang`` picks the language of labels, reasons and notes (LANGUAGES).
+    ``lang`` picks the language of labels, reasons and notes (LANGUAGES). ``support_filament`` says
+    whether a support material (PVA, BVOH, or a filament flagged as support) is loaded.
     Returns a list of dicts with key, label, current, suggested, reason and
     effect, in display order, containing only settings that would change.
     """
@@ -456,7 +464,8 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
     label = t(FAMILY_LABELS[family])
     purpose_label = t(spec["label"])
     if "petg" in families and supports_on:
-        if (_number(current.get("support_top_z_distance")) or 0) < 0.25:
+        # A support material is printed with no gap on purpose (soluble or breakaway interface).
+        if not support_filament and (_number(current.get("support_top_z_distance")) or 0) < 0.25:
             put("support_top_z_distance", "0.25", t("PETG sticks to supports: at least a 0.25 mm gap."))
         if int(targets["support_interface_top_layers"]) < 2:
             put("support_interface_top_layers", 2, t("PETG sticks to supports: at least 2 interface layers."))
@@ -475,6 +484,11 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
         }
         if current_brim in OWN_BRIMS:
             notes.append(t("Your %s brim is kept. %s warps: make sure it holds the corners down.") % (current_brim, warp_label))
+        elif current_brim == "auto_brim":
+            # Orca sizes the auto brim itself, from the material and the part: brim ears or a fixed
+            # width could hold less than what it would print.
+            brim_minimums = {}
+            notes.append(t("Orca's auto brim is kept: it sizes the brim for %s and the part itself.") % warp_label)
         elif current_brim not in BRIM_ORDER or BRIM_ORDER.index(current_brim) < BRIM_ORDER.index(needed):
             if needed == "outer_only":
                 put("brim_type", "outer_only", t("%s warps: a full outer brim is required.") % warp_label)
@@ -482,7 +496,7 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
                 put("brim_type", "brim_ears",
                     t("%s warps at the corners: brim ears hold them down with far less filament than a full brim.") % warp_label)
         current_width = _number(current.get("brim_width"))
-        if current_width is None or current_width < min_brim:
+        if current_brim != "auto_brim" and (current_width is None or current_width < min_brim):
             put("brim_width", min_brim, t("%s warps: brim of at least %d mm.") % (warp_label, min_brim))
     if "silk" in families and purpose in ("functional", "mechanical") and int(targets["wall_loops"]) < 3:
         put("wall_loops", 3, t("Silk PLA has weak layer adhesion: at least 3 walls for a functional part."))
@@ -680,6 +694,11 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
     if len(families) > 1:
         notes.append(t("Several materials (%s): the strictest rule of each applies.")
                      % ", ".join(t(FAMILY_LABELS[each]) for each in sorted(families)))
+        for one, other in POOR_BONDS:
+            if families & one and families & other:
+                first, second = sorted(families & one)[0], sorted(families & other)[0]
+                notes.append(t("%s and %s bond poorly to each other: where they meet inside one part, it can split there.")
+                             % (t(FAMILY_LABELS[first]), t(FAMILY_LABELS[second])))
     if "tpu" in families:
         notes.append(t("TPU: infill sets the hardness of the part, so infill is left unchanged."))
     if "unknown" in families:
@@ -846,6 +865,43 @@ def _read_estimates():
     return data
 
 
+def _saved_total(data):
+    """Validated running total of what slices after Filament Saver's changes saved:
+    {"grams", "seconds", "cost", "currency", "count", "since"}, or None."""
+    saved = data.get("saved") if isinstance(data, dict) else None
+    if not isinstance(saved, dict):
+        return None
+    grams, seconds = _number(saved.get("grams")), _number(saved.get("seconds"))
+    count = _number(saved.get("count"))
+    if grams is None or seconds is None or not count or count < 1:
+        return None
+    cost = _number(saved.get("cost"))
+    currency = saved.get("currency") if saved.get("currency") in CURRENCIES else None
+    return {"grams": grams, "seconds": seconds, "cost": cost if currency else None, "currency": currency,
+            "count": int(count), "since": _number(saved.get("since")) or 0}
+
+
+def add_saved(data, previous, latest, prices, currency):
+    """Add what changed from previous to latest (same parts) to the running total in data.
+
+    Only called when Filament Saver applied or undid changes between the two slices, so the
+    total follows its suggestions; an undo that brings filament back subtracts it again."""
+    total = _saved_total(data) or {"grams": 0.0, "seconds": 0.0, "cost": 0.0, "currency": currency,
+                                   "count": 0, "since": latest.get("at", time.time())}
+    if None in (previous.get("grams"), latest.get("grams"), previous.get("seconds"), latest.get("seconds")):
+        return
+    total["grams"] = round(total["grams"] + previous["grams"] - latest["grams"], 2) + 0.0
+    total["seconds"] = total["seconds"] + previous["seconds"] - latest["seconds"]
+    before, after = priced_cost(previous, prices)[0], priced_cost(latest, prices)[0]
+    # Costs in another currency than the total's cannot be added up.
+    if total["cost"] is not None and total["currency"] == currency and None not in (before, after):
+        total["cost"] = round(total["cost"] + before - after, 2) + 0.0  # + 0.0 turns -0.0 into 0.0
+    else:
+        total["cost"] = None
+    total["count"] += 1
+    data["saved"] = total
+
+
 def _read_prices():
     """{filament preset name: {"price": spool price, "grams": spool weight}}."""
     try:
@@ -962,9 +1018,12 @@ def _current_estimates(rate=1.0):
     prices = _read_prices()
     shown = {}
     for which in ("latest", "previous"):
-        if entry.get(which):
-            cost, priced = priced_cost(entry[which], prices)
-            shown[which] = {**entry[which], "cost": round(cost * rate, 2) if cost is not None else None, "priced": priced}
+        if isinstance(entry.get(which), dict):
+            try:
+                cost, priced = priced_cost(entry[which], prices)
+                shown[which] = {**entry[which], "cost": round(cost * rate, 2) if cost is not None else None, "priced": priced}
+            except (TypeError, ValueError):  # a damaged file must not take the tab down
+                traceback.print_exc()
     return shown
 
 
@@ -1036,6 +1095,52 @@ def _object_overrides():
     except Exception:
         traceback.print_exc()
     return found
+
+
+def _filament_number(value):
+    number = _number(value)
+    return int(number) if number is not None and number >= 1 and number == int(number) else None
+
+
+def _printable(item):
+    check = getattr(item, "is_printable", None)
+    return bool(check()) if callable(check) else bool(getattr(item, "printable", True))
+
+
+def model_filament_use(model, current):
+    """Which filaments the parts print with, read from the objects in Orca.
+
+    Returns {"used": set of 1-based filament numbers, or None when it cannot be told (painted
+    multi-material parts), "mixed": names of objects that print with more than one filament,
+    "copies": printable copies of all objects}. Modifiers only count when they set a filament;
+    support enforcers and blockers never do."""
+    used, mixed, copies, painted = set(), [], 0, False
+    for obj in model.objects():
+        if not _printable(obj):
+            continue
+        copies += sum(1 for instance in obj.instances() if _printable(instance))
+        own = set()
+        obj_filament = _filament_number(obj.config_value("extruder")) or 1
+        for volume in obj.volumes():
+            keys = set(_call(volume, "config_keys") or [])
+            if _call(volume, "is_mm_painted"):
+                painted = True
+                own.add(0)  # some other filament, painted on
+            if _call(volume, "is_model_part"):
+                own.add(_filament_number(_call(volume, "extruder_id")) or obj_filament)
+            elif "extruder" in keys:
+                own.add(_filament_number(volume.config_value("extruder")) or obj_filament)
+            else:
+                continue
+            for key in FEATURE_FILAMENT_KEYS:
+                value = volume.config_value(key) if key in keys else \
+                    obj.config_value(key) if key in set(_call(obj, "config_keys") or []) else current.get(key)
+                if _filament_number(value):
+                    own.add(_filament_number(value))
+        if len(own) > 1:
+            mixed.append(str(getattr(obj, "name", "") or "?"))
+        used |= own - {0}
+    return {"used": None if painted or not used else used, "mixed": mixed, "copies": copies}
 
 
 def clean_form(data):
@@ -1297,13 +1402,25 @@ TRANSLATIONS = {
         "A model with thick walls or an inner cavity comes out as a thin shell.":
             "O modo vaso imprime só o lado de fora da peça, com uma parede e o topo aberto. "
             "Um modelo com paredes grossas ou cavidade interna sai como uma casca fina.",
+        "No part prints with %s, so its material rules are left out.":
+            "Nenhuma peça é impressa com %s, então as regras desse material ficam de fora.",
+        "Vase mode: there are %d copies of parts. On one plate, Orca only slices vase mode with more than one copy when the print sequence is By object.":
+            "Modo vaso: há %d cópias de peças. Numa mesma placa, o Orca só fatia modo vaso com mais de uma cópia quando a sequência de impressão é Por objeto.",
+        "Vase mode: Orca does not slice an object that prints with more than one filament in vase mode (%s).":
+            "Modo vaso: o Orca não fatia em modo vaso um objeto impresso com mais de um filamento (%s).",
+        "%s and %s bond poorly to each other: where they meet inside one part, it can split there.":
+            "%s e %s aderem mal entre si: onde se encontram dentro de uma peça, ela pode se separar ali.",
         "Several materials (%s): the strictest rule of each applies.":
             "Vários materiais (%s): vale a regra mais rígida de cada um.",
         "%s is a support material; the rules follow %s.": "%s é material de suporte; as regras seguem %s.",
 
         # Messages.
-        "The process preset changed. Click Suggest changes again.":
-            "O perfil de processo mudou. Clique em Sugerir mudanças de novo.",
+        "Orca's auto brim is kept: it sizes the brim for %s and the part itself.":
+            "O brim automático do Orca foi mantido: ele dimensiona o brim para %s e para a peça.",
+        "A preset or the filaments changed. Click Suggest changes again.":
+            "Um preset ou os filamentos mudaram. Clique em Sugerir mudanças de novo.",
+        "Settings changed in Orca since the suggestions. Click Suggest changes again.":
+            "Configurações mudaram no Orca depois das sugestões. Clique em Sugerir mudanças de novo.",
         "%d suggested change(s).": "%d mudança(s) sugerida(s).",
         "Your settings already match this profile.": "Suas configurações já batem com este perfil.",
         "Still applying the previous changes.": "Ainda aplicando as mudanças anteriores.",
@@ -1337,6 +1454,10 @@ TRANSLATIONS = {
         "From the last slice, {date}.": "Do último fatiamento, {date}.",
         "From {file}, {date}.": "De {file}, {date}.",
         "Slice again after applying changes to compare.": "Fatie de novo depois de aplicar as mudanças para comparar.",
+        "With the suggestions:": "Com as sugestões:",
+        "{n} comparison(s) since {date}, between slices of the same parts before and after applying or undoing suggestions; other edits made in between count too.":
+            "{n} comparação(ões) desde {date}, entre fatiamentos das mesmas peças antes e depois de aplicar ou desfazer sugestões; outras edições feitas no meio também contam.",
+        "Reset": "Zerar",
         "The difference is against the previous slice of the same parts on the same plate.":
             "A diferença é em relação ao fatiamento anterior das mesmas peças, na mesma placa.",
         "No estimate yet. Slice the plate; the time and filament show up here.":
@@ -1601,6 +1722,7 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
         self.result = None       # last suggest() result plus context
         self.source = None       # preset the suggestions were made for
         self.stale = False
+        self.basis = None        # settings and filaments the suggestions were worked out from
         self.busy = False
         self.message = ""
         self.error = ""
@@ -1614,6 +1736,7 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
         self.bundle_values = {}      # settings managed in the local-bundle preset (fallback mode)
         self.loaded = False          # originals read from plugin storage
         self.applied = {}            # the store of originals_source: key -> value the plugin wrote
+        self.changed_since_slice = False  # the plugin applied or undid changes since the last slice
         self.lang = "en"             # follows Orca's language, see _detect_language
         self.parts = None            # fingerprint of the parts last seen, see _sync_parts
         self.form_version = 0        # bumped when the form changes on this side, so the page reloads it
@@ -1677,6 +1800,10 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
                 self._save_preset(data)
             elif command == "set_currency":
                 self._set_currency(data)
+            elif command == "reset_saved":
+                data = _read_estimates()
+                data.pop("saved", None)
+                _write_json_atomic(_storage_path(ESTIMATES_FILE), data)
             else:
                 raise RuntimeError("Unknown command %r" % command)
         except Exception as error:
@@ -1698,9 +1825,10 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
                 return
             self._record_export(self.pending_gcode)
         elif event == getattr(events, "PresetSelected", None):
-            if getattr(ctx, "msg", "") == "print" and self.result is not None:
+            # The rules read the process, the filaments (material rules) and the printer (nozzle).
+            if self.result is not None:
                 self.stale = True
-                self.message = self._t("The process preset changed. Click Suggest changes again.")
+                self.message = self._t("A preset or the filaments changed. Click Suggest changes again.")
         elif event in [getattr(events, name, None) for name in PARTS_EVENTS]:
             # Other parts may be in Orca now; _push reads them on the UI thread only.
             if threading.current_thread() is not threading.main_thread():
@@ -1730,8 +1858,16 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
                 traceback.print_exc()
         filaments = [p for p in bundle.current_filament_presets() if p is not None]
         # Rules follow the part's materials: support filaments (PVA, BVOH, or flagged as support) are skipped.
-        parts = [p for p in filaments if material_family(p.config_value("filament_type"), p.name) != "support"
-                 and not str(p.config_value("filament_is_support") or "0").startswith("1")]
+        loaded_parts = [p for p in filaments if material_family(p.config_value("filament_type"), p.name) != "support"
+                        and not str(p.config_value("filament_is_support") or "0").startswith("1")]
+        # Only the filaments the objects print with; all of them when that cannot be told.
+        try:
+            use = model_filament_use(orca.host.model(), current)
+        except Exception:
+            traceback.print_exc()
+            use = {"used": None, "mixed": [], "copies": 0}
+        used = use["used"]
+        parts = [p for p in loaded_parts if used is None or filaments.index(p) + 1 in used] or loaded_parts
         filament = (parts or filaments or [None])[0]
         return {
             "bundle": bundle,
@@ -1742,7 +1878,11 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
             "filament_name": filament.name if filament else "",
             "filament_count": len(filaments),
             "other_filaments": [(p.config_value("filament_type"), p.name) for p in parts if p is not filament],
-            "skipped_support": filament is not None and bool(filaments) and filaments[0] is not filament,
+            "skipped_support": filament is not None and bool(filaments) and filaments[0] not in loaded_parts,
+            "support_filament": len(loaded_parts) < len(filaments),
+            "unused_filaments": [p.name for p in loaded_parts if p not in parts],
+            "used_filaments": sorted(used) if used is not None else None,
+            "filament_use": use,
             "first_filament_name": filaments[0].name if filaments else "",
             "filament_names": [p.name for p in filaments],
             "filament_costs": [p.config_value("filament_cost") for p in filaments],
@@ -1765,7 +1905,8 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
                          family=None if material == "auto" else material,
                          answers=answers, filaments=context["filament_count"],
                          same_family=context["same_family"], lang=self.lang,
-                         other_filaments=context["other_filaments"])
+                         other_filaments=context["other_filaments"],
+                         support_filament=context["support_filament"])
         overrides = _object_overrides()
         for change in result["changes"]:
             if overrides.get(change["key"]):
@@ -1779,7 +1920,22 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
         if context["skipped_support"]:
             result["notes"].append(self._t("%s is a support material; the rules follow %s.")
                                    % (context["first_filament_name"], context["filament_name"]))
+        if context["unused_filaments"]:
+            result["notes"].append(self._t("No part prints with %s, so its material rules are left out.")
+                                   % ", ".join(context["unused_filaments"]))
+        use = context["filament_use"]
+        if answers.get("vase"):
+            # Orca refuses to slice these (Print::validate); nothing would print, but say so before applying.
+            if use["copies"] > 1 and context["current"].get("print_sequence") != "by object":
+                result["notes"].insert(0, self._t("Vase mode: there are %d copies of parts. On one plate, Orca only slices "
+                                                  "vase mode with more than one copy when the print sequence is By object.")
+                                       % use["copies"])
+            if use["mixed"]:
+                result["notes"].insert(0, self._t("Vase mode: Orca does not slice an object that prints with more than one "
+                                                  "filament in vase mode (%s).") % ", ".join(use["mixed"]))
         self.result = result
+        self.basis = {"current": dict(context["current"]), "filaments": list(context["filament_names"]),
+                      "used": context["used_filaments"]}
         self.source = context["selected"].name
         self.stale = False
         self.message = (self._t("%d suggested change(s).") % len(result["changes"])) if result["changes"] \
@@ -1875,7 +2031,19 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
         if self.busy:
             raise RuntimeError(self._t("Still applying the previous changes."))
         if self.stale:
-            raise RuntimeError(self._t("The process preset changed. Click Suggest changes again."))
+            raise RuntimeError(self._t("A preset or the filaments changed. Click Suggest changes again."))
+        if self.basis is not None and self.mode() == "in_place":
+            # The suggestions were worked out from the settings and filaments at that time: if they
+            # changed in Orca since, writing them now could undo the user's edit or miss a material rule.
+            context = self._context()
+            settings_changed = any(not _same(context["current"].get(k, ""), v) for k, v in self.basis["current"].items()) or \
+                set(context["current"]) != set(self.basis["current"])
+            if settings_changed or context["filament_names"] != self.basis["filaments"] or \
+                    context.get("used_filaments") != self.basis.get("used"):
+                self.stale = True
+                raise RuntimeError(self._t("Settings changed in Orca since the suggestions. Click Suggest changes again.")
+                                   if settings_changed else
+                                   self._t("A preset or the filaments changed. Click Suggest changes again."))
         changes = [c for c in self._changes(ids) if c["status"] in ("pending", "skipped", "error")]
         if not changes:
             return
@@ -1892,6 +2060,9 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
                 if key not in self.originals or self.applied.get(key) != change["current"]:
                     self.originals[key] = change["current"]
                 self.applied[key] = change["suggested"]
+                if self.basis is not None:
+                    self.basis["current"][key] = change["suggested"]
+            self.changed_since_slice = True
             self._save_originals()
             self.message = (self._t("Applied %d change(s) to '%s'. Slice again to see the new estimate.") % (len(changes), target)
                             if self.mode() == "in_place" else
@@ -1948,10 +2119,13 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
             for key in keys:
                 original = store.pop(key)
                 self.applied.pop(key, None)
+                if self.basis is not None and key in self.basis["current"]:
+                    self.basis["current"][key] = original
                 for change in (self.result or {}).get("changes", []):
                     if change["key"] == key:
                         change["current"] = original
                         change["status"] = "pending"
+            self.changed_since_slice = True
             self._save_originals()
             self.message = self._t("Restored %d setting(s) to their values before the suggestions.") % len(keys)
             if edited:
@@ -2122,7 +2296,13 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
             # Same numbers again (e.g. exporting what was just sliced): keep the comparison.
             entry["latest"] = estimate
         else:
+            if self.changed_since_slice and entry.get("latest"):
+                try:
+                    add_saved(data, entry["latest"], estimate, _read_prices(), read_currency(self.lang)["price"])
+                except Exception:
+                    traceback.print_exc()
             entry = {"previous": entry.get("latest"), "latest": estimate}
+        self.changed_since_slice = False
         models[fingerprint] = entry
         for old in sorted(models, key=lambda k: (models[k].get("latest") or {}).get("at", 0))[:-MAX_ESTIMATE_MODELS]:
             del models[old]
@@ -2163,6 +2343,14 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
         except Exception:
             traceback.print_exc()
 
+    def _saved_state(self, currency):
+        saved = _saved_total(_read_estimates())
+        if saved is None:
+            return None
+        # The total was added up in the prices' currency of that time: shown converted, or without cost.
+        same = saved["currency"] == currency["price"] and saved["cost"] is not None
+        return {**saved, "cost": round(saved["cost"] * currency["rate"], 2) if same else None}
+
     def _read_info(self):
         try:
             context = self._context()
@@ -2201,6 +2389,7 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
             "busy": self.busy,
             "currency": currency,
             "estimates": _current_estimates(currency["rate"]),
+            "saved": self._saved_state(currency),
             "prices": _read_prices(),
             "spool_grams": DEFAULT_SPOOL_GRAMS,
             "message": self.message,
@@ -2233,6 +2422,9 @@ h1 { font-size: 18px; margin: 0; display: flex; align-items: center; gap: 10px; 
 .delta { font-size: 12px; font-weight: 600; }
 .delta.saves { color: var(--save); } .delta.costs { color: var(--cost); }
 .hint { color: var(--muted); font-size: 12px; margin-top: 8px; }
+.saved { font-size: 12px; margin-top: 8px; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.saved:empty { display: none; } .saved .total { font-weight: 600; } .saved small { color: var(--muted); }
+.saved .total.saves { color: var(--save); } .saved .total.costs { color: var(--cost); }
 .form { display: grid; grid-template-columns: 1.2fr 2fr; gap: 14px; align-items: start; }
 .purposes { display: grid; gap: 6px; }
 .purpose { display: flex; gap: 8px; align-items: flex-start; padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
@@ -2307,6 +2499,7 @@ button:disabled { opacity: .45; cursor: default; }
       <div class="stat"><div class="value" id="cost">—</div><div class="label"><span data-t>Cost</span> <span id="cost-source"></span></div><div class="delta" id="cost-delta"></div></div>
     </div>
     <div class="hint" id="estimate-hint"></div>
+    <div class="saved" id="saved"></div>
     <div class="prices" id="prices"></div>
   </section>
 
@@ -2408,7 +2601,21 @@ function delta(el, latest, previous, fmt) {
   el.classList.add(diff < 0 ? 'saves' : 'costs');
 }
 
+function renderSaved() {
+  const box = $('saved'), saved = state.saved;
+  if (!saved) { box.innerHTML = ''; return; }
+  const signed = (v, fmt) => (v > 0 ? '−' : v < 0 ? '+' : '') + fmt(Math.abs(v));  // positive totals are savings
+  const parts = [signed(saved.grams, fmtGrams), signed(saved.seconds, fmtTime)];
+  if (saved.cost != null) parts.push(signed(saved.cost, fmtCost));
+  const since = new Date(saved.since * 1000).toLocaleDateString(state.lang === 'pt_BR' ? 'pt-BR' : undefined);
+  box.innerHTML = '<span>' + esc(T('With the suggestions:')) + '</span><span class="total ' + (saved.grams < 0 ? 'costs' : 'saves') +
+    '">' + esc(parts.join(' · ')) + '</span><small>' +
+    esc(T('{n} comparison(s) since {date}, between slices of the same parts before and after applying or undoing suggestions; other edits made in between count too.', {n: saved.count, date: since})) +
+    '</small><button class="ghost" data-reset-saved>' + esc(T('Reset')) + '</button>';
+}
+
 function renderEstimate() {
+  renderSaved();
   const est = state.estimates || {}, latest = est.latest, previous = est.previous;
   $('time').textContent = fmtTime(latest && latest.seconds);
   $('grams').textContent = fmtGrams(latest && latest.grams);
@@ -2569,6 +2776,9 @@ $('purposes').addEventListener('change', e => {
   renderForm();
 });
 $('material').addEventListener('change', e => { form.material = e.target.value; renderForm(); });
+$('saved').addEventListener('click', e => {
+  if (e.target.dataset.resetSaved !== undefined) send({cmd: 'reset_saved'});
+});
 $('prices').addEventListener('click', e => {
   if (e.target.dataset.retry !== undefined) send({cmd: 'set_currency'});
 });

@@ -35,16 +35,11 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "normal_support|container|ASA": {
   "changes": [
@@ -82,16 +77,11 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "normal_support|container|PA-CF": {
   "changes": [
@@ -129,16 +119,10 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -178,23 +162,11 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "normal_support|container|PETG": {
   "changes": [
@@ -464,16 +436,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "normal_support|decoration|ASA": {
   "changes": [
@@ -497,16 +464,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "normal_support|decoration|PA-CF": {
   "changes": [
@@ -530,16 +492,10 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -565,23 +521,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "normal_support|decoration|PETG": {
   "changes": [
@@ -767,16 +711,11 @@
     "10",
     "saves",
     "Strength 3/5: only sparse areas under 10 mm² become solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "normal_support|functional|ASA": {
   "changes": [
@@ -807,16 +746,11 @@
     "10",
     "saves",
     "Strength 3/5: only sparse areas under 10 mm² become solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "normal_support|functional|PA-CF": {
   "changes": [
@@ -847,16 +781,10 @@
     "10",
     "saves",
     "Strength 3/5: only sparse areas under 10 mm² become solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -889,23 +817,11 @@
     "10",
     "saves",
     "Strength 3/5: only sparse areas under 10 mm² become solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "normal_support|functional|PETG": {
   "changes": [
@@ -1147,16 +1063,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "normal_support|large|ASA": {
   "changes": [
@@ -1201,16 +1112,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "normal_support|large|PA-CF": {
   "changes": [
@@ -1255,16 +1161,10 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -1311,23 +1211,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "normal_support|large|PETG": {
   "changes": [
@@ -1648,13 +1536,6 @@
     "Mechanical needs at least 4 bottom layers."
    ],
    [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
-   ],
-   [
     "support_interface_top_layers",
     "2",
     "1",
@@ -1662,7 +1543,9 @@
     "Finish 1/5: 1 support interface layers."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "normal_support|mechanical|ASA": {
   "changes": [
@@ -1702,13 +1585,6 @@
     "Mechanical needs at least 4 bottom layers."
    ],
    [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
-   ],
-   [
     "support_interface_top_layers",
     "2",
     "1",
@@ -1716,7 +1592,9 @@
     "Finish 1/5: 1 support interface layers."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "normal_support|mechanical|PA-CF": {
   "changes": [
@@ -1756,13 +1634,6 @@
     "Mechanical needs at least 4 bottom layers."
    ],
    [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
-   ],
-   [
     "support_interface_top_layers",
     "2",
     "1",
@@ -1771,6 +1642,7 @@
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -1812,20 +1684,6 @@
     "Mechanical needs at least 4 bottom layers."
    ],
    [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
-   ],
-   [
     "support_interface_top_layers",
     "2",
     "1",
@@ -1833,7 +1691,9 @@
     "Finish 1/5: 1 support interface layers."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "normal_support|mechanical|PETG": {
   "changes": [
@@ -2131,16 +1991,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "normal_support|miniature|ASA": {
   "changes": [
@@ -2164,16 +2019,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "normal_support|miniature|PA-CF": {
   "changes": [
@@ -2197,16 +2047,10 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -2232,23 +2076,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "normal_support|miniature|PETG": {
   "changes": [
@@ -2450,13 +2282,6 @@
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ],
    [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
-   ],
-   [
     "support_interface_top_layers",
     "2",
     "1",
@@ -2464,7 +2289,9 @@
     "Finish 0/5: 1 support interface layers."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "normal_support|prototype|ASA": {
   "changes": [
@@ -2511,13 +2338,6 @@
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ],
    [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
-   ],
-   [
     "support_interface_top_layers",
     "2",
     "1",
@@ -2525,7 +2345,9 @@
     "Finish 0/5: 1 support interface layers."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "normal_support|prototype|PA-CF": {
   "changes": [
@@ -2572,13 +2394,6 @@
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ],
    [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
-   ],
-   [
     "support_interface_top_layers",
     "2",
     "1",
@@ -2587,6 +2402,7 @@
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -2635,20 +2451,6 @@
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ],
    [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
-   ],
-   [
     "support_interface_top_layers",
     "2",
     "1",
@@ -2656,7 +2458,9 @@
     "Finish 0/5: 1 support interface layers."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "normal_support|prototype|PETG": {
   "changes": [
@@ -3010,16 +2814,11 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "petg_no_support|container|ASA": {
   "changes": [
@@ -3057,16 +2856,11 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "petg_no_support|container|PA-CF": {
   "changes": [
@@ -3104,16 +2898,10 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -3153,23 +2941,11 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "petg_no_support|container|PETG": {
   "changes": [
@@ -3432,16 +3208,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "petg_no_support|decoration|ASA": {
   "changes": [
@@ -3465,16 +3236,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "petg_no_support|decoration|PA-CF": {
   "changes": [
@@ -3498,16 +3264,10 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -3533,23 +3293,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "petg_no_support|decoration|PETG": {
   "changes": [
@@ -3728,16 +3476,11 @@
     "10",
     "saves",
     "Strength 3/5: only sparse areas under 10 mm² become solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "petg_no_support|functional|ASA": {
   "changes": [
@@ -3768,16 +3511,11 @@
     "10",
     "saves",
     "Strength 3/5: only sparse areas under 10 mm² become solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "petg_no_support|functional|PA-CF": {
   "changes": [
@@ -3808,16 +3546,10 @@
     "10",
     "saves",
     "Strength 3/5: only sparse areas under 10 mm² become solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -3850,23 +3582,11 @@
     "10",
     "saves",
     "Strength 3/5: only sparse areas under 10 mm² become solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "petg_no_support|functional|PETG": {
   "changes": [
@@ -4101,16 +3821,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "petg_no_support|large|ASA": {
   "changes": [
@@ -4155,16 +3870,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "petg_no_support|large|PA-CF": {
   "changes": [
@@ -4209,16 +3919,10 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -4265,23 +3969,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "petg_no_support|large|PETG": {
   "changes": [
@@ -4593,16 +4285,11 @@
     "4",
     "costs",
     "Mechanical needs at least 4 bottom layers."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "petg_no_support|mechanical|ASA": {
   "changes": [
@@ -4640,16 +4327,11 @@
     "4",
     "costs",
     "Mechanical needs at least 4 bottom layers."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "petg_no_support|mechanical|PA-CF": {
   "changes": [
@@ -4687,16 +4369,10 @@
     "4",
     "costs",
     "Mechanical needs at least 4 bottom layers."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -4736,23 +4412,11 @@
     "4",
     "costs",
     "Mechanical needs at least 4 bottom layers."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "petg_no_support|mechanical|PETG": {
   "changes": [
@@ -5008,16 +4672,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "petg_no_support|miniature|ASA": {
   "changes": [
@@ -5041,16 +4700,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "petg_no_support|miniature|PA-CF": {
   "changes": [
@@ -5074,16 +4728,10 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -5109,23 +4757,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "petg_no_support|miniature|PETG": {
   "changes": [
@@ -5318,16 +4954,11 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "petg_no_support|prototype|ASA": {
   "changes": [
@@ -5372,16 +5003,11 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "petg_no_support|prototype|PA-CF": {
   "changes": [
@@ -5426,16 +5052,10 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -5482,23 +5102,11 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "petg_no_support|prototype|PETG": {
   "changes": [
@@ -5810,16 +5418,11 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "slow_printer|container|ASA": {
   "changes": [
@@ -5857,16 +5460,11 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "slow_printer|container|PA-CF": {
   "changes": [
@@ -5904,16 +5502,10 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -5953,23 +5545,11 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "slow_printer|container|PETG": {
   "changes": [
@@ -6232,16 +5812,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "slow_printer|decoration|ASA": {
   "changes": [
@@ -6265,16 +5840,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "slow_printer|decoration|PA-CF": {
   "changes": [
@@ -6298,16 +5868,10 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -6333,23 +5897,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "slow_printer|decoration|PETG": {
   "changes": [
@@ -6528,16 +6080,11 @@
     "10",
     "saves",
     "Strength 3/5: only sparse areas under 10 mm² become solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "slow_printer|functional|ASA": {
   "changes": [
@@ -6568,16 +6115,11 @@
     "10",
     "saves",
     "Strength 3/5: only sparse areas under 10 mm² become solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "slow_printer|functional|PA-CF": {
   "changes": [
@@ -6608,16 +6150,10 @@
     "10",
     "saves",
     "Strength 3/5: only sparse areas under 10 mm² become solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -6650,23 +6186,11 @@
     "10",
     "saves",
     "Strength 3/5: only sparse areas under 10 mm² become solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "slow_printer|functional|PETG": {
   "changes": [
@@ -6901,16 +6425,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "slow_printer|large|ASA": {
   "changes": [
@@ -6955,16 +6474,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "slow_printer|large|PA-CF": {
   "changes": [
@@ -7009,16 +6523,10 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -7065,23 +6573,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "slow_printer|large|PETG": {
   "changes": [
@@ -7393,16 +6889,11 @@
     "4",
     "costs",
     "Mechanical needs at least 4 bottom layers."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "slow_printer|mechanical|ASA": {
   "changes": [
@@ -7440,16 +6931,11 @@
     "4",
     "costs",
     "Mechanical needs at least 4 bottom layers."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "slow_printer|mechanical|PA-CF": {
   "changes": [
@@ -7487,16 +6973,10 @@
     "4",
     "costs",
     "Mechanical needs at least 4 bottom layers."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -7536,23 +7016,11 @@
     "4",
     "costs",
     "Mechanical needs at least 4 bottom layers."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "slow_printer|mechanical|PETG": {
   "changes": [
@@ -7808,16 +7276,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "slow_printer|miniature|ASA": {
   "changes": [
@@ -7841,16 +7304,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "slow_printer|miniature|PA-CF": {
   "changes": [
@@ -7874,16 +7332,10 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -7909,23 +7361,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "slow_printer|miniature|PETG": {
   "changes": [
@@ -8118,16 +7558,11 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "slow_printer|prototype|ASA": {
   "changes": [
@@ -8172,16 +7607,11 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "slow_printer|prototype|PA-CF": {
   "changes": [
@@ -8226,16 +7656,10 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -8282,23 +7706,11 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "slow_printer|prototype|PETG": {
   "changes": [
@@ -8610,16 +8022,11 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "tree_support|container|ASA": {
   "changes": [
@@ -8657,16 +8064,11 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "tree_support|container|PA-CF": {
   "changes": [
@@ -8704,16 +8106,10 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -8753,23 +8149,11 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "tree_support|container|PETG": {
   "changes": [
@@ -9039,16 +8423,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "tree_support|decoration|ASA": {
   "changes": [
@@ -9072,16 +8451,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "tree_support|decoration|PA-CF": {
   "changes": [
@@ -9105,16 +8479,10 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -9140,23 +8508,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "tree_support|decoration|PETG": {
   "changes": [
@@ -9342,16 +8698,11 @@
     "10",
     "saves",
     "Strength 3/5: only sparse areas under 10 mm² become solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "tree_support|functional|ASA": {
   "changes": [
@@ -9382,16 +8733,11 @@
     "10",
     "saves",
     "Strength 3/5: only sparse areas under 10 mm² become solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "tree_support|functional|PA-CF": {
   "changes": [
@@ -9422,16 +8768,10 @@
     "10",
     "saves",
     "Strength 3/5: only sparse areas under 10 mm² become solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -9464,23 +8804,11 @@
     "10",
     "saves",
     "Strength 3/5: only sparse areas under 10 mm² become solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "tree_support|functional|PETG": {
   "changes": [
@@ -9722,16 +9050,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "tree_support|large|ASA": {
   "changes": [
@@ -9776,16 +9099,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "tree_support|large|PA-CF": {
   "changes": [
@@ -9830,16 +9148,10 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -9886,23 +9198,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "tree_support|large|PETG": {
   "changes": [
@@ -10223,13 +9523,6 @@
     "Mechanical needs at least 4 bottom layers."
    ],
    [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
-   ],
-   [
     "support_interface_top_layers",
     "2",
     "1",
@@ -10237,7 +9530,9 @@
     "Finish 1/5: 1 support interface layers."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "tree_support|mechanical|ASA": {
   "changes": [
@@ -10277,13 +9572,6 @@
     "Mechanical needs at least 4 bottom layers."
    ],
    [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
-   ],
-   [
     "support_interface_top_layers",
     "2",
     "1",
@@ -10291,7 +9579,9 @@
     "Finish 1/5: 1 support interface layers."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "tree_support|mechanical|PA-CF": {
   "changes": [
@@ -10331,13 +9621,6 @@
     "Mechanical needs at least 4 bottom layers."
    ],
    [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
-   ],
-   [
     "support_interface_top_layers",
     "2",
     "1",
@@ -10346,6 +9629,7 @@
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -10387,20 +9671,6 @@
     "Mechanical needs at least 4 bottom layers."
    ],
    [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
-   ],
-   [
     "support_interface_top_layers",
     "2",
     "1",
@@ -10408,7 +9678,9 @@
     "Finish 1/5: 1 support interface layers."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "tree_support|mechanical|PETG": {
   "changes": [
@@ -10706,16 +9978,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "tree_support|miniature|ASA": {
   "changes": [
@@ -10739,16 +10006,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "tree_support|miniature|PA-CF": {
   "changes": [
@@ -10772,16 +10034,10 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -10807,23 +10063,11 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
-   ],
-   [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "tree_support|miniature|PETG": {
   "changes": [
@@ -11025,13 +10269,6 @@
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ],
    [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
-   ],
-   [
     "support_interface_top_layers",
     "2",
     "1",
@@ -11039,7 +10276,9 @@
     "Finish 0/5: 1 support interface layers."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "tree_support|prototype|ASA": {
   "changes": [
@@ -11086,13 +10325,6 @@
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ],
    [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "ABS/ASA warps at the corners: brim ears hold them down with far less filament than a full brim."
-   ],
-   [
     "support_interface_top_layers",
     "2",
     "1",
@@ -11100,7 +10332,9 @@
     "Finish 0/5: 1 support interface layers."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+  ]
  },
  "tree_support|prototype|PA-CF": {
   "changes": [
@@ -11147,13 +10381,6 @@
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ],
    [
-    "brim_type",
-    "auto_brim",
-    "brim_ears",
-    "costs",
-    "Nylon (PA) warps at the corners: brim ears hold them down with far less filament than a full brim."
-   ],
-   [
     "support_interface_top_layers",
     "2",
     "1",
@@ -11162,6 +10389,7 @@
    ]
   ],
   "notes": [
+   "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -11210,20 +10438,6 @@
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ],
    [
-    "brim_type",
-    "auto_brim",
-    "outer_only",
-    "costs",
-    "PC warps: a full outer brim is required."
-   ],
-   [
-    "brim_width",
-    "5",
-    "8",
-    "costs",
-    "PC warps: brim of at least 8 mm."
-   ],
-   [
     "support_interface_top_layers",
     "2",
     "1",
@@ -11231,7 +10445,9 @@
     "Finish 0/5: 1 support interface layers."
    ]
   ],
-  "notes": []
+  "notes": [
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+  ]
  },
  "tree_support|prototype|PETG": {
   "changes": [

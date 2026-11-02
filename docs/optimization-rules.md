@@ -164,7 +164,7 @@ The tab shows these as checkboxes under the sliders, titled "Only check what you
 - **Q17b, purge into the supports** (shown with more than one filament and supports on). Orca's default is already on, so this only changes presets that turned it off.
 - Both purge options only work with the prime tower on (`enable_prime_tower`). When it is off, nothing changes and a note says why.
 
-- **Q7b, print as a vase** (always shown). An open container (vase, cup, pot) printed as one continuous outer wall. When checked, the plugin suggests `spiral_mode = 1` together with everything Orca requires before it prints a vase (`ConfigManipulation.cpp`): `wall_loops = 1`, `top_shell_layers = 0`, `sparse_infill_density = 0%`, `enable_support = 0`, `enforce_support_layers = 0`, `detect_thin_wall = 0`, `overhang_reverse = 0`, `timelapse_type = 0` (traditional) and `enable_wrapping_detection = 0`. These rows form one group: Apply, Skip or Undo on any of them acts on all, so the preset is never left half in vase mode. The vase rules run last, so no purpose floor brings walls, infill or top layers back, and suggestions that no longer apply (infill pattern, top surface, support settings, purge into infill or supports) are dropped. A note warns that vase mode prints only the outside of the part, so a model with thick walls or an inner cavity comes out as a thin shell. Orca itself refuses to slice a vase with several objects (unless printing by object) or several materials in one object.
+- **Q7b, print as a vase** (always shown). An open container (vase, cup, pot) printed as one continuous outer wall. When checked, the plugin suggests `spiral_mode = 1` together with everything Orca requires before it prints a vase (`ConfigManipulation.cpp`): `wall_loops = 1`, `top_shell_layers = 0`, `sparse_infill_density = 0%`, `enable_support = 0`, `enforce_support_layers = 0`, `detect_thin_wall = 0`, `overhang_reverse = 0`, `timelapse_type = 0` (traditional) and `enable_wrapping_detection = 0`. These rows form one group: Apply, Skip or Undo on any of them acts on all, so the preset is never left half in vase mode. The vase rules run last, so no purpose floor brings walls, infill or top layers back, and suggestions that no longer apply (infill pattern, top surface, support settings, purge into infill or supports) are dropped. A note warns that vase mode prints only the outside of the part, so a model with thick walls or an inner cavity comes out as a thin shell. Orca itself refuses to slice a vase with more than one copy on a plate (unless the print sequence is by object) or an object that prints with more than one filament (`Print::validate`); the plugin reads the objects and puts a note about either case at the top of the notes before anything is applied.
 
 `flush_into_objects` (use a whole object as a purge target) is a per-object setting and is not offered. Settings that change the part's geometry, such as `make_overhang_printable`, are never suggested.
 
@@ -209,23 +209,25 @@ Fiber-filled types (`-CF`, `-GF`) follow their base family. The material selecto
 |---|---|---|---|
 | `pla` | — | None (it is the reference for the tables) | — |
 | `silk` | In `functional`/`mechanical`: `wall_loops` ≥ 3 | Warning: weak layer adhesion, not recommended for functional parts | — |
-| `petg` | With supports: `support_top_z_distance` ≥ 0.25 mm | `support_interface_top_layers` ≥ 2 (PETG sticks to supports) | — |
+| `petg` | With supports: `support_top_z_distance` ≥ 0.25 mm, unless a support material (PVA, BVOH, or a filament flagged as support) is loaded, which prints with no gap on purpose | `support_interface_top_layers` ≥ 2 (PETG sticks to supports) | — |
 | `abs_asa` | `brim_type` at least `brim_ears` (or `outer_only` at R = 5), `brim_width` ≥ 5 mm; effective R ≥ 3 | — | `no_brim` |
 | `tpu` | Infill **left unchanged** (density, pattern and minimum sparse area): it sets the hardness of the part | Note in the tab | `lightning` |
 | `pa` | `brim_type` at least `brim_ears` (or `outer_only` at R = 5), `brim_width` ≥ 5 mm; effective R ≥ 3 | Warning: dry the filament before printing | `no_brim` |
 | `pc` | `brim_type = outer_only`, `brim_width` ≥ 8 mm; effective R ≥ 4 | — | `no_brim` |
 
-For materials that warp, the brim is only ever **raised** to these minimums: a fuller brim type or a wider brim that the user set is kept. Painted, inner-only and leading-edge brims are never replaced; a note asks to check they hold the corners.
 | `unknown` | Effective R = R + 1 | Warning with the type | — |
+
+For materials that warp, the brim is only ever **raised** to these minimums: a fuller brim type or a wider brim that the user set is kept. Painted, inner-only and leading-edge brims are never replaced; a note asks to check they hold the corners. Orca's `auto_brim` is kept too, with its width: Orca sizes it from the material and the part, so brim ears or a fixed width could hold less.
 
 Not implemented, on purpose: turning supports off for TPU (it guesses what the part needs, see the certainty rule), a question to unlock TPU infill, and sorting fiber-filled materials by money saved. Per-material strength-per-gram adjustment (e.g. nylon holds up with fewer walls) is deferred until it can be calibrated with real parts.
 
 ### Multi-material
 
 - **Support filaments are skipped.** Filaments of the `support` family or with `filament_is_support` set are not used for the rules. When the first filament is one, a note says which filament the rules follow.
-- **Strictest rule across part filaments.** The API does not say which object uses which filament, so every part filament counts: the highest reliability floor (and the family that raised it), the widest brim (and `outer_only` with any PC), the PETG support gap, the silk wall floor and the TPU infill lock all apply when any part filament needs them. A note lists the materials.
+- **Only the filaments the parts print with.** The plugin reads each object's filament (`extruder`), each part's (`extruder_id`), modifiers that set a filament, and the wall / sparse infill / solid infill filaments of the process or the objects. Loaded filaments that no part prints with are left out, with a note. When a part is painted with several filaments (`is_mm_painted`), which ones cannot be told, so every loaded part filament counts.
+- **Strictest rule across those filaments:** the highest reliability floor (and the family that raised it), the widest brim (and `outer_only` with any PC), the PETG support gap, the silk wall floor and the TPU infill lock all apply when any part filament needs them. A note lists the materials.
 - **Purging between different families:** do not reduce flush volumes. Purge into the infill is only suggested when all filaments belong to the same family (different materials may not bond).
-- **Pairs that do not bond** (e.g. PLA + PETG) are not warned about yet.
+- **Pairs that bond poorly** get a note, since a part can split where they meet: PLA (or Silk PLA) with PETG or ABS/ASA, PETG with ABS/ASA, and nylon with any other part material. Nothing changes; the plugin does not know which filament prints which part.
 
 ### Money saved
 

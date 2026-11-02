@@ -163,10 +163,35 @@ class MaterialFamilyTest(unittest.TestCase):
                 self.assertEqual(fs.material_family(kind), family, kind)
         self.assertEqual(fs.material_family("PLA", "Elegoo PLA Silk"), "silk")
 
-    def _result(self, primary, others, r=2, override=None):
-        current = {**BASE, "enable_support": "1", "support_top_z_distance": "0.2", "skirt_loops": "3"}
+    def _result(self, primary, others, r=2, override=None, support_filament=False, **settings):
+        current = {**BASE, "enable_support": "1", "support_top_z_distance": "0.2", "skirt_loops": "3",
+                   "brim_type": "no_brim", **settings}
         return fs.suggest(current, "functional", 3, 2, r, primary, primary, family=override,
-                          filaments=1 + len(others), other_filaments=[(kind, kind) for kind in others])
+                          filaments=1 + len(others), other_filaments=[(kind, kind) for kind in others],
+                          support_filament=support_filament)
+
+    def test_materials_that_bond_poorly_get_a_note(self):
+        bond = lambda primary, others: [n for n in self._result(primary, others)["notes"] if "bond poorly" in n]
+        self.assertEqual(len(bond("PLA", ["PETG"])), 1)
+        self.assertEqual(len(bond("PA", ["PLA"])), 1)
+        self.assertEqual(bond("PLA", ["PLA-CF"]), [])
+        self.assertEqual(bond("ABS", ["ASA"]), [])
+        self.assertEqual(bond("PLA", ["PVA"]), [])  # support materials are not part materials
+
+    def test_auto_brim_is_kept_for_materials_that_warp(self):
+        """Orca sizes the auto brim from the material: ears or a fixed width could hold less."""
+        for kind in ("ABS", "PA", "PC"):
+            result = self._result(kind, [], brim_type="auto_brim", brim_width="0")
+            keys = {c["key"] for c in result["changes"]}
+            self.assertFalse(keys & {"brim_type", "brim_width"}, kind)
+            self.assertTrue(any("auto brim is kept" in n for n in result["notes"]), kind)
+
+    def test_petg_gap_is_left_alone_with_a_support_material(self):
+        """Soluble or breakaway support materials are printed with no gap on purpose."""
+        keys = {c["key"] for c in self._result("PETG", ["PVA"], support_filament=True, support_top_z_distance="0")["changes"]}
+        self.assertNotIn("support_top_z_distance", keys)
+        targets = {c["key"]: c["suggested"] for c in self._result("PETG", [], support_top_z_distance="0")["changes"]}
+        self.assertEqual(targets["support_top_z_distance"], "0.25")
 
     def test_strictest_rule_across_part_filaments(self):
         result = self._result("PLA", ["PETG", "PC"])
@@ -531,6 +556,31 @@ class OriginalsStorageTest(unittest.TestCase):
         self.assertEqual((self.written, page.originals), ([], {}))
         self.assertEqual(fs._read_originals()["presets"], {})
 
+    def test_apply_refuses_settings_changed_since_the_suggestions(self):
+        """A hand edit made after Suggest is never overwritten with a suggestion worked out from the old value."""
+        page = self._page()
+        live = {"wall_loops": "3", "sparse_infill_density": "15%"}
+        page._context = lambda: {"current": dict(live), "filament_names": ["PLA"]}
+        page.basis = {"current": dict(live), "filaments": ["PLA"]}
+        self._apply(page, "wall_loops", "3", "2")                # unchanged: applied
+        live["wall_loops"] = "2"                                 # what the plugin wrote
+        self._apply(page, "sparse_infill_density", "15%", "10%")  # still fine after the plugin's own write
+        self.assertEqual(len(self.written), 2)
+        live["sparse_infill_density"] = "25%"                    # the user edits a setting in Orca
+        with self.assertRaises(RuntimeError):
+            self._apply(page, "wall_loops", "2", "2")
+        self.assertTrue(page.stale)
+        self.assertEqual(len(self.written), 2)
+
+    def test_apply_refuses_other_filaments(self):
+        """Material rules (brims of materials that warp, the PETG support gap) follow the filaments."""
+        page = self._page()
+        page._context = lambda: {"current": {"brim_type": "auto_brim"}, "filament_names": ["ABS"]}
+        page.basis = {"current": {"brim_type": "auto_brim"}, "filaments": ["PLA"]}
+        with self.assertRaises(RuntimeError):
+            self._apply(page, "brim_type", "auto_brim", "no_brim")
+        self.assertEqual(self.written, [])
+
     def test_older_file_is_read(self):
         with open(os.path.join(self.storage, fs.ORIGINALS_FILE), "w") as stream:
             json.dump({"source": "A", "originals": {"wall_loops": "3"}, "bundle_values": {}}, stream)
@@ -566,6 +616,96 @@ def _object(volumes, scales=((1.0, 1.0, 1.0),), name="part"):
 
 def _model(objects, plate=0):
     return types.SimpleNamespace(objects=lambda: objects, current_plate_index=lambda: plate)
+
+
+def _part(filament=1, painted=False, kind="part", config=None):
+    config = dict(config or {})
+    return types.SimpleNamespace(is_model_part=lambda: kind == "part", is_mm_painted=lambda: painted,
+                                 extruder_id=lambda: filament, config_keys=lambda: list(config),
+                                 config_value=lambda key: config.get(key))
+
+
+def _filament_object(volumes, filament="1", copies=1, name="obj", config=None):
+    config = {"extruder": filament, **(config or {})}
+    return types.SimpleNamespace(name=name, volumes=lambda: volumes, is_printable=lambda: True,
+                                 instances=lambda: [types.SimpleNamespace(is_printable=lambda: True)] * copies,
+                                 config_keys=lambda: list(config), config_value=lambda key: config.get(key))
+
+
+class FilamentUseTest(unittest.TestCase):
+    """Material rules follow only the filaments the objects print with."""
+
+    def use(self, objects, current=None):
+        return fs.model_filament_use(_model(objects), current or {})
+
+    def test_filaments_of_parts_and_modifiers(self):
+        result = self.use([_filament_object([_part(1)]), _filament_object([_part(3)], "3")])
+        self.assertEqual((result["used"], result["mixed"], result["copies"]), ({1, 3}, [], 2))
+        # A modifier counts only when it sets a filament; support enforcers never do.
+        modifier = _part(kind="modifier", config={"extruder": "2"})
+        enforcer = _part(5, kind="enforcer")
+        self.assertEqual(self.use([_filament_object([_part(1), modifier, enforcer], name="a")])["mixed"], ["a"])
+        self.assertEqual(self.use([_filament_object([_part(1), enforcer])])["used"], {1})
+
+    def test_feature_filaments_count(self):
+        self.assertEqual(self.use([_filament_object([_part(1)])], {"wall_filament": "2", "sparse_infill_filament": "0"})["used"], {1, 2})
+        obj = _filament_object([_part(1)], config={"solid_infill_filament": "4"})
+        self.assertEqual(self.use([obj])["used"], {1, 4})
+
+    def test_painting_means_any_filament(self):
+        result = self.use([_filament_object([_part(1, painted=True)], name="p")])
+        self.assertIsNone(result["used"])
+        self.assertEqual(result["mixed"], ["p"])
+
+    def setUp(self):
+        self.storage = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.storage)
+
+    def _context(self, objects, vase=None):
+        preset = lambda name, values: types.SimpleNamespace(name=name, config_value=lambda key: values.get(key, ""))
+        filaments = [preset("Generic PLA", {"filament_type": "PLA"}), preset("Generic PC", {"filament_type": "PC"}),
+                     preset("Generic PVA", {"filament_type": "PVA"})]
+        process = preset("0.20mm", {"brim_type": "no_brim", "print_sequence": "by layer"})
+        fs.orca.host = types.SimpleNamespace(
+            model=lambda: _model(objects),
+            preset_bundle=lambda: types.SimpleNamespace(
+                prints=types.SimpleNamespace(edited_preset=lambda: process, selected_preset=lambda: process),
+                printers=types.SimpleNamespace(edited_preset=lambda: preset("printer", {"nozzle_diameter": "0.4"})),
+                current_filament_presets=lambda: filaments))
+        try:
+            page = fs.FilamentSaverPage()
+            if vase is None:
+                return page._context()
+            fs.orca.host.plugin = types.SimpleNamespace(storage=lambda: self.storage)
+            page._suggest({"purpose": "container", "answers": {"vase": vase}})
+            return [n for n in page.result["notes"] if n.startswith("Vase mode:")]
+        finally:
+            del fs.orca.host
+
+    def test_context_follows_the_filaments_in_use(self):
+        """A PC filament loaded but unused no longer forces PC rules (brim, reliability) on a PLA part."""
+        context = self._context([_filament_object([_part(1)])])
+        self.assertEqual((context["filament_type"], context["other_filaments"]), ("PLA", []))
+        self.assertEqual((context["unused_filaments"], context["used_filaments"]), (["Generic PC"], [1]))
+        self.assertTrue(context["support_filament"])
+        context = self._context([_filament_object([_part(1)]), _filament_object([_part(2)], "2")])
+        self.assertEqual((context["other_filaments"], context["unused_filaments"]), ([("PC", "Generic PC")], []))
+        context = self._context([_filament_object([_part(1, painted=True)])])  # painted: any filament
+        self.assertEqual((context["other_filaments"], context["used_filaments"]), ([("PC", "Generic PC")], None))
+
+    def test_vase_warnings(self):
+        """Orca refuses vase mode for several copies printed by layer and for objects with several filaments."""
+        self.assertEqual(self._context([_filament_object([_part(1)])], vase=True), [])
+        self.assertEqual(len(self._context([_filament_object([_part(1)], copies=2)], vase=True)), 1)
+        mixed = self._context([_filament_object([_part(1), _part(2)], name="cup")], vase=True)
+        self.assertEqual(len(mixed), 1)
+        self.assertIn("cup", mixed[0])
+        self.assertEqual(self._context([_filament_object([_part(1)], copies=2)], vase=False), [])
+
+    def test_copies(self):
+        self.assertEqual(self.use([_filament_object([_part()], copies=3), _filament_object([_part()])])["copies"], 4)
 
 
 class FingerprintTest(unittest.TestCase):
@@ -645,6 +785,35 @@ class EstimateHistoryTest(unittest.TestCase):
         self.assertEqual(self._slice(50), [None, 50])
         self.model = _model([_object([_volume()])])  # back to the first one
         self.assertEqual(self._slice(7), [8, 7])
+
+    def test_saved_total_follows_the_plugin_changes(self):
+        """Only slices right after the plugin applied or undid changes count, and an undo subtracts."""
+        saved = lambda: fs._saved_total(fs._read_estimates())
+        self._slice(10)
+        self.page.changed_since_slice = True
+        self._slice(8)                                   # after applying: 2 g saved
+        self.assertEqual((saved()["grams"], saved()["count"], saved()["cost"]), (2, 1, 0))
+        self._slice(6)                                   # the user's own edit, no plugin change: not counted
+        self.assertEqual(saved()["grams"], 2)
+        self.page.changed_since_slice = True
+        self._slice(7)                                   # after undoing: 1 g back
+        self.assertEqual((saved()["grams"], saved()["count"]), (1, 2))
+        self.page.changed_since_slice = True
+        self.model = _model([_object([_volume(99)])])    # other parts: nothing to compare with
+        self._slice(50)
+        self.assertEqual(saved()["count"], 2)
+        self.assertFalse(self.page.changed_since_slice)
+        self.assertEqual(self.page._saved_state({"price": "USD", "rate": 1.0})["grams"], 1)
+        self.assertIsNone(self.page._saved_state({"price": "BRL", "rate": 1.0})["cost"])  # other currency
+
+    def test_saved_total_can_be_reset_and_ignores_a_damaged_file(self):
+        self.assertIsNone(fs._saved_total({"saved": {"grams": "x", "seconds": 1, "count": 1}}))
+        self.assertIsNone(fs._saved_total({"saved": {"grams": 1, "seconds": 1, "count": 0}}))
+        self._slice(10)
+        self.page.changed_since_slice = True
+        self._slice(8)
+        self.page._handle({"cmd": "reset_saved"})
+        self.assertIsNone(fs._saved_total(fs._read_estimates()))
 
     def test_old_global_history_is_dropped(self):
         with open(os.path.join(self.storage, fs.ESTIMATES_FILE), "w") as stream:
