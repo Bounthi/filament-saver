@@ -35,7 +35,7 @@ Each stage overrides the previous one. Floors always win, except against an expl
 | `prototype` | 0 | 0 | 2 | Only the geometry needs to come out right |
 | `mechanical` | 5 | 1 | 4 | Gear, hinge, load-bearing bracket |
 | `container` | 2 | 3 | 3 | Vase, cup, box; vase mode candidate |
-| `miniature` | 1 | 5 | 3 | Fine detail, delicate supports |
+| `miniature` | 1 | 5 | 3 | Fine detail; supports are left as they are |
 | `large` | 1 | 2 | 4 | Cosplay, large part; infill dominates usage |
 
 ---
@@ -70,7 +70,9 @@ Solid fill that Orca adds on its own also follows S:
 - `gap_fill_target` **only goes down**: Orca's default is `nowhere`, and more gap fill adds filament for little strength. It controls gap fill on top, bottom and internal **solid** surfaces, not between walls. At S ≤ 2 it becomes `topbottom` (no gap fill on internal solid infill).
 - `minimum_sparse_infill_area` follows S in both directions.
 
-Each change has a known cost: sloped walls a bit thinner, small gaps in internal solid infill, small sparse areas no longer turned solid. Orca still decides where any of it applies. TPU keeps `minimum_sparse_infill_area` (infill sets its hardness).
+Each change has a known cost: sloped walls a bit thinner, small gaps in internal solid infill, small sparse areas no longer turned solid. Orca still decides where any of it applies. TPU keeps `minimum_sparse_infill_area` (infill sets its hardness). Miniatures never go below Orca's default of 15 mm², so thin limbs and weapons stay solid (the Orca wiki describes the setting for models with small features).
+
+With supports on, the Miniature purpose adds notes, and changes nothing, when `support_on_build_plate_only` is on (parts of the figure above itself get no support), when `support_remove_small_overhang` is on (fingers, chins and weapon tips get none) and with organic tree supports (Orca's tree support brim only applies to Tree Slim, Strong and Hybrid). These came from two PLA miniatures that failed right above their bases. Miniature also notes layer heights above 0.16 mm, where faces and fine detail fade; the layer height itself is never changed.
 
 Rationale:
 - **Walls give more strength per gram than infill.** From S=3 up, walls increase before density does.

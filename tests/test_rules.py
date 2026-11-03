@@ -12,6 +12,7 @@ import json
 import os
 import re
 import shutil
+import subprocess
 import sys
 import threading
 import tempfile
@@ -390,6 +391,23 @@ class VaseTest(unittest.TestCase):
         self.assertEqual({c["group"] for c in changes if c["key"] in ("brim_type", "bottom_shell_layers")}, {""})
 
 
+class PageScriptTest(unittest.TestCase):
+    """A syntax error in the tab's JavaScript leaves the tab blank in Orca; nothing else would catch it."""
+
+    def test_script_parses(self):
+        node = shutil.which("node")
+        if node is None:
+            self.skipTest("node is not installed")
+        script = fs.PAGE[fs.PAGE.index("<script>") + len("<script>"):fs.PAGE.index("</script>")]
+        with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as stream:
+            stream.write(script)
+        try:
+            check = subprocess.run([node, "--check", stream.name], capture_output=True, text=True)
+        finally:
+            os.unlink(stream.name)
+        self.assertEqual(check.returncode, 0, check.stderr)
+
+
 class TranslationTest(unittest.TestCase):
     """Every text the user sees has a pt_BR entry with the same placeholders."""
 
@@ -572,6 +590,17 @@ class OriginalsStorageTest(unittest.TestCase):
         self.assertTrue(page.stale)
         self.assertEqual(len(self.written), 2)
 
+    def test_preset_switch_during_apply_keeps_its_message(self):
+        """The worker finishing after a preset switch must not replace the out-of-date message."""
+        page = self._page()
+
+        def write(pairs, done, failed, message):
+            page.stale, page.message = True, "out of date"  # PresetSelected while the worker runs
+            done(self.selected)
+        page._write = write
+        self._apply(page, "wall_loops", "3", "2")
+        self.assertEqual((page.message, page.originals), ("out of date", {"wall_loops": "3"}))
+
     def test_apply_refuses_other_filaments(self):
         """Material rules (brims of materials that warp, the PETG support gap) follow the filaments."""
         page = self._page()
@@ -706,6 +735,46 @@ class FilamentUseTest(unittest.TestCase):
 
     def test_copies(self):
         self.assertEqual(self.use([_filament_object([_part()], copies=3), _filament_object([_part()])])["copies"], 4)
+
+
+class ContainerTest(unittest.TestCase):
+    def test_liquid_disclaimer(self):
+        liquid = lambda purpose: [n for n in fs.suggest(dict(BASE), purpose, 2, 3, 3, "PLA", "PLA")["notes"] if "liquid" in n]
+        self.assertEqual(len(liquid("container")), 1)
+        self.assertEqual(liquid("functional"), [])
+
+
+class MiniatureTest(unittest.TestCase):
+    """The settings that made two PLA miniatures fail (2026-11-02): notes, and small areas kept solid."""
+
+    def result(self, **settings):
+        current = {**BASE, "enable_support": "1", "support_type": "tree(auto)", "support_style": "organic",
+                   "support_on_build_plate_only": "1", "support_remove_small_overhang": "1",
+                   "minimum_sparse_infill_area": "15", **settings}
+        return fs.suggest(current, "miniature", 1, 5, 3, "PLA", "PLA")
+
+    def test_support_notes(self):
+        notes = " ".join(self.result()["notes"])
+        for text in ("On build plate only", "Ignore small overhangs", "Organic supports"):
+            self.assertIn(text, notes)
+        quiet = self.result(support_on_build_plate_only="0", support_remove_small_overhang="0", support_style="tree_strong")
+        self.assertFalse([n for n in quiet["notes"] if "support" in n.lower()])
+        self.assertFalse([n for n in self.result(enable_support="0")["notes"] if "On build plate only" in n])
+        # Notes only: no support setting is changed.
+        self.assertFalse({c["key"] for c in self.result()["changes"]} & {"support_on_build_plate_only", "support_remove_small_overhang", "support_style"})
+
+    def test_layer_height_note(self):
+        coarse = lambda height: [n for n in self.result(layer_height=height)["notes"] if "coarse" in n]
+        self.assertEqual(len(coarse("0.2")), 1)
+        self.assertEqual(coarse("0.16"), [])
+        self.assertEqual(coarse("0.12"), [])
+        self.assertFalse([n for n in fs.suggest({**BASE, "layer_height": "0.2"}, "decoration", 1, 4, 3, "PLA", "PLA")["notes"] if "coarse" in n])
+
+    def test_small_areas_stay_solid(self):
+        keys = lambda **s: {c["key"]: c["suggested"] for c in self.result(**s)["changes"]}
+        self.assertNotIn("minimum_sparse_infill_area", keys())                       # 15 stays 15
+        self.assertEqual(keys(minimum_sparse_infill_area="30")["minimum_sparse_infill_area"], "15")
+        self.assertNotIn("minimum_sparse_infill_area", keys(minimum_sparse_infill_area="8"))  # a leaner value is kept
 
 
 class FingerprintTest(unittest.TestCase):

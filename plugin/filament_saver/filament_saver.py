@@ -100,7 +100,7 @@ PURPOSES = {
     "container": {"label": "Container", "hint": "Vase, cup, box",
                   "S": 2, "V": 3, "R": 3,
                   "floors": {"walls": 2, "infill": 0, "top": 3, "bottom": 4, "forbid": ()}},
-    "miniature": {"label": "Miniature", "hint": "Fine detail, delicate supports",
+    "miniature": {"label": "Miniature", "hint": "Fine detail; supports are left as they are",
                   "S": 1, "V": 5, "R": 3,
                   "floors": {"walls": 2, "infill": 0, "top": 3, "bottom": 2, "forbid": ()}},
     "large": {"label": "Large part", "hint": "Cosplay, big prints; infill dominates usage",
@@ -264,7 +264,8 @@ VALUE_NAMES = {"timelapse_type": {"0": "Traditional", "1": "Smooth"}}
 # Numeric settings where a higher value uses less filament.
 HIGHER_SAVES = {"support_top_z_distance", "support_base_pattern_spacing", "support_interface_spacing"}
 # Extra process keys the engine reads but never changes.
-CONTEXT_KEYS = ["support_type", "layer_height", "enable_prime_tower", "draft_shield", "print_sequence"]
+CONTEXT_KEYS = ["support_type", "layer_height", "enable_prime_tower", "draft_shield", "print_sequence",
+                "support_on_build_plate_only"]
 # Process keys that give part features their own filament (1-based; 0 means the object's filament).
 FEATURE_FILAMENT_KEYS = ("wall_filament", "sparse_infill_filament", "solid_infill_filament")
 # Questions only the user can answer (section 6). Unchecked means "not sure": nothing changes.
@@ -322,8 +323,6 @@ def _effect(key, current, target):
         if current in PATTERN_ORDER and target in PATTERN_ORDER:
             return "saves" if PATTERN_ORDER.index(target) < PATTERN_ORDER.index(current) else "costs"
         return "saves" if target in ("lightning", "supportcubic", "adaptivecubic") else ""
-    if key == "support_base_pattern":
-        return "saves" if target in ("lightning", "hollow") else ""
     if key == "support_interface_bottom_layers":
         # -1 means "same as the top interface".
         return "saves" if target == "0" else ""
@@ -338,7 +337,7 @@ def _effect(key, current, target):
             if current in order and target in order:
                 return "saves" if order.index(target) < order.index(current) else "costs"
             return ""
-    if key in ("top_surface_pattern", "support_style", "timelapse_type") or key in SWITCH_KEYS:
+    if key == "timelapse_type" or key in SWITCH_KEYS:
         return ""
     lower_saves = key not in HIGHER_SAVES
     nc, nt = _number(current), _number(target)
@@ -403,6 +402,9 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
     if current_gap in GAP_FILL_ORDER and GAP_FILL_ORDER.index(gap_fill) < GAP_FILL_ORDER.index(current_gap):
         put("gap_fill_target", gap_fill,
             t("Strength %d/5: %s.") % (strength, t("gap fill only on top and bottom surfaces, not on internal solid infill")))
+    if purpose == "miniature":
+        # Thin limbs and weapons are small areas: Orca's default keeps them solid.
+        min_sparse_area = max(min_sparse_area, 15)
     put("minimum_sparse_infill_area", min_sparse_area,
         t("Strength %d/5: only sparse areas under %d mm² become solid infill.") % (strength, min_sparse_area))
 
@@ -627,7 +629,7 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
 
     # Vase mode (section 6), last so that no floor brings back walls, infill or top layers.
     if answers.get("vase"):
-        for key in VASE_DROPS + tuple(k for k in targets if k.startswith("support_") or k == "tree_support_wall_count"):
+        for key in VASE_DROPS + tuple(k for k in targets if k.startswith("support_")):
             targets.pop(key, None)
             reasons.pop(key, None)
         put("spiral_mode", "1", t("You said this is an open container that can print as one continuous outer wall: "
@@ -707,6 +709,20 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
         notes.append(t("Unknown material '%s': PLA rules with extra reliability.") % (", ".join(k or "?" for k in unknown) or "?"))
     if "silk" in families and purpose in ("functional", "mechanical"):
         notes.append(t("Silk PLA is not recommended for functional parts."))
+    if purpose == "container":
+        notes.append(t("These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."))
+    if purpose == "miniature" and (_number(current.get("layer_height")) or 0) > 0.16 + 1e-9:
+        # A note only: layer height sets detail and time, not filament.
+        notes.append(t("%g mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm.")
+                     % _number(current.get("layer_height")))
+    if purpose == "miniature" and supports_on:
+        # Notes only: whether the figure needs that support depends on the model.
+        if current.get("support_on_build_plate_only") == "1":
+            notes.append(t("On build plate only is on: parts of the figure above itself (arms, capes, weapons over the base) get no support."))
+        if current.get("support_remove_small_overhang") == "1":
+            notes.append(t("Ignore small overhangs is on: small overhangs such as fingers, chins and weapon tips get no support."))
+        if str(current.get("support_type", "")).startswith("tree") and current.get("support_style") in ("organic", "default"):
+            notes.append(t("Organic supports: Orca's tree support brim only applies to Tree Slim, Strong and Hybrid, so tall organic branches have no brim of their own."))
     if "pa" in families:
         notes.append(t("Nylon absorbs moisture: dry the filament before printing."))
     return {"family": family, "family_label": label, "detected": detected, "families": sorted(families),
@@ -1249,7 +1265,7 @@ TRANSLATIONS = {
         "Detect thin walls": "Detectar paredes finas",
         "Reverse on even": "Reversão em par",
         "Skirt height": "Altura da saia",
-        "Raft layers": "Camadas da jangada",
+        "Raft layers": "Camadas do raft",
         "Enable support": "Ativar suporte",
         "Enforce support layers": "Camadas de suporte forçado",
         "Support base pattern": "Padrão da base (suporte)",
@@ -1273,7 +1289,7 @@ TRANSLATIONS = {
         "Container": "Recipiente",
         "Vase, cup, box": "Vaso, copo, caixa",
         "Miniature": "Miniatura",
-        "Fine detail, delicate supports": "Detalhes finos, suportes delicados",
+        "Fine detail; supports are left as they are": "Detalhes finos; o suporte fica como está",
         "Large part": "Peça grande",
         "Cosplay, big prints; infill dominates usage": "Cosplay, impressões grandes; o preenchimento domina o consumo",
 
@@ -1334,7 +1350,7 @@ TRANSLATIONS = {
         "%s: %d skirt loop(s).": "%s: %d volta(s) de saia.",
         "You said the part holds on the bed by itself. %s: %s.": "Você disse que a peça fica firme na mesa sem ajuda. %s: %s.",
         "You said the part holds on the bed by itself. %s: no raft, which prints several layers under the whole part.":
-            "Você disse que a peça fica firme na mesa sem ajuda. %s: sem jangada, que imprime várias camadas embaixo da peça inteira.",
+            "Você disse que a peça fica firme na mesa sem ajuda. %s: sem raft, que imprime várias camadas embaixo da peça inteira.",
         "%s has its own layer height: top and bottom layer counts were worked out for the process layer height.":
             "%s tem altura de camada própria: as camadas de topo e de base foram calculadas para a altura do perfil de processo.",
         "%s: one skirt layer is enough without a draft shield.":
@@ -1390,6 +1406,16 @@ TRANSLATIONS = {
         "Unknown material '%s': PLA rules with extra reliability.":
             "Material desconhecido '%s': regras de PLA com confiabilidade extra.",
         "Silk PLA is not recommended for functional parts.": "PLA Silk não é recomendado para peças funcionais.",
+        "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked.":
+            "Estas sugestões não foram testadas em recipientes que precisam segurar líquido; não se verifica se ele vaza.",
+        "%g mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm.":
+            "Camadas de %g mm são grossas para uma miniatura: rosto e detalhes finos como cota de malha somem acima de 0,16 mm. Guias de miniatura usam 0,08–0,12 mm.",
+        "On build plate only is on: parts of the figure above itself (arms, capes, weapons over the base) get no support.":
+            "Apenas na placa de impressão está ligado: partes da figura acima dela mesma (braços, capas, armas sobre a base) ficam sem suporte.",
+        "Ignore small overhangs is on: small overhangs such as fingers, chins and weapon tips get no support.":
+            "Ignorar pequenas saliências está ligado: saliências pequenas como dedos, queixo e pontas de arma ficam sem suporte.",
+        "Organic supports: Orca's tree support brim only applies to Tree Slim, Strong and Hybrid, so tall organic branches have no brim of their own.":
+            "Suporte orgânico: a borda de suporte de árvore do Orca só vale para Árvore Estreita, Árvore Forte e Árvore Híbrida, então galhos orgânicos altos ficam sem borda própria.",
         "Nylon absorbs moisture: dry the filament before printing.":
             "Nylon absorve umidade: seque o filamento antes de imprimir.",
         "Orca only purges into infill or supports when the prime tower is on, so the purge answers changed nothing.":
@@ -1416,7 +1442,7 @@ TRANSLATIONS = {
 
         # Messages.
         "Orca's auto brim is kept: it sizes the brim for %s and the part itself.":
-            "O brim automático do Orca foi mantido: ele dimensiona o brim para %s e para a peça.",
+            "A borda automática do Orca foi mantida: ela dimensiona a borda para %s e para a peça.",
         "A preset or the filaments changed. Click Suggest changes again.":
             "Um preset ou os filamentos mudaram. Clique em Sugerir mudanças de novo.",
         "Settings changed in Orca since the suggestions. Click Suggest changes again.":
@@ -1487,7 +1513,7 @@ TRANSLATIONS = {
         "Purge into the infill": "Purgar no preenchimento",
         "The part holds on the bed by itself": "A peça fica firme na mesa sem ajuda",
         "Wide, low base with no thin corners that lift, or you have printed this part without raft or brim and it stayed down.":
-            "Base larga e baixa, sem cantos finos que levantam, ou você já imprimiu esta peça sem raft nem brim e ela não soltou.",
+            "Base larga e baixa, sem cantos finos que levantam, ou você já imprimiu esta peça sem raft nem borda e ela não soltou.",
         "The walls are opaque, so mixed colors inside the part will not show.":
             "As paredes são opacas, então as cores misturadas dentro da peça não aparecem.",
         "Purge into the supports": "Purgar nos suportes",
@@ -2064,6 +2090,8 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
                     self.basis["current"][key] = change["suggested"]
             self.changed_since_slice = True
             self._save_originals()
+            if self.stale:  # a preset changed while applying: keep the message that says so
+                return
             self.message = (self._t("Applied %d change(s) to '%s'. Slice again to see the new estimate.") % (len(changes), target)
                             if self.mode() == "in_place" else
                             self._t("Saved to the process preset '%s'. Select it in the process list, then slice again.") % target)

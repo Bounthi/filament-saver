@@ -38,7 +38,8 @@
    ]
   ],
   "notes": [
-   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
   ]
  },
  "normal_support|container|ASA": {
@@ -80,7 +81,8 @@
    ]
   ],
   "notes": [
-   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
   ]
  },
  "normal_support|container|PA-CF": {
@@ -123,6 +125,7 @@
   ],
   "notes": [
    "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -165,7 +168,8 @@
    ]
   ],
   "notes": [
-   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
   ]
  },
  "normal_support|container|PETG": {
@@ -213,7 +217,9 @@
     "PETG sticks to supports: at least a 0.25 mm gap."
    ]
   ],
-  "notes": []
+  "notes": [
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
+  ]
  },
  "normal_support|container|PLA": {
   "changes": [
@@ -253,7 +259,9 @@
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ]
   ],
-  "notes": []
+  "notes": [
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
+  ]
  },
  "normal_support|container|PLA Silk": {
   "changes": [
@@ -294,7 +302,8 @@
    ]
   ],
   "notes": [
-   "Unknown material 'PLA Silk': PLA rules with extra reliability."
+   "Unknown material 'PLA Silk': PLA rules with extra reliability.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
   ]
  },
  "normal_support|container|PVA": {
@@ -335,7 +344,9 @@
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ]
   ],
-  "notes": []
+  "notes": [
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
+  ]
  },
  "normal_support|container|TPU": {
   "changes": [
@@ -369,7 +380,8 @@
    ]
   ],
   "notes": [
-   "TPU: infill sets the hardness of the part, so infill is left unchanged."
+   "TPU: infill sets the hardness of the part, so infill is left unchanged.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
   ]
  },
  "normal_support|container|XYZ": {
@@ -411,7 +423,8 @@
    ]
   ],
   "notes": [
-   "Unknown material 'XYZ': PLA rules with extra reliability."
+   "Unknown material 'XYZ': PLA rules with extra reliability.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
   ]
  },
  "normal_support|decoration|ABS": {
@@ -1979,13 +1992,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -1994,7 +2000,9 @@
    ]
   ],
   "notes": [
-   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm.",
+   "Ignore small overhangs is on: small overhangs such as fingers, chins and weapon tips get no support."
   ]
  },
  "normal_support|miniature|ASA": {
@@ -2007,13 +2015,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -2022,7 +2023,9 @@
    ]
   ],
   "notes": [
-   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm.",
+   "Ignore small overhangs is on: small overhangs such as fingers, chins and weapon tips get no support."
   ]
  },
  "normal_support|miniature|PA-CF": {
@@ -2035,13 +2038,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -2051,6 +2047,8 @@
   ],
   "notes": [
    "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm.",
+   "Ignore small overhangs is on: small overhangs such as fingers, chins and weapon tips get no support.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -2064,13 +2062,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -2079,7 +2070,9 @@
    ]
   ],
   "notes": [
-   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm.",
+   "Ignore small overhangs is on: small overhangs such as fingers, chins and weapon tips get no support."
   ]
  },
  "normal_support|miniature|PETG": {
@@ -2090,13 +2083,6 @@
     "8%",
     "saves",
     "Strength 1/5: 8% sparse infill."
-   ],
-   [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
    ],
    [
     "gap_fill_target",
@@ -2113,7 +2099,10 @@
     "PETG sticks to supports: at least a 0.25 mm gap."
    ]
   ],
-  "notes": []
+  "notes": [
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm.",
+   "Ignore small overhangs is on: small overhangs such as fingers, chins and weapon tips get no support."
+  ]
  },
  "normal_support|miniature|PLA": {
   "changes": [
@@ -2125,13 +2114,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -2139,7 +2121,10 @@
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ]
   ],
-  "notes": []
+  "notes": [
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm.",
+   "Ignore small overhangs is on: small overhangs such as fingers, chins and weapon tips get no support."
+  ]
  },
  "normal_support|miniature|PLA Silk": {
   "changes": [
@@ -2151,13 +2136,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -2166,7 +2144,9 @@
    ]
   ],
   "notes": [
-   "Unknown material 'PLA Silk': PLA rules with extra reliability."
+   "Unknown material 'PLA Silk': PLA rules with extra reliability.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm.",
+   "Ignore small overhangs is on: small overhangs such as fingers, chins and weapon tips get no support."
   ]
  },
  "normal_support|miniature|PVA": {
@@ -2179,13 +2159,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -2193,7 +2166,10 @@
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ]
   ],
-  "notes": []
+  "notes": [
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm.",
+   "Ignore small overhangs is on: small overhangs such as fingers, chins and weapon tips get no support."
+  ]
  },
  "normal_support|miniature|TPU": {
   "changes": [
@@ -2206,7 +2182,9 @@
    ]
   ],
   "notes": [
-   "TPU: infill sets the hardness of the part, so infill is left unchanged."
+   "TPU: infill sets the hardness of the part, so infill is left unchanged.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm.",
+   "Ignore small overhangs is on: small overhangs such as fingers, chins and weapon tips get no support."
   ]
  },
  "normal_support|miniature|XYZ": {
@@ -2219,13 +2197,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -2234,7 +2205,9 @@
    ]
   ],
   "notes": [
-   "Unknown material 'XYZ': PLA rules with extra reliability."
+   "Unknown material 'XYZ': PLA rules with extra reliability.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm.",
+   "Ignore small overhangs is on: small overhangs such as fingers, chins and weapon tips get no support."
   ]
  },
  "normal_support|prototype|ABS": {
@@ -2817,7 +2790,8 @@
    ]
   ],
   "notes": [
-   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
   ]
  },
  "petg_no_support|container|ASA": {
@@ -2859,7 +2833,8 @@
    ]
   ],
   "notes": [
-   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
   ]
  },
  "petg_no_support|container|PA-CF": {
@@ -2902,6 +2877,7 @@
   ],
   "notes": [
    "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -2944,7 +2920,8 @@
    ]
   ],
   "notes": [
-   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
   ]
  },
  "petg_no_support|container|PETG": {
@@ -2985,7 +2962,9 @@
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ]
   ],
-  "notes": []
+  "notes": [
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
+  ]
  },
  "petg_no_support|container|PLA": {
   "changes": [
@@ -3025,7 +3004,9 @@
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ]
   ],
-  "notes": []
+  "notes": [
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
+  ]
  },
  "petg_no_support|container|PLA Silk": {
   "changes": [
@@ -3066,7 +3047,8 @@
    ]
   ],
   "notes": [
-   "Unknown material 'PLA Silk': PLA rules with extra reliability."
+   "Unknown material 'PLA Silk': PLA rules with extra reliability.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
   ]
  },
  "petg_no_support|container|PVA": {
@@ -3107,7 +3089,9 @@
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ]
   ],
-  "notes": []
+  "notes": [
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
+  ]
  },
  "petg_no_support|container|TPU": {
   "changes": [
@@ -3141,7 +3125,8 @@
    ]
   ],
   "notes": [
-   "TPU: infill sets the hardness of the part, so infill is left unchanged."
+   "TPU: infill sets the hardness of the part, so infill is left unchanged.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
   ]
  },
  "petg_no_support|container|XYZ": {
@@ -3183,7 +3168,8 @@
    ]
   ],
   "notes": [
-   "Unknown material 'XYZ': PLA rules with extra reliability."
+   "Unknown material 'XYZ': PLA rules with extra reliability.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
   ]
  },
  "petg_no_support|decoration|ABS": {
@@ -4660,13 +4646,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -4675,7 +4654,8 @@
    ]
   ],
   "notes": [
-   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm."
   ]
  },
  "petg_no_support|miniature|ASA": {
@@ -4688,13 +4668,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -4703,7 +4676,8 @@
    ]
   ],
   "notes": [
-   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm."
   ]
  },
  "petg_no_support|miniature|PA-CF": {
@@ -4716,13 +4690,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -4732,6 +4699,7 @@
   ],
   "notes": [
    "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -4745,13 +4713,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -4760,7 +4721,8 @@
    ]
   ],
   "notes": [
-   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm."
   ]
  },
  "petg_no_support|miniature|PETG": {
@@ -4773,13 +4735,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -4787,7 +4742,9 @@
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ]
   ],
-  "notes": []
+  "notes": [
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm."
+  ]
  },
  "petg_no_support|miniature|PLA": {
   "changes": [
@@ -4799,13 +4756,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -4813,7 +4763,9 @@
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ]
   ],
-  "notes": []
+  "notes": [
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm."
+  ]
  },
  "petg_no_support|miniature|PLA Silk": {
   "changes": [
@@ -4825,13 +4777,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -4840,7 +4785,8 @@
    ]
   ],
   "notes": [
-   "Unknown material 'PLA Silk': PLA rules with extra reliability."
+   "Unknown material 'PLA Silk': PLA rules with extra reliability.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm."
   ]
  },
  "petg_no_support|miniature|PVA": {
@@ -4853,13 +4799,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -4867,7 +4806,9 @@
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ]
   ],
-  "notes": []
+  "notes": [
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm."
+  ]
  },
  "petg_no_support|miniature|TPU": {
   "changes": [
@@ -4880,7 +4821,8 @@
    ]
   ],
   "notes": [
-   "TPU: infill sets the hardness of the part, so infill is left unchanged."
+   "TPU: infill sets the hardness of the part, so infill is left unchanged.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm."
   ]
  },
  "petg_no_support|miniature|XYZ": {
@@ -4893,13 +4835,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -4908,7 +4843,8 @@
    ]
   ],
   "notes": [
-   "Unknown material 'XYZ': PLA rules with extra reliability."
+   "Unknown material 'XYZ': PLA rules with extra reliability.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm."
   ]
  },
  "petg_no_support|prototype|ABS": {
@@ -5421,7 +5357,8 @@
    ]
   ],
   "notes": [
-   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
   ]
  },
  "slow_printer|container|ASA": {
@@ -5463,7 +5400,8 @@
    ]
   ],
   "notes": [
-   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
   ]
  },
  "slow_printer|container|PA-CF": {
@@ -5506,6 +5444,7 @@
   ],
   "notes": [
    "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -5548,7 +5487,8 @@
    ]
   ],
   "notes": [
-   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
   ]
  },
  "slow_printer|container|PETG": {
@@ -5589,7 +5529,9 @@
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ]
   ],
-  "notes": []
+  "notes": [
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
+  ]
  },
  "slow_printer|container|PLA": {
   "changes": [
@@ -5629,7 +5571,9 @@
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ]
   ],
-  "notes": []
+  "notes": [
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
+  ]
  },
  "slow_printer|container|PLA Silk": {
   "changes": [
@@ -5670,7 +5614,8 @@
    ]
   ],
   "notes": [
-   "Unknown material 'PLA Silk': PLA rules with extra reliability."
+   "Unknown material 'PLA Silk': PLA rules with extra reliability.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
   ]
  },
  "slow_printer|container|PVA": {
@@ -5711,7 +5656,9 @@
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ]
   ],
-  "notes": []
+  "notes": [
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
+  ]
  },
  "slow_printer|container|TPU": {
   "changes": [
@@ -5745,7 +5692,8 @@
    ]
   ],
   "notes": [
-   "TPU: infill sets the hardness of the part, so infill is left unchanged."
+   "TPU: infill sets the hardness of the part, so infill is left unchanged.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
   ]
  },
  "slow_printer|container|XYZ": {
@@ -5787,7 +5735,8 @@
    ]
   ],
   "notes": [
-   "Unknown material 'XYZ': PLA rules with extra reliability."
+   "Unknown material 'XYZ': PLA rules with extra reliability.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
   ]
  },
  "slow_printer|decoration|ABS": {
@@ -7264,13 +7213,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -7279,7 +7221,8 @@
    ]
   ],
   "notes": [
-   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm."
   ]
  },
  "slow_printer|miniature|ASA": {
@@ -7292,13 +7235,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -7307,7 +7243,8 @@
    ]
   ],
   "notes": [
-   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm."
   ]
  },
  "slow_printer|miniature|PA-CF": {
@@ -7320,13 +7257,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -7336,6 +7266,7 @@
   ],
   "notes": [
    "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -7349,13 +7280,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -7364,7 +7288,8 @@
    ]
   ],
   "notes": [
-   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm."
   ]
  },
  "slow_printer|miniature|PETG": {
@@ -7377,13 +7302,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -7391,7 +7309,9 @@
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ]
   ],
-  "notes": []
+  "notes": [
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm."
+  ]
  },
  "slow_printer|miniature|PLA": {
   "changes": [
@@ -7403,13 +7323,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -7417,7 +7330,9 @@
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ]
   ],
-  "notes": []
+  "notes": [
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm."
+  ]
  },
  "slow_printer|miniature|PLA Silk": {
   "changes": [
@@ -7429,13 +7344,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -7444,7 +7352,8 @@
    ]
   ],
   "notes": [
-   "Unknown material 'PLA Silk': PLA rules with extra reliability."
+   "Unknown material 'PLA Silk': PLA rules with extra reliability.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm."
   ]
  },
  "slow_printer|miniature|PVA": {
@@ -7457,13 +7366,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -7471,7 +7373,9 @@
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ]
   ],
-  "notes": []
+  "notes": [
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm."
+  ]
  },
  "slow_printer|miniature|TPU": {
   "changes": [
@@ -7484,7 +7388,8 @@
    ]
   ],
   "notes": [
-   "TPU: infill sets the hardness of the part, so infill is left unchanged."
+   "TPU: infill sets the hardness of the part, so infill is left unchanged.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm."
   ]
  },
  "slow_printer|miniature|XYZ": {
@@ -7497,13 +7402,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -7512,7 +7410,8 @@
    ]
   ],
   "notes": [
-   "Unknown material 'XYZ': PLA rules with extra reliability."
+   "Unknown material 'XYZ': PLA rules with extra reliability.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm."
   ]
  },
  "slow_printer|prototype|ABS": {
@@ -8025,7 +7924,8 @@
    ]
   ],
   "notes": [
-   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
   ]
  },
  "tree_support|container|ASA": {
@@ -8067,7 +7967,8 @@
    ]
   ],
   "notes": [
-   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
   ]
  },
  "tree_support|container|PA-CF": {
@@ -8110,6 +8011,7 @@
   ],
   "notes": [
    "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -8152,7 +8054,8 @@
    ]
   ],
   "notes": [
-   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
   ]
  },
  "tree_support|container|PETG": {
@@ -8200,7 +8103,9 @@
     "PETG sticks to supports: at least a 0.25 mm gap."
    ]
   ],
-  "notes": []
+  "notes": [
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
+  ]
  },
  "tree_support|container|PLA": {
   "changes": [
@@ -8240,7 +8145,9 @@
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ]
   ],
-  "notes": []
+  "notes": [
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
+  ]
  },
  "tree_support|container|PLA Silk": {
   "changes": [
@@ -8281,7 +8188,8 @@
    ]
   ],
   "notes": [
-   "Unknown material 'PLA Silk': PLA rules with extra reliability."
+   "Unknown material 'PLA Silk': PLA rules with extra reliability.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
   ]
  },
  "tree_support|container|PVA": {
@@ -8322,7 +8230,9 @@
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ]
   ],
-  "notes": []
+  "notes": [
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
+  ]
  },
  "tree_support|container|TPU": {
   "changes": [
@@ -8356,7 +8266,8 @@
    ]
   ],
   "notes": [
-   "TPU: infill sets the hardness of the part, so infill is left unchanged."
+   "TPU: infill sets the hardness of the part, so infill is left unchanged.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
   ]
  },
  "tree_support|container|XYZ": {
@@ -8398,7 +8309,8 @@
    ]
   ],
   "notes": [
-   "Unknown material 'XYZ': PLA rules with extra reliability."
+   "Unknown material 'XYZ': PLA rules with extra reliability.",
+   "These suggestions were not tested on containers that must hold liquid; whether one leaks is not checked."
   ]
  },
  "tree_support|decoration|ABS": {
@@ -9966,13 +9878,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -9981,7 +9886,10 @@
    ]
   ],
   "notes": [
-   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm.",
+   "Ignore small overhangs is on: small overhangs such as fingers, chins and weapon tips get no support.",
+   "Organic supports: Orca's tree support brim only applies to Tree Slim, Strong and Hybrid, so tall organic branches have no brim of their own."
   ]
  },
  "tree_support|miniature|ASA": {
@@ -9994,13 +9902,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -10009,7 +9910,10 @@
    ]
   ],
   "notes": [
-   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself."
+   "Orca's auto brim is kept: it sizes the brim for ABS/ASA and the part itself.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm.",
+   "Ignore small overhangs is on: small overhangs such as fingers, chins and weapon tips get no support.",
+   "Organic supports: Orca's tree support brim only applies to Tree Slim, Strong and Hybrid, so tall organic branches have no brim of their own."
   ]
  },
  "tree_support|miniature|PA-CF": {
@@ -10022,13 +9926,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -10038,6 +9935,9 @@
   ],
   "notes": [
    "Orca's auto brim is kept: it sizes the brim for Nylon (PA) and the part itself.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm.",
+   "Ignore small overhangs is on: small overhangs such as fingers, chins and weapon tips get no support.",
+   "Organic supports: Orca's tree support brim only applies to Tree Slim, Strong and Hybrid, so tall organic branches have no brim of their own.",
    "Nylon absorbs moisture: dry the filament before printing."
   ]
  },
@@ -10051,13 +9951,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -10066,7 +9959,10 @@
    ]
   ],
   "notes": [
-   "Orca's auto brim is kept: it sizes the brim for PC and the part itself."
+   "Orca's auto brim is kept: it sizes the brim for PC and the part itself.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm.",
+   "Ignore small overhangs is on: small overhangs such as fingers, chins and weapon tips get no support.",
+   "Organic supports: Orca's tree support brim only applies to Tree Slim, Strong and Hybrid, so tall organic branches have no brim of their own."
   ]
  },
  "tree_support|miniature|PETG": {
@@ -10077,13 +9973,6 @@
     "8%",
     "saves",
     "Strength 1/5: 8% sparse infill."
-   ],
-   [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
    ],
    [
     "gap_fill_target",
@@ -10100,7 +9989,11 @@
     "PETG sticks to supports: at least a 0.25 mm gap."
    ]
   ],
-  "notes": []
+  "notes": [
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm.",
+   "Ignore small overhangs is on: small overhangs such as fingers, chins and weapon tips get no support.",
+   "Organic supports: Orca's tree support brim only applies to Tree Slim, Strong and Hybrid, so tall organic branches have no brim of their own."
+  ]
  },
  "tree_support|miniature|PLA": {
   "changes": [
@@ -10112,13 +10005,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -10126,7 +10012,11 @@
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ]
   ],
-  "notes": []
+  "notes": [
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm.",
+   "Ignore small overhangs is on: small overhangs such as fingers, chins and weapon tips get no support.",
+   "Organic supports: Orca's tree support brim only applies to Tree Slim, Strong and Hybrid, so tall organic branches have no brim of their own."
+  ]
  },
  "tree_support|miniature|PLA Silk": {
   "changes": [
@@ -10138,13 +10028,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -10153,7 +10036,10 @@
    ]
   ],
   "notes": [
-   "Unknown material 'PLA Silk': PLA rules with extra reliability."
+   "Unknown material 'PLA Silk': PLA rules with extra reliability.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm.",
+   "Ignore small overhangs is on: small overhangs such as fingers, chins and weapon tips get no support.",
+   "Organic supports: Orca's tree support brim only applies to Tree Slim, Strong and Hybrid, so tall organic branches have no brim of their own."
   ]
  },
  "tree_support|miniature|PVA": {
@@ -10166,13 +10052,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -10180,7 +10059,11 @@
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ]
   ],
-  "notes": []
+  "notes": [
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm.",
+   "Ignore small overhangs is on: small overhangs such as fingers, chins and weapon tips get no support.",
+   "Organic supports: Orca's tree support brim only applies to Tree Slim, Strong and Hybrid, so tall organic branches have no brim of their own."
+  ]
  },
  "tree_support|miniature|TPU": {
   "changes": [
@@ -10193,7 +10076,10 @@
    ]
   ],
   "notes": [
-   "TPU: infill sets the hardness of the part, so infill is left unchanged."
+   "TPU: infill sets the hardness of the part, so infill is left unchanged.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm.",
+   "Ignore small overhangs is on: small overhangs such as fingers, chins and weapon tips get no support.",
+   "Organic supports: Orca's tree support brim only applies to Tree Slim, Strong and Hybrid, so tall organic branches have no brim of their own."
   ]
  },
  "tree_support|miniature|XYZ": {
@@ -10206,13 +10092,6 @@
     "Strength 1/5: 8% sparse infill."
    ],
    [
-    "minimum_sparse_infill_area",
-    "15",
-    "5",
-    "saves",
-    "Strength 1/5: only sparse areas under 5 mm² become solid infill."
-   ],
-   [
     "gap_fill_target",
     "everywhere",
     "topbottom",
@@ -10221,7 +10100,10 @@
    ]
   ],
   "notes": [
-   "Unknown material 'XYZ': PLA rules with extra reliability."
+   "Unknown material 'XYZ': PLA rules with extra reliability.",
+   "0.2 mm layers are coarse for a miniature: faces and fine detail such as chainmail fade above 0.16 mm. Miniature guides use 0.08–0.12 mm.",
+   "Ignore small overhangs is on: small overhangs such as fingers, chins and weapon tips get no support.",
+   "Organic supports: Orca's tree support brim only applies to Tree Slim, Strong and Hybrid, so tall organic branches have no brim of their own."
   ]
  },
  "tree_support|prototype|ABS": {

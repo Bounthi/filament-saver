@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+**Projects saved with 0.1.0, 0.1.1 or the development version before them may still hold reduced supports**: a 30° threshold, organic style, a hollow or lightning support base, a single tree support wall, or (development version) On build plate only. Those versions changed supports and 0.1.2 stopped, but a saved project keeps what was applied, and Undo may not reach them. Check the Support tab of old projects, or set those values back to your preset's.
+
+- Container: a note says the suggestions were not tested on containers that must hold liquid.
+- Miniature: with supports on, notes warn when On build plate only is on, when small overhangs are ignored, and that organic branches get no brim of their own. Nothing is changed: whether the figure needs that support depends on the model.
+- Miniature: a note when the layer height is above 0.16 mm, where faces and fine detail start to fade (miniature guides use 0.08–0.12 mm). The plugin does not change the layer height.
+- Miniature never lowers the minimum sparse infill area below Orca's default of 15 mm², so thin limbs and weapons stay solid.
+- Switching a preset while Apply is still running keeps the message that the suggestions are out of date.
+- The tests now check that the tab's JavaScript parses, so a typo there can no longer ship as a blank tab.
+- Portuguese texts about brims use Orca's own word, "borda", instead of "brim".
+- The Miniature hint now reads "Fine detail; supports are left as they are" (it said "delicate supports", which the plugin never does).
+
 ## 0.1.3 (2026-11-01)
 
 Rules follow the filaments the parts really print with, and Apply never writes suggestions worked out from settings that changed since.
