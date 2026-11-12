@@ -761,45 +761,67 @@ def _sum_list(text):
     return sum(values) if values else None
 
 
+GCODE_TAIL_BYTES = 256 * 1024  # Orca writes the statistics in the last lines of the file
+
+
 def parse_gcode_estimate(path):
-    """Print time, filament grams and cost from an Orca G-code file."""
+    """Print time, filament grams and cost from an Orca G-code file.
+
+    Reads the end of the file first: a big print's G-code is hundreds of MB, and this runs on
+    Orca's UI thread after every slice. The whole file is read only when the end lacks them."""
+    with open(path, "rb") as stream:
+        stream.seek(0, os.SEEK_END)
+        size = stream.tell()
+        stream.seek(max(0, size - GCODE_TAIL_BYTES))
+        tail = stream.read().decode("utf-8", errors="replace").splitlines()
+    found = _parse_estimate_lines(tail[1:] if size > GCODE_TAIL_BYTES else tail)  # the first line may be cut
+    if found["seconds"] is not None and found["grams"] is not None:
+        return found
+    with open(path, "r", encoding="utf-8", errors="replace") as stream:
+        return _parse_estimate_lines(stream)
+
+
+def _parse_estimate_lines(lines):
     found = {"seconds": None, "grams": None, "cost": None}
     grams_list = cost_list = None
     grams_each = cost_each = None
     in_config = False
-    with open(path, "r", encoding="utf-8", errors="replace") as stream:
-        for line in stream:
-            if not line.startswith(";"):
-                continue
-            line = line.rstrip("\n")
-            # The statistics come after the config block, whose keys (e.g. filament_cost)
-            # must not be read as results.
-            if line.startswith("; CONFIG_BLOCK_START"):
-                in_config = True
-            elif line.startswith("; CONFIG_BLOCK_END"):
-                in_config = False
-            if in_config:
-                continue
-            if found["seconds"] is None:
-                for pattern in _TIME_PATTERNS:
-                    match = pattern.search(line)
-                    if match:
-                        found["seconds"] = parse_duration(match.group(1))
-                        break
-            match = _WEIGHT_TOTAL.match(line)
-            if match:
-                found["grams"] = float(match.group(1))
-            match = _WEIGHT_LIST.match(line)
-            if match:
-                grams_list = _sum_list(match.group(1))
-                grams_each = _number_list(match.group(1))
-            match = _COST_TOTAL.match(line)
-            if match:
-                found["cost"] = float(match.group(1))
-            match = _COST_LIST.match(line)
-            if match:
-                cost_list = _sum_list(match.group(1))
-                cost_each = _number_list(match.group(1))
+    for line in lines:
+        if not line.startswith(";"):
+            continue
+        line = line.rstrip("\n")
+        # The statistics come after the config block, whose keys (e.g. filament_cost)
+        # must not be read as results.
+        if line.startswith("; CONFIG_BLOCK_START"):
+            in_config = True
+        elif line.startswith("; CONFIG_BLOCK_END"):
+            if not in_config:
+                # The end of a file was read from inside the config block: drop what came before.
+                found = {"seconds": None, "grams": None, "cost": None}
+                grams_list = cost_list = grams_each = cost_each = None
+            in_config = False
+        if in_config:
+            continue
+        if found["seconds"] is None:
+            for pattern in _TIME_PATTERNS:
+                match = pattern.search(line)
+                if match:
+                    found["seconds"] = parse_duration(match.group(1))
+                    break
+        match = _WEIGHT_TOTAL.match(line)
+        if match:
+            found["grams"] = float(match.group(1))
+        match = _WEIGHT_LIST.match(line)
+        if match:
+            grams_list = _sum_list(match.group(1))
+            grams_each = _number_list(match.group(1))
+        match = _COST_TOTAL.match(line)
+        if match:
+            found["cost"] = float(match.group(1))
+        match = _COST_LIST.match(line)
+        if match:
+            cost_list = _sum_list(match.group(1))
+            cost_each = _number_list(match.group(1))
     if found["grams"] is None:
         found["grams"] = grams_list
     if found["cost"] is None:
@@ -1782,7 +1804,8 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
 
     # Messages from the page run on the UI thread.
     def on_message(self, data):
-        # Held until this message's state is posted, so a worker result is always posted after it.
+        # Held until this message's state is posted. Workers build their state under the lock too,
+        # but post it after releasing it (see _post_unlocked).
         with self.lock:
             self._handle(data)
 
@@ -1856,10 +1879,11 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
                 self.stale = True
                 self.message = self._t("A preset or the filaments changed. Click Suggest changes again.")
         elif event in [getattr(events, name, None) for name in PARTS_EVENTS]:
-            # Other parts may be in Orca now; _push reads them on the UI thread only.
-            if threading.current_thread() is not threading.main_thread():
-                self.post_message({"type": "refresh_request"})
-                return
+            # Other parts may be in Orca now. Orca waits for this handler and sends one event per
+            # object when arranging or undoing (10 for 7 objects), so only ask the page, which
+            # refreshes once after the last one.
+            self.post_message({"type": "refresh_request"})
+            return
         else:
             return
         self._push()
@@ -2009,8 +2033,14 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
         if time.time() - self.rates_failed_at < RATES_RETRY:
             return
         self.rates_fetching = True
-        threading.Thread(target=self._fetch_rates, args=(currency["price"],), name="filament-saver-rates",
-                         daemon=True).start()
+        try:
+            threading.Thread(target=self._fetch_rates, args=(currency["price"],), name="filament-saver-rates",
+                             daemon=True).start()
+        except Exception as error:  # e.g. the thread permission was denied: no fetch will ever finish
+            traceback.print_exc()
+            self.rates_fetching = False
+            self.rates_failed_at = time.time()
+            self.rates_error = self._t("Could not get exchange rates: %s") % error
 
     def _fetch_rates(self, base):
         error = ""
@@ -2026,7 +2056,8 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
                 self.rates_error = self._t("Could not get exchange rates: %s") % error
             else:
                 self.rates_error = ""
-            self._push(refresh_info=False)
+            state = self._worker_state()
+        self._post_unlocked(state)
 
     def _currency_state(self):
         currency = read_currency(self.lang)
@@ -2208,8 +2239,9 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
         # The in-place write API must run off the UI thread.
         if self.worker is None:
             self.jobs = queue.Queue()
-            self.worker = threading.Thread(target=self._work, name="filament-saver", daemon=True)
-            self.worker.start()
+            worker = threading.Thread(target=self._work, name="filament-saver", daemon=True)
+            worker.start()  # if this raises, the next Apply tries again instead of queueing for nobody
+            self.worker = worker
         self.busy = True
         self.message = busy_message
         self.jobs.put((pairs, done, failed))
@@ -2226,13 +2258,18 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
             except Exception as caught:
                 target, error = None, caught
             with self.lock:
-                if error is None:
-                    done(target)
-                else:
-                    failed(error)
+                try:
+                    if error is None:
+                        done(target)
+                    else:
+                        failed(error)
+                except Exception as caught:  # the worker must outlive any error, or Apply waits forever
+                    traceback.print_exc()
+                    self.error = self._t("Could not apply: %s") % caught
                 self.busy = False
                 # Off the UI thread: reuse the last preset info instead of reading the host here.
-                self._push(refresh_info=False)
+                state = self._worker_state()
+            self._post_unlocked(state)
 
     def _write_bundle(self, pairs):
         """Fallback: write the managed settings into a local-bundle process preset."""
@@ -2356,6 +2393,24 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
             self.form = clean_form(saved.get("form"))
             self.form_version += 1
             self.message = self._t("Brought back the choices you last used with these parts.")
+
+    def _worker_state(self):
+        """The page state, built by a worker thread while it holds self.lock."""
+        try:
+            self._load_originals()
+            return self._state()
+        except Exception:
+            traceback.print_exc()
+            return None
+
+    def _post_unlocked(self, state):
+        # Called without self.lock: posting can wait for the UI thread, and the UI thread may be
+        # waiting for the lock in on_message (on Linux, closing a dropdown sends "ready").
+        if state is not None:
+            try:
+                self.post_message(state)
+            except Exception:
+                traceback.print_exc()
 
     def _push(self, refresh_info=True):
         try:
@@ -2854,10 +2909,15 @@ $('changes').addEventListener('click', e => {
   const b = e.target.closest('[data-act]');
   if (b && !b.disabled) send({cmd: b.dataset.act, ids: [b.dataset.id]});
 });
+let refreshTimer = null;
 orca.onMessage(msg => {
   if (!msg) return;
   if (msg.type === 'read_request') send({cmd: 'read_estimate'});
-  else if (msg.type === 'refresh_request') send({cmd: 'ready'});
+  else if (msg.type === 'refresh_request') {
+    // Orca sends one per object when arranging or undoing: refresh once, after the last.
+    clearTimeout(refreshTimer);
+    refreshTimer = setTimeout(() => send({cmd: 'ready'}), 300);
+  }
   else if (msg.type === 'state') { state = msg; render(); }
 });
 send({cmd: 'ready'});

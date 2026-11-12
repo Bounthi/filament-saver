@@ -16,6 +16,7 @@ import subprocess
 import sys
 import threading
 import tempfile
+import time
 import types
 import unittest
 
@@ -406,6 +407,49 @@ class PageScriptTest(unittest.TestCase):
         finally:
             os.unlink(stream.name)
         self.assertEqual(check.returncode, 0, check.stderr)
+
+
+class ObjectEventsTest(unittest.TestCase):
+    """Measured in Orca: arranging 7 objects sent 10 events while Orca waited for each handler."""
+
+    def test_object_events_only_ask_the_page(self):
+        events = types.SimpleNamespace(**{name: name for name in fs.PARTS_EVENTS + ("GCodeExportFinished", "PresetSelected")})
+        fs.orca.LifecycleEvent = events
+        try:
+            page = fs.FilamentSaverPage()
+            posted = []
+            page.post_message = posted.append
+            page._push = lambda *a, **k: self.fail("rebuilt the state inside Orca's event")
+            for _ in range(10):
+                page.on_lifecycle_event("ObjectAdded", types.SimpleNamespace(msg=""))
+            self.assertEqual(posted, [{"type": "refresh_request"}] * 10)
+        finally:
+            del fs.orca.LifecycleEvent
+
+    def test_page_refreshes_once_after_a_burst(self):
+        node = shutil.which("node")
+        if node is None:
+            self.skipTest("node is not installed")
+        script = fs.PAGE[fs.PAGE.index("<script>") + len("<script>"):fs.PAGE.index("</script>")]
+        harness = """
+const sent = []; let handler = null;
+const element = new Proxy(function () {}, {get: (t, k) => k === Symbol.toPrimitive ? () => '' : element,
+                                           set: () => true, apply: () => element});
+globalThis.document = {getElementById: () => element, querySelectorAll: () => [], documentElement: {}, activeElement: null};
+globalThis.window = {addEventListener: () => {}};
+globalThis.orca = {postMessage: m => sent.push(m.cmd), onMessage: h => { handler = h; }};
+""" + script + """
+sent.length = 0;
+for (let i = 0; i < 10; i++) handler({type: 'refresh_request'});
+setTimeout(() => { console.log(JSON.stringify(sent)); }, 500);
+"""
+        with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as stream:
+            stream.write(harness)
+        try:
+            run = subprocess.run([node, stream.name], capture_output=True, text=True, timeout=20)
+        finally:
+            os.unlink(stream.name)
+        self.assertEqual(run.stdout.strip(), '["ready"]', run.stderr)
 
 
 class TranslationTest(unittest.TestCase):
@@ -1231,6 +1275,75 @@ class CurrencyTest(unittest.TestCase):
         self.assertEqual((state["shown"], state["converted"], state["fetching"]), ("BRL", False, False))
         self.assertIn("offline", state["error"])
 
+    def test_a_thread_that_cannot_start_does_not_leave_the_tab_stuck(self):
+        """If Orca refuses threads (permission denied), the tab must not stay busy or fetching forever."""
+        real = fs.threading.Thread
+
+        class Refused(real):
+            def start(self):
+                raise PermissionError("threads not allowed")
+        fs.threading.Thread = Refused
+        try:
+            page = fs.FilamentSaverPage()
+            page.post_message = lambda message: None
+            page._set_currency({"price": "BRL", "display": "USD", "rates_allowed": True})
+            state = page._currency_state()
+            self.assertEqual((state["fetching"], "threads not allowed" in state["error"]), (False, True))
+            page.mode = lambda: "in_place"
+            fs.orca.host.preset = types.SimpleNamespace(process=types.SimpleNamespace(begin_update=lambda: None))
+            for _ in range(2):  # every Apply reports the error again instead of queueing for nobody
+                with self.assertRaises(PermissionError):
+                    page._write([("wall_loops", "2")], lambda target: None, lambda error: None, "Applying")
+                self.assertEqual((page.worker, page.busy), (None, False))
+        finally:
+            fs.threading.Thread = real
+            if hasattr(fs.orca.host, "preset"):
+                del fs.orca.host.preset
+
+    def test_apply_worker_survives_an_error(self):
+        page = fs.FilamentSaverPage()
+        page.post_message = lambda message: None
+        page.mode = lambda: "in_place"
+        fs.orca.host.preset = types.SimpleNamespace(process=types.SimpleNamespace(
+            begin_update=lambda: types.SimpleNamespace(set=lambda k, v: None,
+                                                       commit=lambda: types.SimpleNamespace(target_name="P"))))
+        try:
+            def broken(target):
+                raise RuntimeError("boom")
+            done = []
+            page._write([("wall_loops", "2")], broken, lambda error: None, "Applying")
+            page._write([("wall_loops", "3")], done.append, lambda error: None, "Applying")
+            for _ in range(50):
+                if done:
+                    break
+                time.sleep(0.05)
+            self.assertEqual(done, ["P"])  # the second Apply still runs
+            self.assertFalse(page.busy)
+        finally:
+            del fs.orca.host.preset
+
+    def test_workers_post_without_holding_the_lock(self):
+        """Posting from a worker while holding the lock froze Orca on Linux: the post waited for the
+        UI thread, which was waiting for the lock in on_message (closing a dropdown sends "ready")."""
+        def urlopen(url, timeout, context=None):
+            raise OSError("offline")
+        fs.urllib.request.urlopen = urlopen
+        page = fs.FilamentSaverPage()
+        held = []
+        page.post_message = lambda message: held.append(page.lock.locked())
+        page._fetch_rates("BRL")
+        page.mode = lambda: "in_place"
+        fs.orca.host.preset = types.SimpleNamespace(process=types.SimpleNamespace(begin_update=lambda: 1 / 0))
+        try:
+            page._write([("wall_loops", "2")], lambda target: None, lambda error: None, "Applying")
+            for _ in range(50):
+                if len(held) >= 2:
+                    break
+                time.sleep(0.05)
+        finally:
+            del fs.orca.host.preset
+        self.assertEqual(held, [False, False])
+
     def test_nothing_is_sent_without_permission(self):
         self._serve({"base": "BRL", "date": "2026-10-30", "rates": {"USD": 0.2}})
         page = fs.FilamentSaverPage()
@@ -1263,6 +1376,25 @@ class LogoTest(unittest.TestCase):
 
 
 class GcodeEstimateTest(unittest.TestCase):
+    def _parse(self, text):
+        with tempfile.NamedTemporaryFile("w", suffix=".gcode", delete=False) as stream:
+            stream.write(text)
+        try:
+            return fs.parse_gcode_estimate(stream.name)
+        finally:
+            os.unlink(stream.name)
+
+    def test_big_file_reads_the_end(self):
+        """Hundreds of MB are read on Orca's UI thread: the end of the file is enough."""
+        moves = "G1 X1 Y1 E0.1\n" * (fs.GCODE_TAIL_BYTES // 8)
+        config = "; CONFIG_BLOCK_START\n" + "; filament_cost = 30\n; total filament cost = 99\n" * (fs.GCODE_TAIL_BYTES // 20) + "; CONFIG_BLOCK_END\n"
+        stats = "; total filament used [g] = 12.5\n; total filament cost = 0.4\n; estimated printing time (normal mode) = 1h 2m\n"
+        self.assertEqual(self._parse(moves + stats)["grams"], 12.5)
+        # The end starts inside a long config block: nothing from inside it is read as a result.
+        self.assertEqual(self._parse(moves + config + stats)["cost"], 0.4)
+        # Statistics only at the top: the whole file is read.
+        self.assertEqual(self._parse(stats + moves)["seconds"], 3720)
+
     def test_statistics_after_config_block(self):
         text = ("; HEADER_BLOCK_START\n; filament_density: 1.25\n; HEADER_BLOCK_END\nG1 X1\n"
                 "; CONFIG_BLOCK_START\n; filament_cost = 30\n; CONFIG_BLOCK_END\n\n"

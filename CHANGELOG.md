@@ -4,6 +4,11 @@
 
 **Projects saved with 0.1.0, 0.1.1 or the development version before them may still hold reduced supports**: a 30° threshold, organic style, a hollow or lightning support base, a single tree support wall, or (development version) On build plate only. Those versions changed supports and 0.1.2 stopped, but a saved project keeps what was applied, and Undo may not reach them. Check the Support tab of old projects, or set those values back to your preset's.
 
+- Fixed: changing the currency could freeze OrcaSlicer on Linux. The exchange-rate and apply workers sent their results to the tab while holding a lock that the tab's own messages also wait for; they now send them after releasing it.
+- Fixed: if Orca refused to start a background thread (for example after the thread permission was denied), the tab stayed on "Applying…" or "Getting exchange rates…" forever. It now shows the error and tries again next time.
+- Fixed: an unexpected error after an Apply stopped the worker that applies changes, so every later Apply waited forever.
+- Arranging the plate or undoing no longer pauses Orca while the plugin catches up: Orca sends one event per object (10 when arranging 7 objects, about 0.5 s of pauses), and the tab now refreshes once after the last one.
+- Reading the slice's time and filament no longer pauses Orca on big prints: only the end of the G-code is read (about 30 times faster on a 10-hour print).
 - Container: a note says the suggestions were not tested on containers that must hold liquid.
 - Miniature: with supports on, notes warn when On build plate only is on, when small overhangs are ignored, and that organic branches get no brim of their own. Nothing is changed: whether the figure needs that support depends on the model.
 - Miniature: a note when the layer height is above 0.16 mm, where faces and fine detail start to fade (miniature guides use 0.08–0.12 mm). The plugin does not change the layer height.
