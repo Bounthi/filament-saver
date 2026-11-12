@@ -7,7 +7,7 @@
 # name = "Filament Saver"
 # description = "Suggests print settings that save filament for what you are printing, and applies the ones you accept."
 # author = "bounthi"
-# version = "0.1.3"
+# version = "0.1.4"
 # ///
 # Copyright (c) 2026 bounthi. MIT License, see LICENSE.
 # SPDX-License-Identifier: MIT
@@ -48,7 +48,7 @@ import urllib.request
 import orca
 
 
-VERSION = "0.1.3"  # keep in sync with the header above
+VERSION = "0.1.4"  # keep in sync with the header above
 BUNDLE_ID = "filament-saver"
 BUNDLE_NAME = "Filament Saver"
 PRESET_SUFFIX = " - Filament Saver"

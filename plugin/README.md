@@ -1,6 +1,6 @@
 <p align="center"><img src="../assets/logo.png" alt="Filament Saver logo" width="128"></p>
 
-# Filament Saver plugin (v0.1.3)
+# Filament Saver plugin (v0.1.4)
 
 OrcaSlicer 2.5 plugin that adds a **Filament Saver** tab to the main window. It implements the rules from [`docs/optimization-rules.md`](../docs/optimization-rules.md): presets, the three sliders, material rules and the per-purpose floors (sections 2–5, 7 and 9), plus three of the questions from section 6 (hidden top surfaces and multicolor purge). The other questions and the geometry rules are not implemented yet. Changes per version are in [`CHANGELOG.md`](../CHANGELOG.md).
 

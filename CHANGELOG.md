@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.1.4 (2026-11-12)
+
+Fixes for freezes in Orca, and notes that help miniatures print.
 
 **Projects saved with 0.1.0, 0.1.1 or the development version before them may still hold reduced supports**: a 30° threshold, organic style, a hollow or lightning support base, a single tree support wall, or (development version) On build plate only. Those versions changed supports and 0.1.2 stopped, but a saved project keeps what was applied, and Undo may not reach them. Check the Support tab of old projects, or set those values back to your preset's.
 
