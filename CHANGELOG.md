@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.5 (2026-11-14)
+
+A cleaner tab, and the plugin activates on older Orca 2.5 builds.
+
+- Fixed: on OrcaSlicer 2.5.0-alpha the plugin failed to activate ("request_permissions(): incompatible function arguments"). That build cannot be asked for the thread permission ahead of time; the plugin now goes on without asking.
+- New tab layout: the estimate comes first, then numbered steps (what you are printing, then the suggested changes). The kinds of part are tiles, applied rows have a green edge and skipped rows fade. Spool prices and currency, and saving a preset, are in panels you open when you need them.
+- The tab follows Orca's light and dark theme colors.
+- Setting values show Orca's own names, also in the reasons: "All → Critical Only" instead of "ensure_all → ensure_critical_only", "Lightning" instead of "lightning". In Portuguese they use Orca's translation.
+- Fixed: **Restore originals** turned a row you had skipped back into Apply/Skip.
+- Keyboard: focus is visible, and it stays on the kind of part you pick with the arrow keys.
+
 ## 0.1.4 (2026-11-12)
 
 Fixes for freezes in Orca, and notes that help miniatures print.
