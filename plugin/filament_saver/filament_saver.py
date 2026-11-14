@@ -2248,7 +2248,8 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
                 for change in (self.result or {}).get("changes", []):
                     if change["key"] == key:
                         change["current"] = current.get(key, "")
-                        change["status"] = "pending"
+                        if change["status"] != "skipped":  # a skip is the user's choice; keep it
+                            change["status"] = "pending"
             self._save_originals()
             keys = [k for k in keys if k not in edited]
             kept = self._t("%d setting(s) were left as they are: they changed after Filament Saver applied them, or what it applied is not on record.") % len(edited)
@@ -2266,7 +2267,8 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
                 for change in (self.result or {}).get("changes", []):
                     if change["key"] == key:
                         change["current"] = original
-                        change["status"] = "pending"
+                        if change["status"] != "skipped":
+                            change["status"] = "pending"
             self.changed_since_slice = True
             self._save_originals()
             self.message = self._t("Restored %d setting(s) to their values before the suggestions.") % len(keys)

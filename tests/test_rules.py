@@ -608,6 +608,21 @@ class OriginalsStorageTest(unittest.TestCase):
         page._restore(["wall_loops"])  # only an edited setting: nothing is written
         self.assertEqual((self.written, page.originals), ([], {}))
 
+    def test_restore_keeps_skipped_rows_skipped(self):
+        """A row the user skipped stays skipped whether Restore puts its setting back or drops a
+        stale record of it (found in Orca: Restore turned a skipped row back into Apply/Skip)."""
+        page = self._page()
+        self._apply(page, "wall_loops", "3", "2")
+        self._apply(page, "sparse_infill_density", "15%", "10%")
+        page.result = {"changes": [
+            {"id": "wall_loops", "key": "wall_loops", "current": "4", "suggested": "2", "status": "skipped"},
+            {"id": "sparse_infill_density", "key": "sparse_infill_density", "current": "10%", "suggested": "8%",
+             "status": "skipped"}]}
+        page._context = lambda: {"current": {"wall_loops": "4", "sparse_infill_density": "10%"}}  # walls edited by hand
+        page._restore()
+        self.assertEqual([c["status"] for c in page.result["changes"]], ["skipped", "skipped"])
+        self.assertEqual([c["current"] for c in page.result["changes"]], ["4", "15%"])
+
     def test_restore_leaves_settings_without_a_record_of_the_plugin_value(self):
         """0.1.0 files kept only the originals: the setting may have been edited since, so it stays."""
         with open(os.path.join(self.storage, fs.ORIGINALS_FILE), "w") as stream:

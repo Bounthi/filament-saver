@@ -4,6 +4,8 @@ Run in OrcaSlicer before tagging a release. The unit tests (`python3 -m unittest
 
 Setup: copy `plugin/filament_saver/filament_saver.py` into `orca_plugins/filament_saver/`, then in the Plugins window turn off the Orca Cloud copy, turn on the local one (off and on again reloads it). Use a project with one object and one filament, and note its current process values first. Undo everything at the end and switch back to the Orca Cloud copy.
 
+Expect two prompts from Orca: on the first slice, a fresh local copy asks to read the slice's temporary G-code (answer Yes); applying the vase rows shows Orca's own spiral-mode dialog (answer Yes). Clicks sent to the tab in the background can be dropped, so drive Orca in the foreground.
+
 ## Suggest and apply
 
 - [ ] The tab opens in Orca's language (English and Portuguese), with no untranslated text.
