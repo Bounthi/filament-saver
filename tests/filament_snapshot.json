@@ -702,7 +702,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -737,7 +737,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -772,7 +772,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -808,7 +808,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -843,7 +843,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -883,7 +883,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -916,7 +916,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -951,7 +951,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -1005,7 +1005,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -1532,7 +1532,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -1581,7 +1581,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -1630,7 +1630,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -1680,7 +1680,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -1729,7 +1729,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -1776,7 +1776,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -1823,7 +1823,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -1872,7 +1872,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -1954,7 +1954,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -3440,7 +3440,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -3475,7 +3475,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -3510,7 +3510,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -3546,7 +3546,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -3581,7 +3581,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -3614,7 +3614,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -3647,7 +3647,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -3682,7 +3682,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -3736,7 +3736,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -4256,7 +4256,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -4298,7 +4298,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -4340,7 +4340,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -4383,7 +4383,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -4425,7 +4425,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -4465,7 +4465,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -4505,7 +4505,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -4547,7 +4547,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -4615,7 +4615,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -6007,7 +6007,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -6042,7 +6042,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -6077,7 +6077,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -6113,7 +6113,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -6148,7 +6148,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -6181,7 +6181,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -6214,7 +6214,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -6249,7 +6249,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -6303,7 +6303,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -6823,7 +6823,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -6865,7 +6865,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -6907,7 +6907,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -6950,7 +6950,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -6992,7 +6992,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -7032,7 +7032,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -7072,7 +7072,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -7114,7 +7114,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -7182,7 +7182,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -8588,7 +8588,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -8623,7 +8623,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -8658,7 +8658,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -8694,7 +8694,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -8729,7 +8729,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -8769,7 +8769,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -8802,7 +8802,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -8837,7 +8837,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -8891,7 +8891,7 @@
     "lightning",
     "supportcubic",
     "costs",
-    "lightning is not allowed for Functional; using supportcubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Functional; using Support Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -9418,7 +9418,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -9467,7 +9467,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -9516,7 +9516,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -9566,7 +9566,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -9615,7 +9615,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -9662,7 +9662,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -9709,7 +9709,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -9758,7 +9758,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",
@@ -9840,7 +9840,7 @@
     "lightning",
     "adaptivecubic",
     "costs",
-    "lightning is not allowed for Mechanical; using adaptivecubic, dense near the surfaces, sparse in the core."
+    "Lightning is not allowed for Mechanical; using Adaptive Cubic, dense near the surfaces, sparse in the core."
    ],
    [
     "top_shell_layers",

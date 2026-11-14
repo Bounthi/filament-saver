@@ -260,7 +260,34 @@ BOOL_KEYS = {"only_one_wall_top", "support_remove_small_overhang", "only_one_wal
 # On/off settings shown as On/Off whose effect on filament depends on the case.
 SWITCH_KEYS = BOOL_KEYS | {"enable_support", "detect_thin_wall", "overhang_reverse", "enable_wrapping_detection"}
 # Enum values shown with a name instead of Orca's stored value.
-VALUE_NAMES = {"timelapse_type": {"0": "Traditional", "1": "Smooth"}}
+# Orca's own names for setting values (PrintConfig.cpp enum_labels), shown instead of the stored value.
+VALUE_NAMES = {
+    "timelapse_type": {"0": "Traditional", "1": "Smooth"},
+    "brim_type": {"auto_brim": "Auto", "brim_ears": "Mouse ear", "painted": "Painted", "outer_only": "Outer brim only",
+                  "inner_only": "Inner brim only", "outer_and_inner": "Outer and inner brim", "no_brim": "No-brim",
+                  "leading_edge_only": "Leading edge only"},
+    "ensure_vertical_shell_thickness": {"none": "None", "ensure_critical_only": "Critical Only",
+                                        "ensure_moderate": "Moderate", "ensure_all": "All"},
+    "gap_fill_target": {"everywhere": "Everywhere", "topbottom": "Top and bottom surfaces", "nowhere": "Nowhere"},
+    "sparse_infill_pattern": {
+        "rectilinear": "Rectilinear", "alignedrectilinear": "Aligned Rectilinear", "zigzag": "Zig Zag",
+        "crosszag": "Cross Zag", "lockedzag": "Locked Zag", "line": "Line", "grid": "Grid", "triangles": "Triangles",
+        "tri-hexagon": "Tri-hexagon", "cubic": "Cubic", "adaptivecubic": "Adaptive Cubic",
+        "quartercubic": "Quarter Cubic", "supportcubic": "Support Cubic", "lightning": "Lightning",
+        "honeycomb": "Honeycomb", "3dhoneycomb": "3D Honeycomb", "lateral-honeycomb": "Lateral Honeycomb",
+        "lateral-lattice": "Lateral Lattice", "crosshatch": "Cross Hatch", "tpmsd": "TPMS-D", "tpmsfk": "TPMS-FK",
+        "gyroid": "Gyroid", "concentric": "Concentric", "hilbertcurve": "Hilbert Curve",
+        "archimedeanchords": "Archimedean Chords", "octagramspiral": "Octagram Spiral"},
+    "support_style": {"default": "Default (Grid/Organic)", "grid": "Grid", "snug": "Snug", "organic": "Organic",
+                      "tree_slim": "Tree Slim", "tree_strong": "Tree Strong", "tree_hybrid": "Tree Hybrid"},
+    "support_base_pattern": {"default": "Default", "rectilinear": "Rectilinear", "rectilinear-grid": "Rectilinear grid",
+                             "honeycomb": "Honeycomb", "lightning": "Lightning", "hollow": "Hollow"},
+}
+
+
+def value_name(key, value, t):
+    """Orca's name for a stored value, translated; the value itself when Orca has no name for it."""
+    return t(VALUE_NAMES.get(key, {}).get(value, value))
 # Numeric settings where a higher value uses less filament.
 HIGHER_SAVES = {"support_top_z_distance", "support_base_pattern_spacing", "support_interface_spacing"}
 # Extra process keys the engine reads but never changes.
@@ -390,7 +417,8 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
     walls, density, pattern, top, bottom = STRENGTH[strength]
     put("wall_loops", walls, t("Strength %d/5: %d walls. Walls add more strength per gram than infill.") % (strength, walls))
     put("sparse_infill_density", "%d%%" % density, t("Strength %d/5: %d%% sparse infill.") % (strength, density))
-    put("sparse_infill_pattern", pattern, t("Strength %d/5: %s, %s.") % (strength, pattern, t(PATTERN_NOTES[pattern])))
+    put("sparse_infill_pattern", pattern, t("Strength %d/5: %s, %s.") % (
+        strength, value_name("sparse_infill_pattern", pattern, t), t(PATTERN_NOTES[pattern])))
     put("bottom_shell_layers", bottom, t("Strength %d/5: %d bottom layers.") % (strength, bottom))
     _, gap_fill, min_sparse_area = STRENGTH_SOLID[strength]
     # Sloped surfaces are visible, so a high finish keeps them reinforced even at low strength.
@@ -523,8 +551,9 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
         if chosen in forbidden:
             fallback = next(p for p in PATTERN_ORDER if p not in forbidden)
             put("sparse_infill_pattern", fallback,
-                t("%s is not allowed for %s; using %s, %s.") % (chosen, purpose_label if chosen in floors["forbid"] else label,
-                                                             fallback, t(PATTERN_NOTES[fallback])))
+                t("%s is not allowed for %s; using %s, %s.") % (
+                    value_name("sparse_infill_pattern", chosen, t), purpose_label if chosen in floors["forbid"] else label,
+                    value_name("sparse_infill_pattern", fallback, t), t(PATTERN_NOTES[fallback])))
     if int(targets["top_shell_layers"]) < floors["top"]:
         put("top_shell_layers", floors["top"], t("%s needs at least %d top layers.") % (purpose_label, floors["top"]))
     if int(targets["bottom_shell_layers"]) < floors["bottom"]:
@@ -589,7 +618,8 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
             allowed = next(p for p in PATTERN_ORDER if p not in forbidden)
             chosen = current["sparse_infill_pattern"]
             minimums["sparse_infill_pattern"] = (allowed, t("%s is not allowed for %s; using %s, %s.") % (
-                chosen, purpose_label if chosen in floors["forbid"] else label, allowed, t(PATTERN_NOTES[allowed])))
+                value_name("sparse_infill_pattern", chosen, t), purpose_label if chosen in floors["forbid"] else label,
+                value_name("sparse_infill_pattern", allowed, t), t(PATTERN_NOTES[allowed])))
     if "petg" in families and supports_on:
         minimums["support_interface_top_layers"] = ("2", t("PETG sticks to supports: at least 2 interface layers."))
 
@@ -1506,6 +1536,9 @@ TRANSLATIONS = {
         "{n} comparison(s) since {date}, between slices of the same parts before and after applying or undoing suggestions; other edits made in between count too.":
             "{n} comparação(ões) desde {date}, entre fatiamentos das mesmas peças antes e depois de aplicar ou desfazer sugestões; outras edições feitas no meio também contam.",
         "Reset": "Zerar",
+        "{n} comparison(s) since {date}": "{n} comparação(ões) desde {date}",
+        "Spool prices and currency": "Preços dos rolos e moeda",
+        "Preset name": "Nome do preset",
         "The difference is against the previous slice of the same parts on the same plate.":
             "A diferença é em relação ao fatiamento anterior das mesmas peças, na mesma placa.",
         "No estimate yet. Slice the plate; the time and filament show up here.":
@@ -1514,6 +1547,56 @@ TRANSLATIONS = {
         "Material": "Material",
         "Auto: {family}": "Auto: {family}",
         "Auto": "Auto",
+        # Setting values, as in Orca's pt_BR translation.
+        "Mouse ear": "Orelha de rato",
+        "Painted": "Pintado",
+        "Outer brim only": "Somente borda externa",
+        "Inner brim only": "Somente borda interna",
+        "Outer and inner brim": "Borda externa e interna",
+        "No-brim": "Sem borda",
+        "Leading edge only": "Somente bordo de ataque",
+        "None": "Nenhum",
+        "Critical Only": "Apenas crítico",
+        "Moderate": "Moderado",
+        "All": "Todos",
+        "Everywhere": "Sempre",
+        "Top and bottom surfaces": "Superfícies superior e inferior",
+        "Nowhere": "Nunca",
+        "Rectilinear": "Retilíneo",
+        "Aligned Rectilinear": "Retilíneo alinhado",
+        "Zig Zag": "Zigue-Zague",
+        "Cross Zag": "Zague Cruzado",
+        "Locked Zag": "Zague Travado",
+        "Line": "Linha",
+        "Grid": "Grade",
+        "Triangles": "Triângulos",
+        "Tri-hexagon": "Tri-hexágono",
+        "Cubic": "Cúbico",
+        "Adaptive Cubic": "Cúbico Adaptativo",
+        "Quarter Cubic": "Quarto Cúbico",
+        "Support Cubic": "Cúbico de Suporte",
+        "Lightning": "Relâmpago",
+        "Honeycomb": "Favo de Mel",
+        "3D Honeycomb": "Favo de Mel 3D",
+        "Lateral Honeycomb": "Favo de Mel Lateral",
+        "Lateral Lattice": "Treliça Lateral",
+        "Cross Hatch": "Hachura Cruzada",
+        "TPMS-D": "TPMS-D",
+        "TPMS-FK": "TPMS-FK",
+        "Gyroid": "Giroide",
+        "Concentric": "Concêntrico",
+        "Hilbert Curve": "Curva de Hilbert",
+        "Archimedean Chords": "Cordas Arquimedeanas",
+        "Octagram Spiral": "Espiral de Octagrama",
+        "Default (Grid/Organic)": "Padrão (Grade/Orgânico)",
+        "Snug": "Ajustado",
+        "Organic": "Orgânico",
+        "Tree Slim": "Árvore Estreita",
+        "Tree Strong": "Árvore Forte",
+        "Tree Hybrid": "Árvore Híbrida",
+        "Default": "Padrão",
+        "Rectilinear grid": "Grade reticulada",
+        "Hollow": "Oco",
         "Detected from {filament}": "Detectado em {filament}",
         "Overrides the filament profile for these suggestions.": "Substitui o perfil do filamento nestas sugestões.",
         "Strength": "Resistência",
@@ -2484,89 +2567,160 @@ PAGE = r"""<!doctype html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 :root {
-  color-scheme: light dark;
-  --bg: var(--orca-bg, #f6f7f8); --fg: var(--orca-fg, #1d2125); --accent: var(--orca-accent, #009688);
-  --card: rgba(127,127,127,.08); --line: rgba(127,127,127,.25); --muted: rgba(127,127,127,.95);
-  --save: #1f9d55; --cost: #c2410c; --error: #d13c32;
-  font: 13px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Orca fills --orca-* from its live theme and sets data-orca-theme; the values after the comma are for other hosts. */
+  color-scheme: light;
+  --bg: var(--orca-bg, #f4f5f6); --fg: var(--orca-fg, #1d2125); --muted: var(--orca-muted, #646b72);
+  --line: var(--orca-border, #e1e4e7); --line-strong: var(--orca-border, #cdd2d6);
+  --surface: #ffffff; --accent: #00796b; --accent-text: #00796b; --accent-fg: #ffffff; --accent-soft: rgba(0,150,136,.10);
+  --save: #157f45; --save-soft: rgba(21,127,69,.11); --cost: #b4480c; --cost-soft: rgba(180,72,12,.11);
+  --error: #c53030; --error-soft: rgba(197,48,48,.09); --focus: rgba(0,150,136,.45);
+  --radius: 10px; --shadow: 0 1px 2px rgba(16,24,32,.05);
+  font: 13px/1.45 var(--orca-font, system-ui, -apple-system, "Segoe UI", sans-serif);
+}
+/* Dark: Orca's attribute first; the media query only when there is no attribute. */
+:root[data-orca-theme="dark"] {
+  color-scheme: dark; --bg: var(--orca-bg, #1b1d1f); --fg: var(--orca-fg, #e7e9eb); --muted: var(--orca-muted, #9aa1a7);
+  --line: var(--orca-border, #34383c); --line-strong: var(--orca-border, #464b50); --surface: rgba(255,255,255,.04);
+  --accent: var(--orca-accent, #26a69a); --accent-text: #4db6ac; --accent-fg: var(--orca-accent-fg, #0f1a19); --accent-soft: rgba(38,166,154,.16);
+  --save: #4cc38a; --save-soft: rgba(76,195,138,.14); --cost: #f0965a; --cost-soft: rgba(240,150,90,.14);
+  --error: #f07272; --error-soft: rgba(240,114,114,.12); --focus: rgba(38,166,154,.55); --shadow: none;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-orca-theme]) {
+    color-scheme: dark; --bg: #1b1d1f; --fg: #e7e9eb; --muted: #9aa1a7; --line: #34383c; --line-strong: #464b50;
+    --surface: rgba(255,255,255,.04); --accent: #26a69a; --accent-text: #4db6ac; --accent-fg: #0f1a19; --accent-soft: rgba(38,166,154,.16);
+    --save: #4cc38a; --save-soft: rgba(76,195,138,.14); --cost: #f0965a; --cost-soft: rgba(240,150,90,.14);
+    --error: #f07272; --error-soft: rgba(240,114,114,.12); --focus: rgba(38,166,154,.55); --shadow: none;
+  }
 }
 * { box-sizing: border-box; }
-body { margin: 0; padding: 16px; background: var(--bg); color: var(--fg); }
-.wrap { max-width: 980px; margin: 0 auto; display: grid; gap: 12px; }
-header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-h1 { font-size: 18px; margin: 0; display: flex; align-items: center; gap: 10px; }
-.logo { width: 34px; height: 34px; flex: none; background: url(data:image/png;base64,__LOGO_PNG__) center / contain no-repeat; }
+body { margin: 0; padding: 20px 16px 32px; background: var(--bg); color: var(--fg); }
+.wrap { max-width: 1040px; margin: 0 auto; display: grid; gap: 14px; }
+header { display: flex; align-items: center; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap; }
+h1 { font-size: 17px; margin: 0; display: flex; align-items: center; gap: 10px; letter-spacing: -.01em; }
+.logo { width: 30px; height: 30px; flex: none; background: url(data:image/png;base64,__LOGO_PNG__) center / contain no-repeat; }
 .meta { color: var(--muted); font-size: 12px; }
-.card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
-.card h2 { font-size: 13px; margin: 0 0 10px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
-.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-.stat .value { font-size: 22px; font-weight: 650; font-variant-numeric: tabular-nums; }
+#info { padding: 3px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); }
+#info:empty { display: none; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow); }
+.card-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+h2 { font-size: 14px; font-weight: 650; margin: 0; display: flex; align-items: center; gap: 8px; }
+.step { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; font-size: 11px; font-weight: 700;
+        background: var(--accent-soft); color: var(--accent-text); flex: none; }
+.eyebrow { font-size: 11px; font-weight: 650; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 10px; }
+/* Estimate */
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.stat { display: grid; gap: 2px; align-content: start; }
 .stat .label { color: var(--muted); font-size: 12px; }
-.delta { font-size: 12px; font-weight: 600; }
-.delta.saves { color: var(--save); } .delta.costs { color: var(--cost); }
-.hint { color: var(--muted); font-size: 12px; margin-top: 8px; }
-.saved { font-size: 12px; margin-top: 8px; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
-.saved:empty { display: none; } .saved .total { font-weight: 600; } .saved small { color: var(--muted); }
+.stat .value { font-size: 24px; font-weight: 650; font-variant-numeric: tabular-nums; letter-spacing: -.01em; line-height: 1.2; }
+.delta { font-size: 12px; font-weight: 600; justify-self: start; }
+.delta:empty { display: none; }
+.delta.saves, .delta.costs { padding: 1px 8px; border-radius: 999px; }
+.delta.saves { color: var(--save); background: var(--save-soft); } .delta.costs { color: var(--cost); background: var(--cost-soft); }
+.hint { color: var(--muted); font-size: 12px; margin-top: 10px; }
+.saved { margin-top: 12px; padding: 9px 12px; border-radius: 8px; background: var(--save-soft);
+         display: flex; gap: 6px 10px; align-items: center; flex-wrap: wrap; font-size: 12px; }
+.saved:empty { display: none; } .saved .total { font-weight: 650; font-size: 13px; font-variant-numeric: tabular-nums; }
+.saved.costs { background: var(--cost-soft); }
 .saved .total.saves { color: var(--save); } .saved .total.costs { color: var(--cost); }
-.form { display: grid; grid-template-columns: 1.2fr 2fr; gap: 14px; align-items: start; }
-.purposes { display: grid; gap: 6px; }
-.purpose { display: flex; gap: 8px; align-items: flex-start; padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
-.purpose.on { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
-.purpose input { margin-top: 3px; accent-color: var(--accent); }
-.purpose small { display: block; color: var(--muted); }
-.field { display: grid; grid-template-columns: 110px 1fr; gap: 4px 10px; align-items: center; margin-bottom: 14px; }
-.field select { font: inherit; padding: 5px 8px; border-radius: 7px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); }
-.field small { grid-column: 2; color: var(--muted); }
-.slider { display: grid; grid-template-columns: 110px 1fr 28px; gap: 10px; align-items: center; margin-bottom: 10px; }
+.saved small { color: var(--muted); flex: 1; min-width: 160px; }
+details.more { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 10px; }
+details.more > summary { cursor: pointer; color: var(--muted); font-weight: 600; font-size: 12px; list-style: none; display: flex; align-items: center; gap: 6px; }
+details.more > summary::-webkit-details-marker { display: none; }
+details.more > summary::before { content: "›"; display: inline-block; transition: transform .15s; font-size: 14px; line-height: 1; }
+details.more[open] > summary::before { transform: rotate(90deg); }
+details.more > summary:hover { color: var(--fg); }
+/* Form */
+.purposes { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; margin-bottom: 16px; }
+.purpose { position: relative; display: block; padding: 9px 12px 10px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer;
+           background: var(--surface); transition: border-color .12s, background-color .12s; }
+.purpose:hover { border-color: var(--line-strong); }
+.purpose.on { border-color: var(--accent); background: var(--accent-soft); }
+.purpose.on::after { content: "✓"; position: absolute; top: 8px; right: 10px; color: var(--accent-text); font-weight: 700; font-size: 12px; }
+.purpose input { position: absolute; opacity: 0; pointer-events: none; }
+.purpose:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
+.purpose .title { font-weight: 600; padding-right: 16px; }
+.purpose small { display: block; color: var(--muted); font-size: 12px; margin-top: 1px; }
+.form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px 28px; align-items: start; }
+.field { display: grid; grid-template-columns: 96px 1fr; gap: 4px 12px; align-items: center; margin-bottom: 14px; }
+select, input[type=text], input[type=number] { font: inherit; padding: 6px 9px; border-radius: 7px; border: 1px solid var(--line-strong);
+         background: var(--surface); color: var(--fg); min-height: 32px; }
+.field small { grid-column: 2; color: var(--muted); font-size: 12px; }
+.slider { display: grid; grid-template-columns: 96px 1fr 32px; gap: 2px 12px; align-items: center; margin-bottom: 10px; }
 .slider input { width: 100%; accent-color: var(--accent); }
-.slider output { font-weight: 650; text-align: right; font-variant-numeric: tabular-nums; }
-.slider small { grid-column: 2 / 4; color: var(--muted); margin-top: -6px; }
-button { border: 0; border-radius: 7px; padding: 7px 12px; font: inherit; font-weight: 600; cursor: pointer; background: var(--accent); color: #fff; }
-button.ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); }
+.slider output { font-weight: 650; text-align: center; font-variant-numeric: tabular-nums; background: var(--accent-soft); color: var(--accent-text);
+                 border-radius: 6px; padding: 1px 0; }
+.slider small { grid-column: 2 / 4; color: var(--muted); font-size: 12px; }
+.questions { display: grid; gap: 10px; }
+.questions .title { font-size: 11px; font-weight: 650; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.question { display: flex; gap: 9px; align-items: flex-start; cursor: pointer; }
+.question input { margin-top: 2px; accent-color: var(--accent); width: 15px; height: 15px; flex: none; }
+.question small { display: block; color: var(--muted); font-size: 12px; }
+.form-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px 14px; flex-wrap: wrap;
+             margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+/* Buttons */
+button { border: 1px solid transparent; border-radius: 7px; padding: 6px 13px; min-height: 32px; font: inherit; font-weight: 600; cursor: pointer;
+         background: var(--accent); color: var(--accent-fg); transition: filter .12s, background-color .12s; }
+button:hover:not(:disabled) { filter: brightness(1.06); }
+button.ghost { background: var(--surface); color: var(--fg); border-color: var(--line-strong); }
+button.ghost:hover:not(:disabled) { background: var(--bg); filter: none; }
+button.link { background: none; border: 0; padding: 0 2px; min-height: 0; color: var(--muted); text-decoration: underline; font-weight: 600; }
+button.link:hover:not(:disabled) { color: var(--fg); filter: none; }
 button:disabled { opacity: .45; cursor: default; }
+button:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+button.big { padding: 8px 18px; }
 .row-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-.toolbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
-.changes { display: grid; gap: 14px; }
+.toolbar .sep { width: 1px; align-self: stretch; background: var(--line); margin: 2px 2px; }
+/* Changes */
+.status { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+.status:empty { display: none; }
+.status.error { color: var(--error); background: var(--error-soft); padding: 8px 12px; border-radius: 8px; margin-bottom: 10px; }
+.changes { display: grid; gap: 18px; }
 .section { display: grid; gap: 8px; }
-.section-title { font-weight: 650; }
+.section-title { font-size: 11px; font-weight: 650; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
 .section .hint { margin-top: -4px; }
-.change { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center;
-          padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
-.change.applied { opacity: .7; } .change.skipped { opacity: .5; }
-.change .name { font-weight: 650; }
-.change .values { font-variant-numeric: tabular-nums; margin: 2px 0; }
+.change { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center;
+          padding: 11px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.change.applied { border-left: 3px solid var(--save); padding-left: 12px; }
+.change.skipped > div:first-child { opacity: .5; }
+.change.error { border-left: 3px solid var(--error); padding-left: 12px; }
+.change .name { font-weight: 600; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.change .values { font-variant-numeric: tabular-nums; margin: 3px 0 2px; display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
 .change .values .from { color: var(--muted); text-decoration: line-through; }
+.change .values .arrow { color: var(--muted); }
 .change .values .to { font-weight: 650; }
 .change .why { color: var(--muted); font-size: 12px; }
-.badge { display: inline-block; font-size: 11px; font-weight: 650; padding: 1px 7px; border-radius: 999px; margin-left: 6px; }
-.badge.saves { background: rgba(31,157,85,.15); color: var(--save); }
-.badge.costs { background: rgba(194,65,12,.15); color: var(--cost); }
-.badge.state { background: rgba(127,127,127,.2); }
-.status { min-height: 18px; font-size: 12px; }
-.status.error { color: var(--error); }
-.notes { margin: 8px 0 0; padding-left: 18px; color: var(--muted); font-size: 12px; }
-.empty { color: var(--muted); padding: 6px 0; }
-.save-preset { border-top: 1px solid var(--line); margin-top: 12px; padding-top: 10px; display: grid; gap: 6px; }
-.save-preset .title { font-weight: 650; }
-.save-preset input { font: inherit; padding: 6px 8px; border-radius: 7px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); flex: 1; min-width: 180px; }
-.save-preset small { color: var(--muted); }
-.prices { border-top: 1px solid var(--line); margin-top: 12px; padding-top: 10px; display: grid; gap: 8px; }
-.prices .title { font-weight: 650; }
-.currency { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; }
-.currency select { font: inherit; padding: 4px 6px; border-radius: 7px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); }
-.currency small { flex-basis: 100%; color: var(--muted); }
-.currency .consent { flex-basis: 100%; display: flex; gap: 6px; align-items: flex-start; }
-.currency .consent input { margin-top: 3px; accent-color: var(--accent); }
-.price { display: grid; grid-template-columns: minmax(0, 1fr) 120px 110px; gap: 4px 10px; align-items: center; }
-.price input { font: inherit; padding: 5px 8px; border-radius: 7px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); width: 100%; }
-.price small { grid-column: 1 / -1; color: var(--muted); }
-@media (max-width: 720px) { .price { grid-template-columns: 1fr 1fr; } .price .name { grid-column: 1 / -1; } }
-.questions { border-top: 1px solid var(--line); margin: 4px 0 14px; padding-top: 10px; display: grid; gap: 8px; }
-.questions .title { font-weight: 650; }
-.question { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; }
-.question input { margin-top: 3px; accent-color: var(--accent); }
-.question small { display: block; color: var(--muted); }
-@media (max-width: 720px) { .form { grid-template-columns: 1fr; } .stats { grid-template-columns: 1fr 1fr; } }
+.change .why.warn { color: var(--cost); } .change .why.err { color: var(--error); }
+.change .row-actions { justify-content: flex-end; }
+.badge { display: inline-block; font-size: 11px; font-weight: 650; padding: 1px 8px; border-radius: 999px; }
+.badge.saves { background: var(--save-soft); color: var(--save); }
+.badge.costs { background: var(--cost-soft); color: var(--cost); }
+.badge.state { background: var(--bg); color: var(--muted); border: 1px solid var(--line); }
+.done { color: var(--save); font-weight: 650; font-size: 12px; white-space: nowrap; }
+.notes { margin: 16px 0 0; padding: 10px 12px 10px 28px; color: var(--muted); font-size: 12px; background: var(--bg); border-radius: 8px; }
+.notes:empty { display: none; }
+.notes li + li { margin-top: 4px; }
+.empty { color: var(--muted); padding: 22px 12px; text-align: center; border: 1px dashed var(--line-strong); border-radius: 8px; }
+.save-preset { display: grid; gap: 6px; padding-top: 4px; }
+.save-preset .row-actions input { flex: 1; min-width: 180px; }
+.save-preset small { color: var(--muted); font-size: 12px; }
+/* Prices */
+.prices { display: grid; gap: 10px; padding-top: 10px; }
+.prices .title { font-weight: 600; }
+.currency { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; }
+.currency small { flex-basis: 100%; color: var(--muted); font-size: 12px; }
+.currency .consent { flex-basis: 100%; display: flex; gap: 8px; align-items: flex-start; }
+.currency .consent input { margin-top: 2px; accent-color: var(--accent); }
+.price { display: grid; grid-template-columns: minmax(0, 1fr) 130px 110px; gap: 4px 10px; align-items: center; }
+.price input { width: 100%; }
+.price small { grid-column: 1 / -1; color: var(--muted); font-size: 12px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+@media (max-width: 760px) {
+  .form { grid-template-columns: 1fr; } .stats { grid-template-columns: 1fr 1fr; }
+  .price { grid-template-columns: 1fr 1fr; } .price .name { grid-column: 1 / -1; }
+  .change { grid-template-columns: 1fr; } .change .row-actions { justify-content: flex-start; }
+  .toolbar .sep { display: none; }
+}
 </style></head><body>
 <div class="wrap">
   <header>
@@ -2574,55 +2728,57 @@ button:disabled { opacity: .45; cursor: default; }
     <div class="meta" id="info"></div>
   </header>
 
-  <section class="card">
-    <h2 data-t>Current estimate</h2>
+  <section class="card" aria-labelledby="estimate-title">
+    <p class="eyebrow" id="estimate-title" data-t>Current estimate</p>
     <div class="stats">
-      <div class="stat"><div class="value" id="time">—</div><div class="label" data-t>Print time</div><div class="delta" id="time-delta"></div></div>
-      <div class="stat"><div class="value" id="grams">—</div><div class="label" data-t>Filament</div><div class="delta" id="grams-delta"></div></div>
-      <div class="stat"><div class="value" id="cost">—</div><div class="label"><span data-t>Cost</span> <span id="cost-source"></span></div><div class="delta" id="cost-delta"></div></div>
+      <div class="stat"><div class="label" data-t>Print time</div><div class="value" id="time">—</div><div class="delta" id="time-delta"></div></div>
+      <div class="stat"><div class="label" data-t>Filament</div><div class="value" id="grams">—</div><div class="delta" id="grams-delta"></div></div>
+      <div class="stat"><div class="label"><span data-t>Cost</span> <span id="cost-source"></span></div><div class="value" id="cost">—</div><div class="delta" id="cost-delta"></div></div>
     </div>
     <div class="hint" id="estimate-hint"></div>
     <div class="saved" id="saved"></div>
-    <div class="prices" id="prices"></div>
+    <details class="more" id="prices-panel"><summary data-t>Spool prices and currency</summary><div class="prices" id="prices"></div></details>
   </section>
 
-  <section class="card">
-    <h2 data-t>What are you printing?</h2>
+  <section class="card" aria-labelledby="form-title">
+    <div class="card-head"><h2 id="form-title"><span class="step" aria-hidden="true">1</span><span data-t>What are you printing?</span></h2></div>
+    <div class="purposes" id="purposes" role="radiogroup"></div>
     <div class="form">
-      <div class="purposes" id="purposes"></div>
       <div>
         <div class="field"><label for="material" data-t>Material</label><select id="material"></select>
           <small id="material-hint"></small></div>
-        <div class="slider"><label for="S" data-t>Strength</label><input type="range" id="S" min="0" max="5" step="1"><output id="S-out"></output>
+        <div class="slider"><label for="S" data-t>Strength</label><input type="range" id="S" min="0" max="5" step="1"><output id="S-out" for="S"></output>
           <small data-t>Walls, infill and solid layers</small></div>
-        <div class="slider"><label for="V" data-t>Finish</label><input type="range" id="V" min="0" max="5" step="1"><output id="V-out"></output>
+        <div class="slider"><label for="V" data-t>Finish</label><input type="range" id="V" min="0" max="5" step="1"><output id="V-out" for="V"></output>
           <small data-t>Top surfaces and support interfaces</small></div>
-        <div class="slider"><label for="R" data-t>Reliability</label><input type="range" id="R" min="0" max="5" step="1"><output id="R-out"></output>
+        <div class="slider"><label for="R" data-t>Reliability</label><input type="range" id="R" min="0" max="5" step="1"><output id="R-out" for="R"></output>
           <small data-t>Brim, skirt and support coverage</small></div>
-        <div class="questions" id="questions"></div>
-        <div class="row-actions"><button id="suggest" data-t>Suggest changes</button><span class="meta" id="mode"></span></div>
       </div>
+      <div class="questions" id="questions"></div>
     </div>
+    <div class="form-foot"><span class="meta" id="mode"></span><button id="suggest" class="big" data-t>Suggest changes</button></div>
   </section>
 
-  <section class="card">
-    <div class="toolbar">
-      <h2 style="margin:0" data-t>Suggested changes</h2>
+  <section class="card" aria-labelledby="changes-title">
+    <div class="card-head toolbar">
+      <h2 id="changes-title"><span class="step" aria-hidden="true">2</span><span data-t>Suggested changes</span></h2>
       <div class="row-actions">
         <button id="apply-savings" disabled data-t>Apply savings</button>
         <button id="apply-all" class="ghost" disabled data-t>Apply all</button>
         <button id="skip-all" class="ghost" disabled data-t>Skip all</button>
+        <span class="sep" aria-hidden="true"></span>
         <button id="restore-all" class="ghost" disabled>Restore originals</button>
       </div>
     </div>
-    <div class="status" id="status"></div>
+    <div class="status" id="status" role="status"></div>
     <div class="changes" id="changes"><div class="empty" data-t>Pick what you are printing and click Suggest changes.</div></div>
     <ul class="notes" id="notes"></ul>
-    <div class="save-preset">
-      <label for="preset-name" class="title" data-t>Save the current process settings as a new preset</label>
-      <div class="row-actions"><input id="preset-name" type="text" maxlength="120"><button id="save-preset" class="ghost" data-t>Save preset</button></div>
-      <small data-t>Includes your unsaved edits and the applied suggestions. It goes into the Filament Saver group of the process list.</small>
-    </div>
+    <details class="more" id="preset-panel"><summary data-t>Save the current process settings as a new preset</summary>
+      <div class="save-preset">
+        <div class="row-actions"><input id="preset-name" type="text" maxlength="120" aria-label="Preset name"><button id="save-preset" class="ghost" data-t>Save preset</button></div>
+        <small data-t>Includes your unsaved edits and the applied suggestions. It goes into the Filament Saver group of the process list.</small>
+      </div>
+    </details>
   </section>
 </div>
 <script>
@@ -2686,15 +2842,17 @@ function delta(el, latest, previous, fmt) {
 
 function renderSaved() {
   const box = $('saved'), saved = state.saved;
-  if (!saved) { box.innerHTML = ''; return; }
+  if (!saved) { box.innerHTML = ''; box.className = 'saved'; return; }
   const signed = (v, fmt) => (v > 0 ? '−' : v < 0 ? '+' : '') + fmt(Math.abs(v));  // positive totals are savings
   const parts = [signed(saved.grams, fmtGrams), signed(saved.seconds, fmtTime)];
   if (saved.cost != null) parts.push(signed(saved.cost, fmtCost));
   const since = new Date(saved.since * 1000).toLocaleDateString(state.lang === 'pt_BR' ? 'pt-BR' : undefined);
-  box.innerHTML = '<span>' + esc(T('With the suggestions:')) + '</span><span class="total ' + (saved.grams < 0 ? 'costs' : 'saves') +
-    '">' + esc(parts.join(' · ')) + '</span><small>' +
-    esc(T('{n} comparison(s) since {date}, between slices of the same parts before and after applying or undoing suggestions; other edits made in between count too.', {n: saved.count, date: since})) +
-    '</small><button class="ghost" data-reset-saved>' + esc(T('Reset')) + '</button>';
+  const kind = saved.grams < 0 ? 'costs' : 'saves';
+  box.className = 'saved ' + kind;
+  box.innerHTML = '<span>' + esc(T('With the suggestions:')) + '</span><span class="total ' + kind + '">' + esc(parts.join(' · ')) +
+    '</span><small title="' + esc(T('{n} comparison(s) since {date}, between slices of the same parts before and after applying or undoing suggestions; other edits made in between count too.', {n: saved.count, date: since})) +
+    '">' + esc(T('{n} comparison(s) since {date}', {n: saved.count, date: since})) +
+    '</small><button class="link" data-reset-saved>' + esc(T('Reset')) + '</button>';
 }
 
 function renderEstimate() {
@@ -2766,7 +2924,7 @@ function _numberOrNull(v) { const n = parseFloat(v); return Number.isFinite(n) ?
 function renderForm() {
   $('purposes').innerHTML = state.purposes.map(p =>
     '<label class="purpose' + (p.id === form.purpose ? ' on' : '') + '"><input type="radio" name="purpose" value="' + esc(p.id) + '"' +
-    (p.id === form.purpose ? ' checked' : '') + '><span>' + esc(p.label) + '<small>' + esc(p.hint) + '</small></span></label>').join('');
+    (p.id === form.purpose ? ' checked' : '') + '><span class="title">' + esc(p.label) + '</span><small>' + esc(p.hint) + '</small></label>').join('');
   const info = state.info || {};
   const detected = info.family ? T('Auto: {family}', {family: info.family}) : T('Auto');
   $('material').innerHTML = '<option value="auto">' + esc(detected) + '</option>' +
@@ -2778,6 +2936,7 @@ function renderForm() {
   for (const k of ['S', 'V', 'R']) { $(k).value = form[k]; $(k + '-out').textContent = form[k]; }
   const purpose = state.purposes.find(p => p.id === form.purpose);
   $('preset-name').placeholder = (info.process || '') + (purpose ? ' - ' + purpose.label : '');
+  $('preset-name').setAttribute('aria-label', T('Preset name'));
   const shown = QUESTIONS.filter(q => (!q.multi || info.filaments > 1) && (!q.supports || info.supports));
   const answers = form.answers || {};
   $('questions').innerHTML = '<div class="title">' + esc(T('Only check what you are sure of')) + '</div>' + shown.map(q =>
@@ -2808,16 +2967,16 @@ function renderChanges() {
     const badge = (c.effect ? '<span class="badge ' + c.effect + '">' + esc(T(c.effect === 'saves' ? 'saves filament' : 'uses more')) + '</span>' : '') +
       (c.group === 'vase' ? '<span class="badge state">' + esc(T('vase mode, applied together')) + '</span>' : '');
     let actions;
-    if (c.status === 'applied') actions = '<span class="badge state">' + esc(T('Applied')) + '</span>' + (canRestore.has(c.key)
+    if (c.status === 'applied') actions = '<span class="done">✓ ' + esc(T('Applied')) + '</span>' + (canRestore.has(c.key)
       ? '<button class="ghost" data-act="restore" data-id="' + esc(c.id) + '"' + (state.busy ? ' disabled' : '') + '>' + esc(T('Undo')) + '</button>' : '');
     else if (c.status === 'skipped') actions = '<button class="ghost" data-act="undo_skip" data-id="' + esc(c.id) + '"' + (blocked ? ' disabled' : '') + '>' + esc(T('Undo skip')) + '</button>';
     else actions = '<button data-act="apply" data-id="' + esc(c.id) + '"' + (blocked ? ' disabled' : '') + '>' + esc(T('Apply')) + '</button>' +
                    '<button class="ghost" data-act="skip" data-id="' + esc(c.id) + '"' + (blocked ? ' disabled' : '') + '>' + esc(T('Skip')) + '</button>';
-    const err = c.status === 'error' ? '<div class="why" style="color:var(--error)">' + esc(c.error || T('Failed')) + '</div>' : '';
+    const err = c.status === 'error' ? '<div class="why err">' + esc(c.error || T('Failed')) + '</div>' : '';
     const overridden = (c.overridden_by || []).length
-      ? '<div class="why" style="color:var(--cost)">' + esc(T('Not used by objects with their own value: {names}', {names: c.overridden_by.join(', ')})) + '</div>' : '';
+      ? '<div class="why warn">' + esc(T('Not used by objects with their own value: {names}', {names: c.overridden_by.join(', ')})) + '</div>' : '';
     return '<div class="change ' + esc(c.status) + '"><div><div class="name">' + esc(c.label) + badge + '</div>' +
-      '<div class="values"><span class="from">' + esc(fmtValue(c, c.current)) + '</span> → <span class="to">' + esc(fmtValue(c, c.suggested)) + '</span></div>' +
+      '<div class="values"><span class="from">' + esc(fmtValue(c, c.current)) + '</span><span class="arrow" aria-hidden="true">→</span><span class="to">' + esc(fmtValue(c, c.suggested)) + '</span></div>' +
       '<div class="why">' + esc(c.reason) + '</div>' + overridden + err + '</div><div class="row-actions">' + actions + '</div></div>';
   };
   // Increases only show up when the current value is below what the purpose or the material
@@ -2857,6 +3016,9 @@ $('purposes').addEventListener('change', e => {
   if (!p) return;
   form = {purpose: p.id, material: form.material, S: p.S, V: p.V, R: p.R, answers: form.answers};
   renderForm();
+  // renderForm rebuilds the tiles: keep keyboard focus on the chosen one.
+  const chosen = document.querySelector('.purpose input:checked');
+  if (chosen) chosen.focus();
 });
 $('material').addEventListener('change', e => { form.material = e.target.value; renderForm(); });
 $('saved').addEventListener('click', e => {
