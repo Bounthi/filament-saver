@@ -1375,6 +1375,21 @@ class LogoTest(unittest.TestCase):
             shutil.rmtree(storage)
 
 
+class RegistrationTest(unittest.TestCase):
+    def test_registers_on_orca_without_threading_permission(self):
+        # Older Orca builds: request_permissions(fs_read=...) only, kwargs threading raise TypeError.
+        def old_api(fs_read=()):
+            pass
+        registered = []
+        saved = fs.orca.request_permissions, fs.orca.register_capability
+        fs.orca.request_permissions, fs.orca.register_capability = old_api, registered.append
+        try:
+            fs.FilamentSaverPackage().register_capabilities()
+        finally:
+            fs.orca.request_permissions, fs.orca.register_capability = saved
+        self.assertEqual(registered, [fs.FilamentSaverPage])
+
+
 class GcodeEstimateTest(unittest.TestCase):
     def _parse(self, text):
         with tempfile.NamedTemporaryFile("w", suffix=".gcode", delete=False) as stream:

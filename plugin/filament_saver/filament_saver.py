@@ -2930,5 +2930,9 @@ class FilamentSaverPackage(orca.base):
         # One worker thread applies changes: the in-place write API must not run on the UI thread.
         # Network access is not declared here: the exchange-rate service is only contacted after
         # the user allows it in the tab, and Orca then asks for that host itself.
-        orca.request_permissions(threading=True)
+        try:
+            orca.request_permissions(threading=True)
+        except TypeError:
+            # Orca builds before 2026-10-22 take only fs_read here and do not audit threads.
+            pass
         orca.register_capability(FilamentSaverPage)
