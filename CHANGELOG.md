@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- New **Save time** section: Orca features that shorten the print without changing the part. Infill combination (Strength 2 or lower; −1.6 % time and −1 % filament on a test miniature), no retraction on travels inside the infill (−1.8 % time), concentric lines in narrow solid areas when that Orca default was turned off (−2 % time), and combining prime tower layers that have no filament change. Settings your Orca version does not have are never suggested.
+- New **Worth a try** card, off until you check **Show settings worth a try**: settings whose effect depends on the part, under a large disclaimer, never applied by Apply savings or Apply all. The first one is the Arachne wall generator, which shortens prints with thin walls or text but made a test miniature slower. If Arachne is on for a miniature or with a 0.6 mm or larger nozzle, the card shows an alert.
+
 ## 0.1.5 (2026-11-14)
 
 A cleaner tab, and the plugin activates on older Orca 2.5 builds.

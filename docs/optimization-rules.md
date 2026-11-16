@@ -515,3 +515,32 @@ Run with `plugin/filament_saver` (Pages tab).
 - **Measuring savings:** before slicing, savings are an **estimate** computed from geometry and settings. The actual value comes from `statistics.json` after export.
 
 Sources: [plugin development](https://www.orcaslicer.com/wiki/developer_reference/plugin_development/plugin_development), [Host API](https://www.orcaslicer.com/wiki/developer_reference/plugin_development/api_reference/host.html), [Slicing Pipeline](https://www.orcaslicer.com/wiki/developer_reference/plugin_development/api_reference/slicing.html), [lifecycle events](https://www.orcaslicer.com/wiki/developer_reference/plugin_development/api_reference/lifecycle_events.html), [Pages](https://www.orcaslicer.com/wiki/developer_reference/plugin_development/api_reference/pages.html), [Registry](https://www.orcaslicer.com/wiki/developer_reference/plugin_development/api_reference/registry.html), [2.5.0 Alpha release notes](https://www.orcaslicer.com/wiki/releases/release_2_5_0_alpha).
+
+## 14. Time savers (no change to the part or the filament)
+
+Orca features that only shorten the print. They are shown as **saves time** in their own section, and **Apply savings** applies them too. A setting the user's Orca does not have is never read, so it is never suggested.
+
+| Setting | Rule | Measured (Obsidian Inquisitor miniature, 0.12 mm, PLA, Orca 2.5.1 CLI) |
+|---|---|---|
+| `infill_combination` | On when Strength ≤ 2, not for TPU, not in vase mode. Max layer height left at Orca's default (the nozzle width). Walls keep the layer height. | −1.6 % time, −1.0 % filament |
+| `reduce_infill_retraction` | On, except in vase mode. Oozing stays inside the infill; Orca also skips Z-hop there. | −1.8 % time, same filament |
+| `detect_narrow_internal_solid_infill` | On (Orca's default) when it is off, except in vase mode. Narrow internal solid areas get concentric lines. | Off → on: −2.0 % time, −0.5 % filament |
+| `wipe_tower_sparse_layers_combination` | On with more than one filament and the prime tower on, unless No sparse layers, smooth timelapse or clumping detection is on (Orca ignores it then). | Not measured: Orca says it only acts when two or more tower layers fit under the nozzle's maximum layer height (thin layers). |
+
+**Rejected: Arachne (`wall_generator`).** Orca's default, and it shortened one user print a lot, but on the miniature above it made the print slower and heavier (+7.1 % time, +4.4 % filament, +6 min of travel). Its effect depends on the part, so it fails the certainty rule.
+
+Also measured on the same miniature and rejected: infill multiline (−0.6 % on Gyroid, +1.5 % slower on Grid: depends on the pattern) and sparse infill smooth factor (no effect on Gyroid or Grid). Ironing off saved 4.5 % but changes the top finish; not added.
+
+The removed "Save time" mode (layer height, ironing, speeds) stays removed: those change quality or risk failures. These rules live in the one filament mode.
+
+## 15. Worth a try (opt-in)
+
+Settings whose effect depends on the part. They live in their own card under a large disclaimer, are never in Apply savings, Apply all or Skip all, and are only offered after the user checks **Show settings worth a try** (saved in `trials.json`; off by default). Undo and Restore work as for any other row.
+
+| Setting | Offered when | Never offered (and an alert when it is on) |
+|---|---|---|
+| `wall_generator` Classic → Arachne | Classic, not vase mode | Miniature (measured +7 % time, +4 % filament on a test miniature); nozzle 0.6 mm or larger (user reports of holes in top layers) |
+
+The alert shows in the card whenever Arachne is on in one of those cases, even with the section off, because the user may have turned it on earlier.
+
+Sources: [Prusa: Arachne perimeter generator](https://help.prusa3d.com/article/arachne-perimeter-generator_352769) (less gap fill, shorter prints, cleaner small text; comments about 0.6 mm nozzles and seams), [Orca wall generator](https://www.orcaslicer.com/wiki/print_settings/quality/quality_settings_wall_generator), section 14 measurement.

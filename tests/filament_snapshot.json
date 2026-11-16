@@ -35,6 +35,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -78,6 +85,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -121,6 +135,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -165,6 +186,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -208,6 +236,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ],
    [
     "support_top_z_distance",
@@ -257,6 +292,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -299,6 +341,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -342,6 +391,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -420,6 +476,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -449,6 +512,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -477,6 +547,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -505,6 +582,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -534,6 +618,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -562,6 +653,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ],
    [
     "support_top_z_distance",
@@ -595,6 +693,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": []
@@ -621,6 +726,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -649,6 +761,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": []
@@ -689,6 +808,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -1076,6 +1202,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -1125,6 +1258,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -1174,6 +1314,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -1224,6 +1371,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -1273,6 +1427,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ],
    [
     "support_top_z_distance",
@@ -1327,6 +1488,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": []
@@ -1374,6 +1542,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -1423,6 +1598,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": []
@@ -1505,6 +1687,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -1997,6 +2186,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -2020,6 +2216,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -2043,6 +2246,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -2067,6 +2277,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -2090,6 +2307,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ],
    [
     "support_top_z_distance",
@@ -2119,6 +2343,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -2141,6 +2372,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -2164,6 +2402,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -2202,6 +2447,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -2253,6 +2505,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ],
    [
     "support_interface_top_layers",
@@ -2311,6 +2570,13 @@
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ],
    [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
+   ],
+   [
     "support_interface_top_layers",
     "2",
     "1",
@@ -2365,6 +2631,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ],
    [
     "support_interface_top_layers",
@@ -2424,6 +2697,13 @@
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ],
    [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
+   ],
+   [
     "support_interface_top_layers",
     "2",
     "1",
@@ -2480,6 +2760,13 @@
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ],
    [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
+   ],
+   [
     "support_top_z_distance",
     "0.2",
     "0.25",
@@ -2532,6 +2819,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ],
    [
     "support_interface_top_layers",
@@ -2588,6 +2882,13 @@
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ],
    [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
+   ],
+   [
     "support_interface_top_layers",
     "2",
     "1",
@@ -2642,6 +2943,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ],
    [
     "support_interface_top_layers",
@@ -2740,6 +3048,13 @@
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ],
    [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
+   ],
+   [
     "support_interface_top_layers",
     "2",
     "1",
@@ -2787,6 +3102,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -2830,6 +3152,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -2873,6 +3202,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -2917,6 +3253,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -2960,6 +3303,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -3002,6 +3352,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -3044,6 +3401,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -3087,6 +3451,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -3165,6 +3536,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -3194,6 +3572,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -3222,6 +3607,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -3250,6 +3642,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -3279,6 +3678,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -3307,6 +3713,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": []
@@ -3333,6 +3746,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": []
@@ -3359,6 +3779,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -3387,6 +3814,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": []
@@ -3427,6 +3861,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -3807,6 +4248,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -3856,6 +4304,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -3905,6 +4360,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -3955,6 +4417,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -4004,6 +4473,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": []
@@ -4051,6 +4527,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": []
@@ -4098,6 +4581,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -4147,6 +4637,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": []
@@ -4229,6 +4726,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -4651,6 +5155,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -4673,6 +5184,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -4695,6 +5213,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -4718,6 +5243,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -4740,6 +5272,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -4761,6 +5300,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -4782,6 +5328,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -4804,6 +5357,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -4840,6 +5400,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -4890,6 +5457,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -4939,6 +5513,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -4988,6 +5569,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -5038,6 +5626,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -5087,6 +5682,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": []
@@ -5134,6 +5736,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": []
@@ -5181,6 +5790,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -5230,6 +5846,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": []
@@ -5312,6 +5935,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -5354,6 +5984,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -5397,6 +6034,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -5440,6 +6084,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -5484,6 +6135,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -5527,6 +6185,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -5569,6 +6234,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -5611,6 +6283,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -5654,6 +6333,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -5732,6 +6418,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -5761,6 +6454,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -5789,6 +6489,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -5817,6 +6524,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -5846,6 +6560,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -5874,6 +6595,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": []
@@ -5900,6 +6628,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": []
@@ -5926,6 +6661,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -5954,6 +6696,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": []
@@ -5994,6 +6743,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -6374,6 +7130,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -6423,6 +7186,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -6472,6 +7242,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -6522,6 +7299,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -6571,6 +7355,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": []
@@ -6618,6 +7409,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": []
@@ -6665,6 +7463,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -6714,6 +7519,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": []
@@ -6796,6 +7608,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -7218,6 +8037,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -7240,6 +8066,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -7262,6 +8095,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -7285,6 +8125,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -7307,6 +8154,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -7328,6 +8182,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -7349,6 +8210,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -7371,6 +8239,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -7407,6 +8282,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -7457,6 +8339,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -7506,6 +8395,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -7555,6 +8451,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -7605,6 +8508,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -7654,6 +8564,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": []
@@ -7701,6 +8618,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": []
@@ -7748,6 +8672,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -7797,6 +8728,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": []
@@ -7879,6 +8817,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -7921,6 +8866,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -7964,6 +8916,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -8007,6 +8966,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -8051,6 +9017,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -8094,6 +9067,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ],
    [
     "support_top_z_distance",
@@ -8143,6 +9123,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -8185,6 +9172,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -8228,6 +9222,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -8306,6 +9307,13 @@
     "topbottom",
     "saves",
     "Strength 2/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 2/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -8335,6 +9343,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -8363,6 +9378,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -8391,6 +9413,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -8420,6 +9449,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -8448,6 +9484,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ],
    [
     "support_top_z_distance",
@@ -8481,6 +9524,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": []
@@ -8507,6 +9557,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -8535,6 +9592,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": []
@@ -8575,6 +9639,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -8962,6 +10033,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -9011,6 +10089,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -9060,6 +10145,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -9110,6 +10202,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -9159,6 +10258,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ],
    [
     "support_top_z_distance",
@@ -9213,6 +10319,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": []
@@ -9260,6 +10373,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -9309,6 +10429,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": []
@@ -9391,6 +10518,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -9883,6 +11017,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -9907,6 +11048,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -9931,6 +11079,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -9956,6 +11111,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -9980,6 +11142,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ],
    [
     "support_top_z_distance",
@@ -10010,6 +11179,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -10033,6 +11209,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -10057,6 +11240,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -10097,6 +11287,13 @@
     "topbottom",
     "saves",
     "Strength 1/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 1/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ]
   ],
   "notes": [
@@ -10149,6 +11346,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ],
    [
     "support_interface_top_layers",
@@ -10207,6 +11411,13 @@
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ],
    [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
+   ],
+   [
     "support_interface_top_layers",
     "2",
     "1",
@@ -10261,6 +11472,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ],
    [
     "support_interface_top_layers",
@@ -10320,6 +11538,13 @@
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ],
    [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
+   ],
+   [
     "support_interface_top_layers",
     "2",
     "1",
@@ -10376,6 +11601,13 @@
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ],
    [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
+   ],
+   [
     "support_top_z_distance",
     "0.2",
     "0.25",
@@ -10428,6 +11660,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ],
    [
     "support_interface_top_layers",
@@ -10484,6 +11723,13 @@
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
    ],
    [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
+   ],
+   [
     "support_interface_top_layers",
     "2",
     "1",
@@ -10538,6 +11784,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ],
    [
     "support_interface_top_layers",
@@ -10634,6 +11887,13 @@
     "topbottom",
     "saves",
     "Strength 0/5: gap fill only on top and bottom surfaces, not on internal solid infill."
+   ],
+   [
+    "infill_combination",
+    "0",
+    "1",
+    "time",
+    "Strength 0/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height."
    ],
    [
     "support_interface_top_layers",

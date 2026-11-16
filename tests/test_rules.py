@@ -72,9 +72,10 @@ VARIANTS = {
                      "internal_solid_infill_speed": "100,100", "ironing_type": "top", "infill_combination": "0"},
 }
 MATERIALS = ["PLA", "PLA Silk", "PETG", "ABS", "ASA", "TPU", "PA-CF", "PC", "PVA", "XYZ"]
-# Settings the plugin must never suggest: time-only settings (the time mode was removed) and
-# rules removed by the certainty rule.
-NEVER_SUGGESTED = {"layer_height", "infill_combination", "ironing_type", "inner_wall_speed",
+# Settings the plugin must never suggest: time settings of the removed "Save time" mode that change
+# quality or speed (infill combination came back as a time rule, 0.1.6), and rules removed by the
+# certainty rule.
+NEVER_SUGGESTED = {"layer_height", "ironing_type", "inner_wall_speed", "wall_generator",
                    "sparse_infill_speed", "internal_solid_infill_speed", "support_on_build_plate_only"}
 
 
@@ -801,6 +802,96 @@ class ContainerTest(unittest.TestCase):
         liquid = lambda purpose: [n for n in fs.suggest(dict(BASE), purpose, 2, 3, 3, "PLA", "PLA")["notes"] if "liquid" in n]
         self.assertEqual(len(liquid("container")), 1)
         self.assertEqual(liquid("functional"), [])
+
+
+class TrialTest(unittest.TestCase):
+    """The "worth a try" section: off by default, never where it has caused problems, with alerts."""
+
+    def _run(self, wall="classic", purpose="decoration", trials=True, nozzle="0.4", answers=None):
+        current = {**BASE, "wall_generator": wall, "nozzle_diameter": nozzle}
+        return fs.suggest(current, purpose, 2, 3, 3, "PLA", "PLA", trials=trials, answers=answers)
+
+    def _trial_rows(self, **kw):
+        return [(c["key"], c["suggested"]) for c in self._run(**kw)["changes"] if c["effect"] == "trial"]
+
+    def test_off_by_default(self):
+        current = {**BASE, "wall_generator": "classic"}
+        self.assertEqual([c for c in fs.suggest(current, "decoration", 2, 3, 3, "PLA", "PLA")["changes"]
+                          if c["key"] == "wall_generator"], [])
+
+    def test_offered_when_turned_on(self):
+        self.assertEqual(self._trial_rows(), [("wall_generator", "arachne")])
+        self.assertEqual(self._trial_rows(wall="arachne"), [])
+
+    def test_never_where_it_has_caused_problems_or_in_vase_mode(self):
+        self.assertEqual(self._trial_rows(purpose="miniature"), [])
+        self.assertEqual(self._trial_rows(nozzle="0.6"), [])
+        self.assertEqual(self._trial_rows(answers={"vase": True}), [])
+
+    def test_alert_when_on_where_it_hurts_even_with_the_section_off(self):
+        self.assertEqual(len(self._run(wall="arachne", purpose="miniature", trials=False)["trial_alerts"]), 1)
+        self.assertIn("0.6", self._run(wall="arachne", nozzle="0.6", trials=False)["trial_alerts"][0])
+        self.assertEqual(self._run(wall="arachne")["trial_alerts"], [])
+        self.assertEqual(self._run(wall="classic", purpose="miniature")["trial_alerts"], [])
+
+    def test_switch_is_saved_and_off_drops_only_unapplied_rows(self):
+        storage = tempfile.mkdtemp()
+        fs.orca.host = types.SimpleNamespace(plugin=types.SimpleNamespace(storage=lambda: storage))
+        try:
+            self.assertFalse(fs.trials_enabled())
+            page = fs.FilamentSaverPage()
+            page.result = {"changes": [{"key": "wall_generator", "effect": "trial", "status": "pending"},
+                                       {"key": "x", "effect": "trial", "status": "applied"},
+                                       {"key": "wall_loops", "effect": "saves", "status": "pending"}]}
+            page._set_trials({"enabled": True})
+            self.assertTrue(fs.trials_enabled())
+            page._set_trials({"enabled": False})
+            self.assertFalse(fs.trials_enabled())
+            self.assertEqual([c["key"] for c in page.result["changes"]], ["x", "wall_loops"])
+        finally:
+            del fs.orca.host
+            shutil.rmtree(storage)
+
+
+class TimeRulesTest(unittest.TestCase):
+    """Orca features that only shorten the print: shown as "saves time", never when the key is missing."""
+    TIME = {"wall_generator": "classic", "infill_combination": "0", "reduce_infill_retraction": "0",
+            "wipe_tower_sparse_layers_combination": "0", "enable_prime_tower": "1",
+            "detect_narrow_internal_solid_infill": "0"}
+
+    def _time(self, extra=None, strength=1, material="PLA", filaments=2, answers=None):
+        current = {**BASE, **self.TIME, **(extra or {})}
+        changes = fs.suggest(current, "decoration", strength, 3, 3, material, material, filaments=filaments,
+                             answers=answers)["changes"]
+        return {c["key"]: (c["suggested"], c["effect"]) for c in changes if c["effect"] == "time"}
+
+    def test_three_as_time_and_never_arachne(self):
+        # Arachne was measured slower and heavier on a miniature (+7% time, +4% filament): not certain.
+        self.assertEqual(self._time(), {"infill_combination": ("1", "time"),
+                                        "reduce_infill_retraction": ("1", "time"),
+                                        "detect_narrow_internal_solid_infill": ("1", "time"),
+                                        "wipe_tower_sparse_layers_combination": ("1", "time")})
+
+    def test_already_on_or_missing_is_left_alone(self):
+        on = {"infill_combination": "1", "reduce_infill_retraction": "1", "detect_narrow_internal_solid_infill": "1",
+              "wipe_tower_sparse_layers_combination": "1"}
+        self.assertEqual(self._time(on), {})
+        current = {k: v for k, v in {**BASE, **self.TIME}.items() if k not in on}  # an Orca without these settings
+        self.assertFalse({c["key"] for c in fs.suggest(current, "decoration", 1, 3, 3, "PLA", "PLA", filaments=2)["changes"]} & set(on))
+
+    def test_infill_combination_only_for_low_strength_and_not_tpu(self):
+        self.assertNotIn("infill_combination", self._time(strength=3))
+        self.assertNotIn("infill_combination", self._time(material="TPU"))
+
+    def test_tower_combining_only_where_orca_uses_it(self):
+        for extra in ({"enable_prime_tower": "0"}, {"wipe_tower_no_sparse_layers": "1"}, {"timelapse_type": "1"},
+                      {"enable_wrapping_detection": "1"}):
+            self.assertNotIn("wipe_tower_sparse_layers_combination", self._time(extra), extra)
+        self.assertNotIn("wipe_tower_sparse_layers_combination", self._time(filaments=1))
+
+    def test_vase_drops_the_infill_and_wall_rules(self):
+        self.assertFalse(set(self._time(answers={"vase": True})) & {"infill_combination", "reduce_infill_retraction",
+                                                                     "detect_narrow_internal_solid_infill"})
 
 
 class MiniatureTest(unittest.TestCase):

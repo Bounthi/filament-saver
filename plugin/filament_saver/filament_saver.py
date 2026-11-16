@@ -59,6 +59,7 @@ PRICES_FILE = "prices.json"
 FORMS_FILE = "forms.json"
 CURRENCY_FILE = "currency.json"
 RATES_FILE = "rates.json"
+TRIALS_FILE = "trials.json"  # {"enabled": bool}: the "worth a try" section, off until the user turns it on
 # Exchange rates: Frankfurter, free and keyless, with the European Central Bank's daily reference
 # rates. Only currency codes are sent, and only after the user allows it in the tab.
 RATES_HOST = "https://api.frankfurter.dev"
@@ -188,7 +189,8 @@ VASE_REQUIRES = [("wall_loops", "1"), ("top_shell_layers", "0"), ("sparse_infill
                  ("overhang_reverse", "0"), ("timelapse_type", "0"), ("enable_wrapping_detection", "0")]
 VASE_DROPS = ("sparse_infill_pattern", "top_shell_thickness", "top_surface_density",
               "only_one_wall_top", "minimum_sparse_infill_area", "ensure_vertical_shell_thickness",
-              "flush_into_infill", "flush_into_support")
+              "flush_into_infill", "flush_into_support", "infill_combination", "reduce_infill_retraction",
+              "detect_narrow_internal_solid_infill")
 
 # Part materials that bond poorly to each other: where they meet inside one part, it can split.
 # Only a note; which filament prints which part is not known to the plugin.
@@ -225,6 +227,10 @@ SETTINGS = [
     ("gap_fill_target", "Apply gap fill"),
     ("only_one_wall_top", "Only one wall on top surfaces"),
     ("only_one_wall_first_layer", "Only one wall on first layer"),
+    ("wall_generator", "Wall generator"),
+    ("infill_combination", "Infill combination"),
+    ("reduce_infill_retraction", "Reduce infill retraction"),
+    ("detect_narrow_internal_solid_infill", "Detect narrow internal solid infills"),
     ("detect_thin_wall", "Detect thin walls"),
     ("overhang_reverse", "Reverse on even"),
     ("brim_type", "Brim type"),
@@ -245,6 +251,7 @@ SETTINGS = [
     ("support_interface_spacing", "Support top interface spacing"),
     ("support_top_z_distance", "Support top Z distance"),
     ("prime_tower_brim_width", "Prime tower brim width"),
+    ("wipe_tower_sparse_layers_combination", "Combine sparse layers (prime tower)"),
     ("flush_into_infill", "Purge into objects' infill"),
     ("flush_into_support", "Purge into objects' support"),
     ("timelapse_type", "Timelapse"),
@@ -258,11 +265,14 @@ UNITS = {"brim_width": "mm", "support_top_z_distance": "mm", "support_threshold_
 BOOL_KEYS = {"only_one_wall_top", "support_remove_small_overhang", "only_one_wall_first_layer",
              "flush_into_infill", "flush_into_support", "spiral_mode"}
 # On/off settings shown as On/Off whose effect on filament depends on the case.
-SWITCH_KEYS = BOOL_KEYS | {"enable_support", "detect_thin_wall", "overhang_reverse", "enable_wrapping_detection"}
+SWITCH_KEYS = BOOL_KEYS | {"enable_support", "detect_thin_wall", "overhang_reverse", "enable_wrapping_detection",
+                           "infill_combination", "reduce_infill_retraction", "wipe_tower_sparse_layers_combination",
+                           "detect_narrow_internal_solid_infill"}
 # Enum values shown with a name instead of Orca's stored value.
 # Orca's own names for setting values (PrintConfig.cpp enum_labels), shown instead of the stored value.
 VALUE_NAMES = {
     "timelapse_type": {"0": "Traditional", "1": "Smooth"},
+    "wall_generator": {"classic": "Classic", "arachne": "Arachne"},
     "brim_type": {"auto_brim": "Auto", "brim_ears": "Mouse ear", "painted": "Painted", "outer_only": "Outer brim only",
                   "inner_only": "Inner brim only", "outer_and_inner": "Outer and inner brim", "no_brim": "No-brim",
                   "leading_edge_only": "Leading edge only"},
@@ -292,7 +302,7 @@ def value_name(key, value, t):
 HIGHER_SAVES = {"support_top_z_distance", "support_base_pattern_spacing", "support_interface_spacing"}
 # Extra process keys the engine reads but never changes.
 CONTEXT_KEYS = ["support_type", "layer_height", "enable_prime_tower", "draft_shield", "print_sequence",
-                "support_on_build_plate_only"]
+                "support_on_build_plate_only", "wipe_tower_no_sparse_layers"]
 # Process keys that give part features their own filament (1-based; 0 means the object's filament).
 FEATURE_FILAMENT_KEYS = ("wall_filament", "sparse_infill_filament", "solid_infill_filament")
 # Questions only the user can answer (section 6). Unchecked means "not sure": nothing changes.
@@ -374,7 +384,8 @@ def _effect(key, current, target):
 
 
 def suggest(current, purpose, strength, finish, reliability, filament_type="", filament_name="", family=None,
-            answers=None, filaments=1, same_family=True, lang="en", other_filaments=(), support_filament=False):
+            answers=None, filaments=1, same_family=True, lang="en", other_filaments=(), support_filament=False,
+            trials=False):
     """Suggested changes for the current settings.
 
     ``current`` maps setting keys to Orca's string values. ``family`` overrides
@@ -384,7 +395,9 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
     ``other_filaments`` lists (filament_type, preset_name) of the project's other part filaments
     (not support materials): the strictest rule across all of them applies.
     ``lang`` picks the language of labels, reasons and notes (LANGUAGES). ``support_filament`` says
-    whether a support material (PVA, BVOH, or a filament flagged as support) is loaded.
+    whether a support material (PVA, BVOH, or a filament flagged as support) is loaded. ``trials``
+    adds the "worth a try" rows (effect "trial"), which the user must turn on; ``trial_alerts`` is
+    filled either way.
     Returns a list of dicts with key, label, current, suggested, reason and
     effect, in display order, containing only settings that would change.
     """
@@ -470,6 +483,32 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
             and current_tower_brim is not None and current_tower_brim > tower_brim:
         put("prime_tower_brim_width", tower_brim,
             t("%s: %d mm brim around the prime tower; a wider one only matters for tall, narrow towers.") % (r_text, tower_brim))
+    # Time (section 14): Orca features that only shorten the print; the part and the filament stay
+    # the same. A setting the user's Orca does not have is not in current, so it is never suggested.
+    def put_time(key, value, why):
+        put(key, value, why)
+        effects[key] = "time"
+
+    if strength <= 2 and current.get("infill_combination") == "0" and "tpu" not in families:
+        put_time("infill_combination", "1",
+                 t("Strength %d/5: sparse infill is printed every few layers, up to the nozzle width; "
+                   "walls keep the layer height.") % strength)
+    if current.get("reduce_infill_retraction") == "0":
+        put_time("reduce_infill_retraction", "1",
+                 t("No retraction on travels that stay inside the infill, where oozing cannot be seen."))
+    if current.get("detect_narrow_internal_solid_infill") == "0":
+        put_time("detect_narrow_internal_solid_infill", "1",
+                 t("Orca's default: narrow solid areas inside the part are filled with concentric lines, "
+                   "with fewer back-and-forth turns."))
+    # Orca ignores tower layer combining with no sparse layers, smooth timelapse or clumping detection.
+    if filaments > 1 and current.get("enable_prime_tower") == "1" \
+            and current.get("wipe_tower_sparse_layers_combination") == "0" \
+            and "1" not in (current.get("wipe_tower_no_sparse_layers"), current.get("timelapse_type"),
+                            current.get("enable_wrapping_detection")):
+        put_time("wipe_tower_sparse_layers_combination", "1",
+                 t("Prime tower layers with no filament change are printed together as one thicker layer: "
+                   "fewer trips to the tower."))
+
     if holds and (_number(current.get("raft_layers")) or 0) > 0 and eff_r <= 4:
         put("raft_layers", 0, t("You said the part holds on the bed by itself. %s: no raft, which prints several layers under the whole part.") % r_text)
 
@@ -721,6 +760,27 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
             "group": groups.get(key, ""),
             "status": "pending",
         })
+    # Worth a try (section 15): settings whose effect depends on the part, offered only when the user
+    # turned the section on. The alerts warn when one is on where it has caused problems.
+    trial_alerts, harm = [], []
+    if purpose == "miniature":
+        harm.append(t("on a test miniature it made the print slower (+7%) and heavier (+4%)"))
+    if nozzle and nozzle >= 0.6 - 1e-9:
+        harm.append(t("with nozzles of 0.6 mm and up, users report small holes in the top layers"))
+    if current.get("wall_generator") == "arachne" and harm:
+        trial_alerts.append(t("The Arachne wall generator is on, and with this purpose or nozzle it has caused problems: %s. "
+                              "If the slice got slower or the top looks worse, set Wall generator back to Classic.")
+                            % "; ".join(harm))
+    if trials and current.get("wall_generator") == "classic" and not harm and not answers.get("vase"):
+        changes.append({
+            "id": "wall_generator", "key": "wall_generator", "label": t(LABELS["wall_generator"]), "unit": "",
+            "current": "classic", "suggested": "arachne",
+            "reason": t("Can shorten the print on parts with thin walls, text or logos, where Classic spends time on gap fill. "
+                        "On organic parts, such as sculptures and scanned or AI models, it can be slower."),
+            "effect": "trial", "bool": False,
+            "values": {value: t(name) for value, name in VALUE_NAMES["wall_generator"].items()},
+            "group": "", "status": "pending",
+        })
     if family != detected:
         notes.append(t("Using %s instead of the detected %s.") % (label, t(FAMILY_LABELS[detected])))
     if len(families) > 1:
@@ -756,7 +816,7 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
     if "pa" in families:
         notes.append(t("Nylon absorbs moisture: dry the filament before printing."))
     return {"family": family, "family_label": label, "detected": detected, "families": sorted(families),
-            "changes": changes, "notes": notes}
+            "changes": changes, "notes": notes, "trial_alerts": trial_alerts}
 
 
 # --- print estimate from exported G-code -------------------------------------
@@ -998,6 +1058,10 @@ def read_currency(lang):
     price = data.get("price") if data.get("price") in CURRENCIES else ("BRL" if lang == "pt_BR" else "USD")
     display = data.get("display") if data.get("display") in CURRENCIES else price
     return {"price": price, "display": display, "rates_allowed": data.get("rates_allowed") is True}
+
+
+def trials_enabled():
+    return _read_storage_json(TRIALS_FILE).get("enabled") is True
 
 
 def read_rates():
@@ -1643,6 +1707,38 @@ TRANSLATIONS = {
             "Escolha o que você está imprimindo e clique em Sugerir mudanças.",
         "Nothing to change for this profile.": "Nada a mudar para este perfil.",
         "saves filament": "economiza filamento",
+        "saves time": "economiza tempo",
+        "worth a try": "vale testar",
+        "Worth a try": "Vale testar",
+        "These are not recommendations.": "Isto não são recomendações.",
+        "The effect of these settings depends on the part. They can make the print slower, use more filament, change how thin walls, seams and small text look, and with some nozzles leave small holes in the top layers. Apply one at a time, slice again and compare the estimate at the top; if the print got slower, heavier or looks worse, click Undo.":
+            "O efeito destas configurações depende da peça. Elas podem deixar a impressão mais lenta, gastar mais filamento, mudar a aparência de paredes finas, costuras e textos pequenos e, com alguns bicos, deixar pequenos furos nas camadas de topo. Aplique uma por vez, fatie de novo e compare a estimativa no topo; se a impressão ficou mais lenta, mais pesada ou com pior aparência, clique em Desfazer.",
+        "Show settings worth a try": "Mostrar configurações que vale testar",
+        "Click Suggest changes to see the settings worth a try.": "Clique em Sugerir mudanças para ver as configurações que vale testar.",
+        "Wall generator": "Gerador de paredes",
+        "Classic": "Clássico",
+        "Arachne": "Arachne",
+        "Can shorten the print on parts with thin walls, text or logos, where Classic spends time on gap fill. On organic parts, such as sculptures and scanned or AI models, it can be slower.":
+            "Pode encurtar a impressão em peças com paredes finas, textos ou logotipos, onde o Clássico gasta tempo com preenchimento de vão. Em peças orgânicas, como esculturas e modelos escaneados ou de IA, pode ficar mais lenta.",
+        "on a test miniature it made the print slower (+7%) and heavier (+4%)":
+            "numa miniatura de teste ele deixou a impressão mais lenta (+7%) e mais pesada (+4%)",
+        "with nozzles of 0.6 mm and up, users report small holes in the top layers":
+            "com bicos de 0,6 mm ou mais, há relatos de pequenos furos nas camadas de topo",
+        "The Arachne wall generator is on, and with this purpose or nozzle it has caused problems: %s. If the slice got slower or the top looks worse, set Wall generator back to Classic.":
+            "O gerador de paredes Arachne está ligado, e com este propósito ou bico ele já causou problemas: %s. Se o fatiamento ficou mais lento ou o topo piorou, volte o Gerador de paredes para Clássico.",
+        "Save time": "Economizam tempo",
+        "Infill combination": "Combinar preenchimento",
+        "Reduce infill retraction": "Reduzir retração durante o preenchimento",
+        "Detect narrow internal solid infills": "Detectar preenchimentos sólidos internos estreitos",
+        "Orca's default: narrow solid areas inside the part are filled with concentric lines, with fewer back-and-forth turns.":
+            "Padrão do Orca: áreas sólidas estreitas dentro da peça são preenchidas com linhas concêntricas, com menos idas e voltas.",
+        "Combine sparse layers (prime tower)": "Combinar camadas esparsas (torre de purga)",
+        "Strength %d/5: sparse infill is printed every few layers, up to the nozzle width; walls keep the layer height.":
+            "Resistência %d/5: o preenchimento esparso é impresso a cada algumas camadas, até a largura do bico; as paredes mantêm a altura da camada.",
+        "No retraction on travels that stay inside the infill, where oozing cannot be seen.":
+            "Sem retração nas viagens que ficam dentro do preenchimento, onde o vazamento não aparece.",
+        "Prime tower layers with no filament change are printed together as one thicker layer: fewer trips to the tower.":
+            "Camadas da torre de purga sem troca de filamento são impressas juntas, numa camada mais grossa: menos idas à torre.",
         "uses more": "usa mais",
         "Applied": "Aplicada",
         "Undo": "Desfazer",
@@ -1932,6 +2028,8 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
                 self._save_preset(data)
             elif command == "set_currency":
                 self._set_currency(data)
+            elif command == "set_trials":
+                self._set_trials(data)
             elif command == "reset_saved":
                 data = _read_estimates()
                 data.pop("saved", None)
@@ -2039,7 +2137,7 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
                          answers=answers, filaments=context["filament_count"],
                          same_family=context["same_family"], lang=self.lang,
                          other_filaments=context["other_filaments"],
-                         support_filament=context["support_filament"])
+                         support_filament=context["support_filament"], trials=trials_enabled())
         overrides = _object_overrides()
         for change in result["changes"]:
             if overrides.get(change["key"]):
@@ -2073,6 +2171,15 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
         self.stale = False
         self.message = (self._t("%d suggested change(s).") % len(result["changes"])) if result["changes"] \
             else self._t("Your settings already match this profile.")
+
+    def _set_trials(self, data):
+        enabled = data.get("enabled") is True
+        _write_json_atomic(_storage_path(TRIALS_FILE), {"enabled": enabled})
+        if self.result:
+            if not enabled:  # applied rows stay, so they can still be undone
+                self.result["changes"] = [c for c in self.result["changes"]
+                                          if c.get("effect") != "trial" or c["status"] == "applied"]
+            self.message = self._t("Click Suggest changes to see the settings worth a try.") if enabled else ""
 
     def _set_price(self, data):
         """Spool price for one filament preset; an empty price goes back to Orca's filament cost."""
@@ -2560,6 +2667,7 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
             "saved": self._saved_state(currency),
             "prices": _read_prices(),
             "spool_grams": DEFAULT_SPOOL_GRAMS,
+            "trials_enabled": trials_enabled(),
             "message": self.message,
             "error": self.error,
         }
@@ -2576,6 +2684,7 @@ PAGE = r"""<!doctype html>
   --surface: #ffffff; --accent: #00796b; --accent-text: #00796b; --accent-fg: #ffffff; --accent-soft: rgba(0,150,136,.10);
   --save: #157f45; --save-soft: rgba(21,127,69,.11); --cost: #b4480c; --cost-soft: rgba(180,72,12,.11);
   --error: #c53030; --error-soft: rgba(197,48,48,.09); --focus: rgba(0,150,136,.45);
+  --warn: #8a5a00; --warn-soft: rgba(214,158,46,.14);
   --radius: 10px; --shadow: 0 1px 2px rgba(16,24,32,.05);
   font: 13px/1.45 var(--orca-font, system-ui, -apple-system, "Segoe UI", sans-serif);
 }
@@ -2586,6 +2695,7 @@ PAGE = r"""<!doctype html>
   --accent: var(--orca-accent, #26a69a); --accent-text: #4db6ac; --accent-fg: var(--orca-accent-fg, #0f1a19); --accent-soft: rgba(38,166,154,.16);
   --save: #4cc38a; --save-soft: rgba(76,195,138,.14); --cost: #f0965a; --cost-soft: rgba(240,150,90,.14);
   --error: #f07272; --error-soft: rgba(240,114,114,.12); --focus: rgba(38,166,154,.55); --shadow: none;
+  --warn: #e6b450; --warn-soft: rgba(230,180,80,.14);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-orca-theme]) {
@@ -2593,6 +2703,7 @@ PAGE = r"""<!doctype html>
     --surface: rgba(255,255,255,.04); --accent: #26a69a; --accent-text: #4db6ac; --accent-fg: #0f1a19; --accent-soft: rgba(38,166,154,.16);
     --save: #4cc38a; --save-soft: rgba(76,195,138,.14); --cost: #f0965a; --cost-soft: rgba(240,150,90,.14);
     --error: #f07272; --error-soft: rgba(240,114,114,.12); --focus: rgba(38,166,154,.55); --shadow: none;
+    --warn: #e6b450; --warn-soft: rgba(230,180,80,.14);
   }
 }
 * { box-sizing: border-box; }
@@ -2697,6 +2808,16 @@ button.big { padding: 8px 18px; }
 .badge { display: inline-block; font-size: 11px; font-weight: 650; padding: 1px 8px; border-radius: 999px; }
 .badge.saves { background: var(--save-soft); color: var(--save); }
 .badge.costs { background: var(--cost-soft); color: var(--cost); }
+.badge.time { background: var(--accent-soft); color: var(--accent-text); }
+.badge.trial, .step.trial { background: var(--warn-soft); color: var(--warn); }
+.alert { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; margin-bottom: 10px; border-radius: 8px;
+         background: var(--warn-soft); border-left: 4px solid var(--warn); }
+.alert .icon { color: var(--warn); font-weight: 700; }
+.disclaimer { padding: 12px 14px; margin-bottom: 12px; border-radius: 8px; background: var(--warn-soft);
+              border: 1px solid var(--warn); font-size: 13px; line-height: 1.55; }
+.disclaimer strong { color: var(--warn); display: block; margin-bottom: 4px; font-size: 14px; }
+.trial-toggle { font-weight: 600; }
+#trial-changes:not(:empty) { margin-top: 12px; }
 .badge.state { background: var(--bg); color: var(--muted); border: 1px solid var(--line); }
 .done { color: var(--save); font-weight: 650; font-size: 12px; white-space: nowrap; }
 .notes { margin: 16px 0 0; padding: 10px 12px 10px 28px; color: var(--muted); font-size: 12px; background: var(--bg); border-radius: 8px; }
@@ -2781,6 +2902,14 @@ button.big { padding: 8px 18px; }
         <small data-t>Includes your unsaved edits and the applied suggestions. It goes into the Filament Saver group of the process list.</small>
       </div>
     </details>
+  </section>
+
+  <section class="card" aria-labelledby="trials-title">
+    <div class="card-head"><h2 id="trials-title"><span class="step trial" aria-hidden="true">?</span><span data-t>Worth a try</span></h2></div>
+    <div id="trial-alerts"></div>
+    <div class="disclaimer"><strong data-t>These are not recommendations.</strong><span data-t>The effect of these settings depends on the part. They can make the print slower, use more filament, change how thin walls, seams and small text look, and with some nozzles leave small holes in the top layers. Apply one at a time, slice again and compare the estimate at the top; if the print got slower, heavier or looks worse, click Undo.</span></div>
+    <label class="question trial-toggle"><input type="checkbox" id="trials-enabled"><span data-t>Show settings worth a try</span></label>
+    <div class="changes" id="trial-changes"></div>
   </section>
 </div>
 <script>
@@ -2954,19 +3083,23 @@ function renderChanges() {
   $('notes').innerHTML = result ? result.notes.map(n => '<li>' + esc(n) + '</li>').join('') : '';
   const blocked = state.busy || state.stale;
   // Skipped rows stay out of both buttons until "Undo skip".
-  const toApply = result ? result.changes.filter(c => c.status === 'pending' || c.status === 'error') : [];
+  // "Worth a try" rows live in their own card and stay out of every button that acts on many rows.
+  const main = result ? result.changes.filter(c => c.effect !== 'trial') : [];
+  const toApply = main.filter(c => c.status === 'pending' || c.status === 'error');
   $('apply-all').disabled = blocked || !toApply.length;
   $('apply-savings').disabled = blocked || !toApply.some(c => c.effect !== 'costs');
-  $('skip-all').disabled = blocked || !result || !result.changes.some(c => c.status === 'pending');
+  $('skip-all').disabled = blocked || !main.some(c => c.status === 'pending');
   const restorable = state.restorable || [];
   $('restore-all').disabled = state.busy || !restorable.length;
   $('restore-all').textContent = restorable.length ? T('Restore originals ({n})', {n: restorable.length}) : T('Restore originals');
   $('restore-all').title = restorable.map(r => r.label + ': ' + r.original).join('\n');
-  if (!result) return;
+  $('trials-enabled').checked = !!state.trials_enabled;
+  $('trial-alerts').innerHTML = ((result && result.trial_alerts) || []).map(a =>
+    '<div class="alert" role="alert"><span class="icon" aria-hidden="true">⚠</span><span>' + esc(a) + '</span></div>').join('');
+  if (!result) { $('trial-changes').innerHTML = ''; return; }
   const canRestore = new Set(restorable.map(r => r.key));
-  if (!result.changes.length) { list.innerHTML = '<div class="empty">' + esc(T('Nothing to change for this profile.')) + '</div>'; return; }
   const row = c => {
-    const badge = (c.effect ? '<span class="badge ' + c.effect + '">' + esc(T(c.effect === 'saves' ? 'saves filament' : 'uses more')) + '</span>' : '') +
+    const badge = (c.effect ? '<span class="badge ' + c.effect + '">' + esc(T({saves: 'saves filament', time: 'saves time', costs: 'uses more', trial: 'worth a try'}[c.effect])) + '</span>' : '') +
       (c.group === 'vase' ? '<span class="badge state">' + esc(T('vase mode, applied together')) + '</span>' : '');
     let actions;
     if (c.status === 'applied') actions = '<span class="done">✓ ' + esc(T('Applied')) + '</span>' + (canRestore.has(c.key)
@@ -2981,13 +3114,16 @@ function renderChanges() {
       '<div class="values"><span class="from">' + esc(fmtValue(c, c.current)) + '</span><span class="arrow" aria-hidden="true">→</span><span class="to">' + esc(fmtValue(c, c.suggested)) + '</span></div>' +
       '<div class="why">' + esc(c.reason) + '</div>' + overridden + err + '</div><div class="row-actions">' + actions + '</div></div>';
   };
+  $('trial-changes').innerHTML = result.changes.filter(c => c.effect === 'trial').map(row).join('');
+  if (!main.length) { list.innerHTML = '<div class="empty">' + esc(T('Nothing to change for this profile.')) + '</div>'; return; }
   // Increases only show up when the current value is below what the purpose or the material
   // needs; they get their own section so "Apply savings" never raises filament use.
-  const savings = result.changes.filter(c => c.effect !== 'costs');
-  const needed = result.changes.filter(c => c.effect === 'costs');
+  const savings = main.filter(c => c.effect !== 'costs' && c.effect !== 'time');
+  const faster = main.filter(c => c.effect === 'time');
+  const needed = main.filter(c => c.effect === 'costs');
   const section = (title, hint, rows) => !rows.length ? '' : '<div class="section"><div class="section-title">' + esc(title) +
     '</div>' + (hint ? '<div class="hint">' + esc(hint) + '</div>' : '') + rows.map(row).join('') + '</div>';
-  list.innerHTML = section(T('Save filament'), '', savings) +
+  list.innerHTML = section(T('Save filament'), '', savings) + section(T('Save time'), '', faster) +
     section(T('Needed for the purpose or the material'),
             T('Your current value is below what the purpose or the material needs. Apply all also applies these.'), needed);
 }
@@ -3053,14 +3189,19 @@ $('questions').addEventListener('change', e => {
 for (const k of ['S', 'V', 'R']) $(k).addEventListener('input', e => { form[k] = Number(e.target.value); $(k + '-out').textContent = form[k]; });
 $('suggest').addEventListener('click', () => send(Object.assign({cmd: 'suggest'}, form)));
 $('apply-savings').addEventListener('click', () => {
-  const ids = state.result.changes.filter(c => (c.status === 'pending' || c.status === 'error') && c.effect !== 'costs').map(c => c.id);
+  const ids = state.result.changes.filter(c => (c.status === 'pending' || c.status === 'error') && c.effect !== 'costs' && c.effect !== 'trial').map(c => c.id);
   if (ids.length) send({cmd: 'apply', ids});
 });
 $('apply-all').addEventListener('click', () => {
-  const ids = state.result.changes.filter(c => c.status === 'pending' || c.status === 'error').map(c => c.id);
+  const ids = state.result.changes.filter(c => (c.status === 'pending' || c.status === 'error') && c.effect !== 'trial').map(c => c.id);
   if (ids.length) send({cmd: 'apply', ids});
 });
-$('skip-all').addEventListener('click', () => send({cmd: 'skip', ids: state.result.changes.filter(c => c.status === 'pending').map(c => c.id)}));
+$('skip-all').addEventListener('click', () => send({cmd: 'skip', ids: state.result.changes.filter(c => c.status === 'pending' && c.effect !== 'trial').map(c => c.id)}));
+$('trials-enabled').addEventListener('change', e => send({cmd: 'set_trials', enabled: e.target.checked}));
+$('trial-changes').addEventListener('click', e => {
+  const b = e.target.closest('[data-act]');
+  if (b && !b.disabled) send({cmd: b.dataset.act, ids: [b.dataset.id]});
+});
 $('restore-all').addEventListener('click', () => send({cmd: 'restore'}));
 $('save-preset').addEventListener('click', () => {
   const name = $('preset-name').value.trim() || $('preset-name').placeholder;
