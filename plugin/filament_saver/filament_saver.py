@@ -761,17 +761,9 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
             "status": "pending",
         })
     # Worth a try (section 15): settings whose effect depends on the part, offered only when the user
-    # turned the section on. The alerts warn when one is on where it has caused problems.
-    trial_alerts, harm = [], []
-    if purpose == "miniature":
-        harm.append(t("on a test miniature it made the print slower (+7%) and heavier (+4%)"))
-    if nozzle and nozzle >= 0.6 - 1e-9:
-        harm.append(t("with nozzles of 0.6 mm and up, users report small holes in the top layers"))
-    if current.get("wall_generator") == "arachne" and harm:
-        trial_alerts.append(t("The Arachne wall generator is on, and with this purpose or nozzle it has caused problems: %s. "
-                              "If the slice got slower or the top looks worse, set Wall generator back to Classic.")
-                            % "; ".join(harm))
-    if trials and current.get("wall_generator") == "classic" and not harm and not answers.get("vase"):
+    # turned the section on, and never where they have caused problems.
+    if trials and current.get("wall_generator") == "classic" and not _arachne_harm(current, purpose, t) \
+            and not answers.get("vase"):
         changes.append({
             "id": "wall_generator", "key": "wall_generator", "label": t(LABELS["wall_generator"]), "unit": "",
             "current": "classic", "suggested": "arachne",
@@ -816,7 +808,28 @@ def suggest(current, purpose, strength, finish, reliability, filament_type="", f
     if "pa" in families:
         notes.append(t("Nylon absorbs moisture: dry the filament before printing."))
     return {"family": family, "family_label": label, "detected": detected, "families": sorted(families),
-            "changes": changes, "notes": notes, "trial_alerts": trial_alerts}
+            "changes": changes, "notes": notes, "trial_alerts": trial_alerts(current, purpose, t)}
+
+
+def _arachne_harm(current, purpose, t):
+    """Why Arachne hurts with this purpose or nozzle; empty when nothing is known against it."""
+    harm = []
+    if purpose == "miniature":
+        harm.append(t("on a test miniature it made the print slower (+7%) and heavier (+4%)"))
+    nozzle = _number(str(current.get("nozzle_diameter") or "").split(",")[0])
+    if nozzle and nozzle >= 0.6 - 1e-9:
+        harm.append(t("with nozzles of 0.6 mm and up, users report small holes in the top layers"))
+    return harm
+
+
+def trial_alerts(current, purpose, t):
+    """Alerts for a "worth a try" setting that is on where it has caused problems, shown even with
+    the section off. Worked out again on every state, so an Apply or Restore updates them."""
+    harm = _arachne_harm(current, purpose, t)
+    if current.get("wall_generator") == "arachne" and harm:
+        return [t("The Arachne wall generator is on, and with this purpose or nozzle it has caused problems: %s. "
+                  "If the slice got slower or the top looks worse, set Wall generator back to Classic.") % "; ".join(harm)]
+    return []
 
 
 # --- print estimate from exported G-code -------------------------------------
@@ -2166,10 +2179,11 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
                                                   "filament in vase mode (%s).") % ", ".join(use["mixed"]))
         self.result = result
         self.basis = {"current": dict(context["current"]), "filaments": list(context["filament_names"]),
-                      "used": context["used_filaments"]}
+                      "used": context["used_filaments"], "purpose": purpose}
         self.source = context["selected"].name
         self.stale = False
-        self.message = (self._t("%d suggested change(s).") % len(result["changes"])) if result["changes"] \
+        main = [c for c in result["changes"] if c["effect"] != "trial"]  # worth-a-try rows are not suggestions
+        self.message = (self._t("%d suggested change(s).") % len(main)) if main \
             else self._t("Your settings already match this profile.")
 
     def _set_trials(self, data):
@@ -2645,6 +2659,10 @@ class FilamentSaverPage(orca.pages.PagesPluginCapabilityBase):
 
     def _state(self):
         currency = self._currency_state()
+        if self.result is not None and self.basis:
+            # basis["current"] follows every Apply and Restore, so a stale alert never stays up.
+            self.result["trial_alerts"] = trial_alerts(self.basis["current"], self.basis.get("purpose"),
+                                                       translator(self.lang))
         return {
             "type": "state",
             "info": getattr(self, "info", {}),

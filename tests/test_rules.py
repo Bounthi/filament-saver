@@ -834,6 +834,22 @@ class TrialTest(unittest.TestCase):
         self.assertEqual(self._run(wall="arachne")["trial_alerts"], [])
         self.assertEqual(self._run(wall="classic", purpose="miniature")["trial_alerts"], [])
 
+    def test_alert_follows_apply_and_restore(self):
+        """Found in Orca: the alert stayed up after Restore put Classic back."""
+        storage = tempfile.mkdtemp()
+        fs.orca.host = types.SimpleNamespace(plugin=types.SimpleNamespace(storage=lambda: storage))
+        try:
+            page = fs.FilamentSaverPage()
+            page.mode = lambda: "in_place"
+            page.result = {"changes": [], "notes": [], "trial_alerts": []}
+            page.basis = {"current": {"wall_generator": "arachne", "nozzle_diameter": "0.4"}, "purpose": "miniature"}
+            self.assertEqual(len(page._state()["result"]["trial_alerts"]), 1)
+            page.basis["current"]["wall_generator"] = "classic"  # what Restore does to the basis
+            self.assertEqual(page._state()["result"]["trial_alerts"], [])
+        finally:
+            del fs.orca.host
+            shutil.rmtree(storage)
+
     def test_switch_is_saved_and_off_drops_only_unapplied_rows(self):
         storage = tempfile.mkdtemp()
         fs.orca.host = types.SimpleNamespace(plugin=types.SimpleNamespace(storage=lambda: storage))
